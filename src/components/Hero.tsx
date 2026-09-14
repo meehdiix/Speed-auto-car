@@ -41,8 +41,10 @@ export default function Hero() {
             الوسيط الأول لاستيراد السيارات
           </motion.div>
           
-          <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-signature text-white leading-[1.1] mb-6 sm:mb-5 drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
-            Speed Auto Car
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bruno font-bold tracking-wider sm:tracking-widest uppercase text-white leading-tight mb-5 sm:mb-4 drop-shadow-[0_4px_20px_rgba(0,0,0,0.85)]">
+            <span className="text-white">Speed </span>
+            <span className="text-red-500">Auto </span>
+            <span className="text-white">Car</span>
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-white/90 font-medium leading-relaxed mb-20 sm:mb-16 max-w-[95%] sm:max-w-2xl mx-auto drop-shadow-lg">
             من الصين إلى الجزائر. أنت تمول، ونحن نتكفل بالبحث، الفحص، والشراء لضمان وصول سيارتك بأفضل حالة وأنسب سعر.
@@ -50,7 +52,7 @@ export default function Hero() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full px-4">
             <a 
-              href="tel:0564507370"
+              href="tel:0541399342"
               className="px-5 py-2.5 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white rounded-full font-bold text-xs sm:text-sm transition-all shadow-[0_4px_24px_rgba(239,68,68,0.2)] flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Phone className="w-3.5 h-3.5"/>

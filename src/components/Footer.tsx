@@ -2,7 +2,6 @@ import { Phone, MapPin, Instagram, Facebook, MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom';
 import { WhatsappIcon } from './WhatsappIcon';
 
-
 const TiktokIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.24-2.37.75-4.81 2.66-6.22 1.25-.94 2.82-1.41 4.39-1.38v4.06c-1.3.06-2.52.79-3.14 1.91-.65 1.13-.59 2.64.2 3.69.75.99 2.05 1.48 3.28 1.35 1.83-.2 3.17-1.89 3.16-3.75-.02-5.46-.01-10.91-.01-16.37Z" />
@@ -16,7 +15,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-right relative">
           <div className="col-span-1 md:col-span-2">
-            <h2 className="text-3xl font-signature font-normal mb-4" dir="ltr">
+            <h2 className="text-2xl sm:text-3xl font-bruno font-bold tracking-wider uppercase mb-4" dir="ltr">
               <span className="text-white">Speed</span> <span className="text-red-500">Auto</span>
             </h2>
             <p className="text-white/70 mb-6 max-w-md font-medium leading-relaxed text-base md:text-lg">
@@ -29,7 +28,7 @@ export default function Footer() {
               <a href="https://www.tiktok.com/@wadieabid" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 hover:bg-red-600 hover:text-white transition-colors shadow-sm">
                 <TiktokIcon className="w-6 h-6" />
               </a>
-              <a href="https://wa.me/213564507370" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-green-600/20 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-600 hover:text-white transition-colors shadow-sm">
+              <a href="https://wa.me/213541399342" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-green-600/20 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-600 hover:text-white transition-colors shadow-sm" title="واتساب">
                 <WhatsappIcon className="w-6 h-6" />
               </a>
             </div>
@@ -53,7 +52,7 @@ export default function Footer() {
                 </div>
                 <div>
                    <p className="text-white/50 text-sm mb-1">الهاتف / واتساب</p>
-                   <a href="tel:0564507370" className="text-white font-bold hover:text-red-400 transition-colors inline-block tracking-wide text-lg" dir="ltr">0564 50 73 70</a>
+                   <a href="tel:0541399342" className="text-white font-bold hover:text-red-400 transition-colors inline-block tracking-wide text-lg" dir="ltr">0541 39 93 42</a>
                 </div>
               </li>
               <li className="flex items-start gap-4">
@@ -62,7 +61,10 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white/50 text-sm mb-1">الموقع</p>
-                  <a href="https://maps.app.goo.gl/uqyL7KUvZJmtZNm6A?g_st=ic" target="_blank" rel="noreferrer" className="text-white font-bold text-lg hover:text-red-400 transition-colors block">الجزائر (عرض الخريطة)</a>
+                  <a href="https://maps.app.goo.gl/uqyL7KUvZJmtZNm6A?g_st=ic" target="_blank" rel="noreferrer" className="text-white font-bold text-base hover:text-red-400 transition-colors block leading-snug">
+                    عين الصحراء تقرت - بلوك رقم 547
+                    <span className="block text-xs text-red-400 font-medium mt-1">(عرض على الخريطة)</span>
+                  </a>
                 </div>
               </li>
             </ul>

@@ -1,6 +1,5 @@
 import { motion } from 'motion/react';
-import { Target, Search, FileCheck, Ship, MessageCircle, Phone } from 'lucide-react';
-import { WhatsappIcon } from '../components/WhatsappIcon';
+import { Target, Search, FileCheck, Ship, Phone, PhoneCall } from 'lucide-react';
 
 export default function About() {
   return (
@@ -13,7 +12,7 @@ export default function About() {
       >
         <h1 className="text-5xl md:text-6xl font-bold text-white mb-8"><span className="font-amiri text-red-400 font-normal">كيف</span> نعمل؟</h1>
         <p className="text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed font-bold">
-          نحن في <span className="font-signature font-normal text-red-400">Speed Auto Car</span> نلعب دور الوسيط الآمن بينك وبين أسواق السيارات في الصين. لا نبيع السيارات بأنفسنا، بل نشتريها لك بأموالك الخاصة بعد التأكد من جودتها.
+          نحن في <span className="font-bruno font-bold text-red-500 tracking-wider uppercase px-1">Speed Auto Car</span> نلعب دور الوسيط الآمن بينك وبين أسواق السيارات في الصين. لا نبيع السيارات بأنفسنا، بل نشتريها لك بأموالك الخاصة بعد التأكد من جودتها.
         </p>
       </motion.section>
 
@@ -30,11 +29,11 @@ export default function About() {
           >
             <div className="absolute -top-6 -right-6 w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-lg">1</div>
             <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
-              <WhatsappIcon className="w-10 h-10" />
+              <PhoneCall className="w-10 h-10 text-red-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-4">الطلب والاستفسار</h3>
             <p className="text-white/70 text-lg leading-relaxed">
-              تتواصل معنا عبر واتساب وتخبرنا بنوع السيارة التي تريدها (ماركة، سنة، ميزانية).
+              تتصل بنا مباشرة هاتفياً وتخبرنا بنوع السيارة التي تريدها (ماركة، سنة، ميزانية).
             </p>
           </motion.div>
 
@@ -108,7 +107,7 @@ export default function About() {
             نحن هنا للإجابة على كافة استفساراتك وتسهيل كل خطوة في رحلتك.
           </p>
           <a
-            href="tel:0564507370"
+            href="tel:0541399342"
             className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold text-lg transition-all shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:-translate-y-1"
           >
             <Phone className="w-5 h-5"/>

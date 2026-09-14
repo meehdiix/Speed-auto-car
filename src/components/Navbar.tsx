@@ -31,7 +31,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const [phoneNumber, setPhoneNumber] = useState('0564507370');
+  const [phoneNumber, setPhoneNumber] = useState('0541399342');
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -61,13 +61,13 @@ export default function Navbar() {
           {/* Logo: Full 'SpeedAutoCar' on Desktop/PC, 'HM' on Mobile */}
           <Link to="/" dir="ltr" className="flex items-center relative z-10 font-normal tracking-wide hover:opacity-90 transition-opacity">
             {/* Desktop Brand */}
-            <span className="hidden md:flex items-center font-signature text-xl lg:text-2xl">
+            <span className="hidden md:flex items-center font-bruno font-bold tracking-wider text-base lg:text-[17px] uppercase">
               <span className="text-white">Speed</span>
-              <span className="text-red-500 ml-1">Auto</span>
+              <span className="text-red-500 ml-1.5">Auto</span>
             </span>
 
-            {/* Mobile HM Monogram */}
-            <span className="md:hidden flex items-center font-signature text-xl">
+            {/* Mobile SA Monogram */}
+            <span className="md:hidden flex items-center font-bruno font-bold text-lg uppercase tracking-wider">
               <span className="text-white">S</span>
               <span className="text-red-500 ml-0.5">A</span>
             </span>

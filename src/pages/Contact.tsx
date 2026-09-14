@@ -1,6 +1,5 @@
 import { motion } from 'motion/react';
-import { Phone, MapPin, MessageCircle, Send } from 'lucide-react';
-import { WhatsappIcon } from '../components/WhatsappIcon';
+import { Phone, MapPin, PhoneCall } from 'lucide-react';
 
 export default function Contact() {
   return (
@@ -9,35 +8,38 @@ export default function Contact() {
       <motion.section 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-20"
+        className="text-center mb-16"
       >
         <h1 className="text-5xl md:text-6xl font-bold text-white mb-6"><span className="font-amiri text-red-400 font-normal">تواصل</span> معنا</h1>
-        <p className="text-2xl text-white/70 max-w-3xl mx-auto leading-relaxed font-medium">
-          أسرع طريقة للتواصل معنا هي عبر واتساب. نحن متواجدون للرد على استفساراتك حول السيارات وعملية الاستيراد.
+        <p className="text-xl md:text-2xl text-white/75 max-w-3xl mx-auto leading-relaxed font-medium">
+          نفضل دائماً الاتصال الهاتفي المباشر لنمنحك المعلومة الدقيقة فوراً ونجيب على كل تساؤلاتك حول السيارات وعملية الاستيراد بدون أي تضييع للوقت.
         </p>
       </motion.section>
 
-      {/* 2. Important Contact Method (WhatsApp) */}
+      {/* 2. Direct Call Action Banner */}
       <motion.section 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
-        className="max-w-4xl mx-auto mb-20 bg-green-500 text-white rounded-[3rem] p-10 md:p-16 text-center shadow-[0_10px_40px_rgba(34,197,94,0.4)] relative overflow-hidden"
+        className="max-w-4xl mx-auto mb-20 bg-gradient-to-br from-red-600 to-red-800 text-white rounded-[3rem] p-10 md:p-16 text-center shadow-[0_10px_40px_rgba(239,68,68,0.35)] relative overflow-hidden border border-red-500/40"
       >
-        <div className="absolute -top-20 -right-20 opacity-20">
-          <WhatsappIcon className="w-64 h-64" />
+        <div className="absolute -top-16 -right-16 opacity-10 pointer-events-none">
+          <PhoneCall className="w-64 h-64 text-white" />
         </div>
         <div className="relative z-10 flex flex-col items-center">
-          <WhatsappIcon className="w-20 h-20 mb-8" />
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">استفسر براحة <span className="font-amiri text-red-400 font-normal">تامة</span></h2>
-          <p className="text-xl md:text-2xl font-bold mb-10 text-white/90">اضغط على الزر أدناه وسيحولك مباشرة إلى محادثة معنا عبر واتساب.</p>
+          <div className="w-20 h-20 bg-white/15 rounded-full flex items-center justify-center mb-8 backdrop-blur-md border border-white/20 shadow-inner">
+            <PhoneCall className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">اتصل بنا <span className="font-amiri text-white/90 font-normal">مباشرة</span></h2>
+          <p className="text-lg md:text-xl font-medium mb-10 text-white/90 max-w-2xl">
+            للحصول على استشارة فورية وشاملة حول توفر السيارات، الأسعار الإجمالية، والشروع في عملية الشراء.
+          </p>
           <a 
-            href="https://wa.me/213564507370" 
-            target="_blank" 
-            rel="noreferrer"
-            className="bg-white text-green-600 px-10 py-5 rounded-full font-bold text-2xl hover:bg-gray-100 transition-all shadow-lg inline-block"
+            href="tel:0541399342" 
+            className="bg-white text-red-600 hover:bg-neutral-100 px-8 sm:px-12 py-4 sm:py-5 rounded-full font-bold text-xl sm:text-2xl transition-all shadow-xl inline-flex items-center gap-3 active:scale-95 hover:scale-105"
           >
-            تحدث معنا على واتساب
+            <Phone className="w-6 h-6 sm:w-7 sm:h-7" />
+            <span dir="ltr" className="tracking-wider">0541 39 93 42</span>
           </a>
         </div>
       </motion.section>
@@ -48,29 +50,32 @@ export default function Contact() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center flex flex-col items-center"
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center flex flex-col items-center hover:border-red-500/30 transition-colors"
           >
-            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
-              <Phone className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-400 border border-red-500/20">
+              <Phone className="w-9 h-9" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">رقم الهاتف</h3>
-            <a href="tel:0564507370" className="text-white/80 hover:text-white transition-colors text-2xl font-bold" dir="ltr">
-              0564 50 73 70
+            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">رقم الهاتف المباشر</h3>
+            <p className="text-white/50 text-sm mb-4">متاح للرد والاستفسار المباشر</p>
+            <a href="tel:0541399342" className="text-white hover:text-red-400 transition-colors text-2xl sm:text-3xl font-bold tracking-wider" dir="ltr">
+              0541 39 93 42
             </a>
           </motion.div>
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center flex flex-col items-center"
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center flex flex-col items-center hover:border-red-500/30 transition-colors"
           >
-            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
-              <MapPin className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-400 border border-red-500/20">
+              <MapPin className="w-9 h-9" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">مقرنا</h3>
-            <a href="https://maps.app.goo.gl/uqyL7KUvZJmtZNm6A?g_st=ic" target="_blank" rel="noreferrer" className="text-white/80 hover:text-white transition-colors text-2xl font-bold flex flex-col items-center gap-2">
-              <span>الجزائر</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">مقرنا</h3>
+            <p className="text-white/50 text-sm mb-4">مرحباً بك في أي وقت</p>
+            <a href="https://maps.app.goo.gl/uqyL7KUvZJmtZNm6A?g_st=ic" target="_blank" rel="noreferrer" className="text-white/80 hover:text-white transition-colors text-xl sm:text-2xl font-bold flex flex-col items-center gap-2">
+              <span>عين الصحراء تقرت - بلوك رقم 547</span>
               <span className="text-sm font-medium text-red-400 bg-red-400/10 px-4 py-2 rounded-full">عرض على الخريطة</span>
             </a>
           </motion.div>

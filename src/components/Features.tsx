@@ -51,7 +51,7 @@ export default function Features() {
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 flex items-center justify-center gap-2">
           <span className="font-amiri text-red-400 font-normal">لماذا</span>
           <span>تختار</span>
-          <span className="font-signature font-normal text-red-400" dir="ltr">Speed Auto Car</span>
+          <span className="font-bruno font-bold text-red-500 tracking-wider uppercase text-2xl md:text-3xl inline-block px-1" dir="ltr">Speed Auto Car</span>
         </h2>
         <p className="text-white/70 max-w-3xl mx-auto font-medium text-lg md:text-xl leading-relaxed">
           نحن لسنا مجرد بائعين، بل نحن فريقك ووكيلك في الخارج. نسهل عليك عملية استيراد السيارات المعقدة ونجعلها آمنة ومضمونة.

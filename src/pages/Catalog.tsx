@@ -114,7 +114,7 @@ export default function Catalog() {
     acc[car.baseCarId].count += 1;
     
     return acc;
-  }, {} as Record<string, any>)).map(group => {
+  }, {} as Record<string, any>)).map((group: any) => {
     const minPrice = group.prices.length > 0 ? Math.min(...group.prices) : 0;
     
     const catalogItem = carsCatalog[group.baseCarId];
@@ -128,7 +128,7 @@ export default function Catalog() {
       year: group.year,
       images: group.images,
       hasMultipleTrims: group.count > 1,
-      mainImg: catalogItem ? catalogItem.mainImg : ''
+      mainImg: catalogItem ? ((catalogItem as any).mainImg || catalogItem.trims?.[0]?.images?.[0] || '') : ''
     };
   });
 

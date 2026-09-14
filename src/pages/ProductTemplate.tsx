@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -16,7 +16,6 @@ import { db } from '../firebase';
 import { carsCatalog } from '../data/carsCatalog';
 import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
-import { WhatsappIcon } from '../components/WhatsappIcon';
 
 
 interface TrimOption {
@@ -30,14 +29,36 @@ interface TrimOption {
   heroSpecs: Array<{ icon: any; label: string; value: string }>;
 }
 
+function getInitialCar(id: string | undefined) {
+  const targetId = (!id || id === 'coolray-2026-battle' || id === 'geely-coolray-2026') ? 'geely-coolray' : id;
+  const catalogData = carsCatalog[targetId];
+  if (catalogData) {
+    const defaultTrim = catalogData.trims[0];
+    return {
+      id: catalogData.id,
+      title: catalogData.title,
+      year: catalogData.year,
+      mileage: '0 كم جديدة من المصنع',
+      images: defaultTrim?.images || [],
+      thumbs: defaultTrim?.images || [],
+      hasCustomImages: false,
+      mainImg: defaultTrim?.images?.[0] || 'https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199678/i2kmtu63hvkeaudjn3si.png',
+      price: defaultTrim?.price?.replace(/دج/g, '').trim() || '',
+      specs: defaultTrim?.heroSpecs?.map(s => ({ label: s.label, value: s.value })) || []
+    };
+  }
+  return null;
+}
+
 export default function ProductTemplate() {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeImg, setActiveImg] = useState('');
+  const initialCar = getInitialCar(id);
+  const [product, setProduct] = useState<any>(initialCar);
+  const [loading, setLoading] = useState(!initialCar);
+  const [activeImg, setActiveImg] = useState(initialCar?.mainImg || '');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [familyCarsDb, setFamilyCarsDb] = useState<any[]>([]);
-  const [phoneNumber, setPhoneNumber] = useState('0564507370');
+  const [phoneNumber, setPhoneNumber] = useState('0541399342');
   
   // Color palette state
   const availableColors = [
@@ -339,12 +360,12 @@ export default function ProductTemplate() {
     }
   }, [displayImages, activeImg]);
 
-  // Preload high-res images for instant switching
+  // Preload top 2 images only to preserve mobile bandwidth
   useEffect(() => {
     if (displayImages && displayImages.length > 0) {
-      displayImages.forEach((img) => {
+      displayImages.slice(0, 2).forEach((img) => {
         const preloadedImg = new Image();
-        preloadedImg.src = optimizeImage(img, 1200);
+        preloadedImg.src = optimizeImage(img, 1000);
       });
     }
   }, [displayImages]);
@@ -566,6 +587,101 @@ export default function ProductTemplate() {
     breakpoints: { '(min-width: 768px)': { active: false } }
   });
 
+  // 🚗 Embla instance for main product photo gallery (swipeable on mobile & desktop)
+  const [galleryEmblaRef, galleryEmblaApi] = useEmblaCarousel({
+    loop: true,
+    direction: 'rtl',
+    align: 'start',
+    duration: 25,
+  });
+
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState(0);
+  const thumbsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sync selected index with Embla carousel
+  const onSelectGallery = useCallback(() => {
+    if (!galleryEmblaApi) return;
+    const idx = galleryEmblaApi.selectedScrollSnap();
+    setSelectedGalleryIndex(idx);
+    if (displayImages && displayImages[idx]) {
+      setActiveImg(displayImages[idx]);
+    }
+  }, [galleryEmblaApi, displayImages]);
+
+  useEffect(() => {
+    if (!galleryEmblaApi) return;
+    galleryEmblaApi.on('select', onSelectGallery);
+    galleryEmblaApi.on('reInit', onSelectGallery);
+    return () => {
+      galleryEmblaApi.off('select', onSelectGallery);
+      galleryEmblaApi.off('reInit', onSelectGallery);
+    };
+  }, [galleryEmblaApi, onSelectGallery]);
+
+  // When trim/displayImages change, reset to first image
+  useEffect(() => {
+    if (galleryEmblaApi) {
+      galleryEmblaApi.reInit();
+      galleryEmblaApi.scrollTo(0, true);
+    }
+    setSelectedGalleryIndex(0);
+    if (displayImages && displayImages.length > 0) {
+      setActiveImg(displayImages[0]);
+    }
+  }, [displayImages, galleryEmblaApi]);
+
+  // Auto-scroll active thumbnail into view
+  useEffect(() => {
+    if (thumbsContainerRef.current) {
+      const activeChild = thumbsContainerRef.current.children[selectedGalleryIndex] as HTMLElement;
+      if (activeChild) {
+        activeChild.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }, [selectedGalleryIndex]);
+
+  // Gallery Navigation helpers
+  const selectImageIndex = (idx: number) => {
+    setSelectedGalleryIndex(idx);
+    if (displayImages && displayImages[idx]) {
+      setActiveImg(displayImages[idx]);
+    }
+    if (galleryEmblaApi) {
+      galleryEmblaApi.scrollTo(idx);
+    }
+  };
+
+  const scrollGalleryNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (galleryEmblaApi) {
+      galleryEmblaApi.scrollNext();
+    } else if (displayImages && displayImages.length > 0) {
+      const nextIdx = (selectedGalleryIndex + 1) % displayImages.length;
+      selectImageIndex(nextIdx);
+    }
+  };
+
+  const scrollGalleryPrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (galleryEmblaApi) {
+      galleryEmblaApi.scrollPrev();
+    } else if (displayImages && displayImages.length > 0) {
+      const prevIdx = (selectedGalleryIndex - 1 + displayImages.length) % displayImages.length;
+      selectImageIndex(prevIdx);
+    }
+  };
+
+  const scrollThumbnails = (direction: 'left' | 'right') => {
+    if (thumbsContainerRef.current) {
+      const amount = direction === 'left' ? -180 : 180;
+      thumbsContainerRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
   const navigateLightbox = useCallback((direction: 'next' | 'prev') => {
     if (!displayImages || displayImages.length === 0) return;
     const currentIndex = displayImages.indexOf(activeImg);
@@ -576,18 +692,43 @@ export default function ProductTemplate() {
     if (newIndex < 0) newIndex = displayImages.length - 1;
     
     setActiveImg(displayImages[newIndex]);
-  }, [displayImages, activeImg]);
+    setSelectedGalleryIndex(newIndex);
+    if (galleryEmblaApi) {
+      galleryEmblaApi.scrollTo(newIndex, true);
+    }
+  }, [displayImages, activeImg, galleryEmblaApi]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isLightboxOpen) return;
-      if (e.key === 'ArrowRight') navigateLightbox('next');
-      if (e.key === 'ArrowLeft') navigateLightbox('prev');
-      if (e.key === 'Escape') setIsLightboxOpen(false);
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (isLightboxOpen) {
+        if (e.key === 'ArrowRight') navigateLightbox('next');
+        if (e.key === 'ArrowLeft') navigateLightbox('prev');
+        if (e.key === 'Escape') setIsLightboxOpen(false);
+      } else {
+        if (e.key === 'ArrowRight') scrollGalleryPrev();
+        if (e.key === 'ArrowLeft') scrollGalleryNext();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLightboxOpen, navigateLightbox]);
+  }, [isLightboxOpen, navigateLightbox, scrollGalleryNext, scrollGalleryPrev]);
+
+  // Lock body scroll and pause Lenis while lightbox is open
+  useEffect(() => {
+    const lenis = (window as any).lenis;
+    if (isLightboxOpen) {
+      document.body.style.overflow = 'hidden';
+      if (lenis) lenis.stop();
+    } else {
+      document.body.style.overflow = '';
+      if (lenis) lenis.start();
+    }
+    return () => {
+      document.body.style.overflow = '';
+      if (lenis) lenis.start();
+    };
+  }, [isLightboxOpen]);
 
   // Embla select callbacks
   const handleShare = async () => {
@@ -744,54 +885,165 @@ export default function ProductTemplate() {
         {/* 🌟 HERO PRODUCT SHOWCASE (Refined Desktop Image Size & Balanced Grid) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start mb-16">
           
-          {/* Left: Auto-scaling Photo Stage (lg:col-span-5) */}
+          {/* Left: Auto-scaling Photo Stage with Mobile Touch Swipe & PC Scroll Indicators (lg:col-span-5) */}
           <div className="lg:col-span-5 mx-auto w-full space-y-3">
-            {/* Main Image */}
-            <div 
-              onClick={() => setIsLightboxOpen(true)}
-              className="w-full rounded-[2rem] overflow-hidden border border-white/10 bg-[#181818] relative cursor-pointer group shadow-2xl"
-            >
-              <img
-                src={optimizeImage(activeImg, 1200)}
-                alt={product.title}
-                className="w-full h-auto transition-transform duration-500 group-hover:scale-105 object-contain"
-              />
+            {/* Main Image Carousel Container */}
+            <div className="relative group/gallery">
+              <div 
+                ref={galleryEmblaRef}
+                className="w-full rounded-[2rem] overflow-hidden border border-white/10 bg-[#181818] shadow-2xl touch-pan-y select-none"
+              >
+                <div className="flex touch-pan-y">
+                  {displayImages.map((img: string, idx: number) => (
+                    <div 
+                      key={idx}
+                      className="flex-[0_0_100%] min-w-0 relative flex items-center justify-center cursor-pointer"
+                      onClick={() => {
+                        setActiveImg(img);
+                        setSelectedGalleryIndex(idx);
+                        setIsLightboxOpen(true);
+                      }}
+                      title="انقر لتكبير وتصفح الصور بالكامل"
+                    >
+                      <img
+                        src={optimizeImage(img, 1200)}
+                        alt={`${product.title} - صورة ${idx + 1}`}
+                        className="w-full h-auto transition-transform duration-500 hover:scale-[1.03]"
+                        loading={idx === 0 ? "eager" : "lazy"}
+                        draggable={false}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
               
-              {/* Dynamic Trim Badge on Photo */}
-              <div className="absolute top-4 right-4 z-10">
+              {/* Dynamic Trim Badge on Photo (Top Right) */}
+              <div className="absolute top-4 right-4 z-10 pointer-events-none">
                 <span className="bg-red-600/90 backdrop-blur-md text-white font-bold text-xs tracking-wider px-3.5 py-1.5 rounded-full border border-red-400/30 shadow-lg">
                   {activeTrim.badge}
                 </span>
               </div>
 
-              {/* Share Button (Top Left) */}
-              <button 
-                onClick={(e) => { e.stopPropagation(); handleShare(); }}
-                className="absolute top-4 left-4 z-10 p-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all active:scale-95 shadow-lg"
-                aria-label="Share"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
+              {/* Share & Zoom Buttons (Top Left) */}
+              <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleShare(); }}
+                  className="p-2.5 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all active:scale-95 shadow-lg"
+                  aria-label="Share"
+                  title="مشاركة الرابط"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => setIsLightboxOpen(true)}
+                  className="p-2.5 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all active:scale-95 shadow-lg"
+                  aria-label="Zoom"
+                  title="تكبير الصور"
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* 🖥️ PC SCROLL & NAVIGATION INDICATORS (Visible on PC and on hover) */}
+              {displayImages.length > 1 && (
+                <>
+                  {/* Right Navigation Arrow (Prev in RTL Arabic) */}
+                  <button
+                    onClick={scrollGalleryPrev}
+                    type="button"
+                    aria-label="الصورة السابقة"
+                    title="الصورة السابقة"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 hover:border-red-500 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 shadow-xl active:scale-90 opacity-90 sm:opacity-0 sm:group-hover/gallery:opacity-100 focus:opacity-100"
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+
+                  {/* Left Navigation Arrow (Next in RTL Arabic) */}
+                  <button
+                    onClick={scrollGalleryNext}
+                    type="button"
+                    aria-label="الصورة التالية"
+                    title="الصورة التالية"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 hover:border-red-500 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 shadow-xl active:scale-90 opacity-90 sm:opacity-0 sm:group-hover/gallery:opacity-100 focus:opacity-100"
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+
+                  {/* 📍 BOTTOM OVERLAY: Indicator Dots */}
+                  <div className="absolute bottom-3 inset-x-0 z-10 flex flex-col items-center gap-1.5 pointer-events-none">
+                    {/* Slide Dots Indicator */}
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 pointer-events-auto">
+                      {displayImages.map((_, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => selectImageIndex(idx)}
+                          className={`transition-all duration-300 rounded-full ${
+                            idx === selectedGalleryIndex
+                              ? 'w-5 h-1.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                              : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/70'
+                          }`}
+                          aria-label={`الانتقال إلى صورة ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Scrollable Thumbnails Strip */}
-            <div>
-              <div className="flex gap-2.5 overflow-x-auto pb-1 hide-scroll">
-                {displayImages.map((img: string, idx: number) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImg(img)}
-                    className={`relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl overflow-hidden border transition-all ${
-                      activeImg === img 
-                        ? 'border-red-500 ring-2 ring-red-500/30 opacity-100' 
-                        : 'border-white/10 opacity-40 hover:opacity-80'
-                    }`}
-                  >
-                    <img src={optimizeImage(img, 300)} alt="" className="w-full h-full object-cover bg-[#181818]" />
-                  </button>
-                ))}
+            {/* 🎞️ Scrollable Thumbnails Strip with PC Navigation Controls */}
+            {displayImages.length > 1 && (
+              <div className="relative group/thumbs">
+                {/* Thumbnails PC Left Arrow */}
+                <button
+                  type="button"
+                  onClick={() => scrollThumbnails('left')}
+                  className="hidden sm:flex absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full bg-black/80 hover:bg-red-600 border border-white/20 text-white items-center justify-center backdrop-blur-md shadow-md opacity-0 group-hover/thumbs:opacity-100 transition-all active:scale-90"
+                  aria-label="تمرير الصور لليسار"
+                  title="تمرير لليسار"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Thumbnails PC Right Arrow */}
+                <button
+                  type="button"
+                  onClick={() => scrollThumbnails('right')}
+                  className="hidden sm:flex absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full bg-black/80 hover:bg-red-600 border border-white/20 text-white items-center justify-center backdrop-blur-md shadow-md opacity-0 group-hover/thumbs:opacity-100 transition-all active:scale-90"
+                  aria-label="تمرير الصور لليمين"
+                  title="تمرير لليمين"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                <div 
+                  ref={thumbsContainerRef}
+                  className="flex gap-2.5 overflow-x-auto pb-1 px-1 hide-scroll scroll-smooth"
+                >
+                  {displayImages.map((img: string, idx: number) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => selectImageIndex(idx)}
+                      className={`relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl overflow-hidden border transition-all duration-200 ${
+                        selectedGalleryIndex === idx 
+                          ? 'border-red-500 ring-2 ring-red-500/40 opacity-100 scale-105 shadow-[0_0_12px_rgba(239,68,68,0.35)]' 
+                          : 'border-white/10 opacity-45 hover:opacity-90 hover:border-white/30'
+                      }`}
+                      aria-label={`عرض الصورة ${idx + 1}`}
+                    >
+                      <img 
+                        src={optimizeImage(img, 300)} 
+                        alt="" 
+                        className="w-full h-full object-cover bg-[#181818]" 
+                        loading="lazy"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right: Sleek Buy Box with Standout Trim Selector (lg:col-span-7) */}
@@ -962,7 +1214,7 @@ export default function ProductTemplate() {
                   <Car className="w-4 h-4 text-amber-400" />
                   حالة السيارة:
                 </span>
-                <span className="font-bold text-white text-left">0 كم جديدة من المصنع</span>
+                <span className="font-bold text-amber-400 text-left">{product?.mileage || '0 كم جديدة من المصنع'}</span>
               </div>
             </div>
 
@@ -985,7 +1237,7 @@ export default function ProductTemplate() {
         <div className="mb-16">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 flex items-center flex-wrap gap-x-2 pt-3 pb-2">
             <span>أبرز مواصفات نسخة</span>
-            <span dir="ltr" className="font-signature text-red-400 font-normal text-3xl sm:text-4xl md:text-5xl inline-block px-1 leading-none">
+            <span dir="ltr" className="font-bruno text-red-500 font-bold text-xl sm:text-2xl md:text-3xl tracking-wider uppercase inline-block px-1 leading-none">
               {activeTrim.name.split(' ')[0]} 2026
             </span>
           </h2>
@@ -1255,20 +1507,11 @@ export default function ProductTemplate() {
 
           <div className="flex items-center gap-2 w-full min-[380px]:w-auto justify-end">
             <a
-              href={`https://wa.me/213${phoneNumber.replace(/^0/, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 min-[380px]:flex-none px-4 py-2.5 bg-green-500/10 hover:bg-green-500/20 active:scale-95 border border-green-500/30 text-green-400 rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
-            >
-              <WhatsappIcon className="w-4 h-4" />
-              <span>واتساب</span>
-            </a>
-            <a
               href={`tel:${phoneNumber}`}
-              className="flex-1 min-[380px]:flex-none px-4 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+              className="w-full min-[380px]:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]"
             >
               <Phone className="w-4 h-4" />
-              <span>إتصال</span>
+              <span>إتصل بنا الآن مباشرة</span>
             </a>
           </div>
         </div>
@@ -1281,40 +1524,80 @@ export default function ProductTemplate() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 md:p-12"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-4 md:p-12"
             onClick={() => setIsLightboxOpen(false)}
+            onTouchStart={(e) => {
+              (window as any)._touchStartX = e.changedTouches[0].screenX;
+            }}
+            onTouchEnd={(e) => {
+              const startX = (window as any)._touchStartX;
+              if (startX !== undefined) {
+                const diff = e.changedTouches[0].screenX - startX;
+                if (diff > 50) navigateLightbox('prev');
+                if (diff < -50) navigateLightbox('next');
+              }
+            }}
           >
-            <button 
-              className="absolute top-4 right-4 z-50 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-              onClick={() => setIsLightboxOpen(false)}
-            >
-              <X className="w-6 h-6" />
-            </button>
+            {/* Header with Close */}
+            <div className="absolute top-4 inset-x-4 sm:inset-x-8 z-50 flex items-center justify-end pointer-events-none">
+              <button 
+                className="p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors pointer-events-auto shadow-lg"
+                onClick={() => setIsLightboxOpen(false)}
+                aria-label="إغلاق"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
 
             {/* Left/Prev Navigation */}
             <button 
-              className="absolute left-4 md:left-8 z-50 p-3 md:p-4 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white transition-all active:scale-95"
+              className="absolute left-4 md:left-8 z-50 p-3 md:p-4 bg-black/60 hover:bg-red-600 backdrop-blur-md border border-white/20 hover:border-red-500 rounded-full text-white transition-all active:scale-95 shadow-xl"
               onClick={(e) => { e.stopPropagation(); navigateLightbox('prev'); }}
               aria-label="Previous image"
+              title="الصورة السابقة"
             >
               <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
 
-            <img
-              src={optimizeImage(activeImg, 1200)}
-              alt={product.title}
-              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl select-none"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="relative flex items-center justify-center max-w-full max-h-[80vh]">
+              <img
+                src={optimizeImage(activeImg, 1400)}
+                alt={product.title}
+                className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl select-none"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
 
             {/* Right/Next Navigation */}
             <button 
-              className="absolute right-4 md:right-8 z-50 p-3 md:p-4 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white transition-all active:scale-95"
+              className="absolute right-4 md:right-8 z-50 p-3 md:p-4 bg-black/60 hover:bg-red-600 backdrop-blur-md border border-white/20 hover:border-red-500 rounded-full text-white transition-all active:scale-95 shadow-xl"
               onClick={(e) => { e.stopPropagation(); navigateLightbox('next'); }}
               aria-label="Next image"
+              title="الصورة التالية"
             >
               <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
+
+            {/* Bottom Indicator Dots */}
+            <div className="absolute bottom-4 inset-x-0 z-50 flex justify-center pointer-events-none">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-full border border-white/15 pointer-events-auto">
+                {displayImages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      selectImageIndex(idx);
+                    }}
+                    className={`transition-all duration-300 rounded-full ${
+                      idx === selectedGalleryIndex
+                        ? 'w-6 h-1.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                        : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/70'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

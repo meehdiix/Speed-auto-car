@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { MessageCircle, Search, ShieldCheck, Ship } from 'lucide-react';
+import { PhoneCall, Search, ShieldCheck, Ship } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { WhatsappIcon } from './WhatsappIcon';
 
 const steps = [
   {
-    icon: <WhatsappIcon className="w-8 h-8" />,
+    icon: <PhoneCall className="w-8 h-8" />,
     num: '1',
     title: 'الطلب والاستفسار',
-    desc: 'تتواصل معنا عبر واتساب وتخبرنا بنوع السيارة التي تريدها (ماركة، سنة، ميزانية).'
+    desc: 'تتصل بنا مباشرة هاتفياً وتخبرنا بنوع السيارة التي تريدها (ماركة، سنة، ميزانية).'
   },
   {
     icon: <Search className="w-8 h-8" />,

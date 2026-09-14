@@ -3,6 +3,10 @@
 @theme {
   --font-sans: "Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-signature: "Great Vibes", cursive;
+  --font-bruno: "Bruno Ace SC", sans-serif;
+  --font-unbounded: "Unbounded", sans-serif;
+  --font-syne: "Syne", sans-serif;
+  --font-cinzel: "Cinzel", serif;
   --font-amiri: "Amiri", serif;
   --font-elegant: "Playfair Display", serif;
 }

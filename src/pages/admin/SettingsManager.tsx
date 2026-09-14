@@ -7,8 +7,8 @@ export default function SettingsManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
-    phone: '0564507370',
-    address: 'الجزائر العاصمة، باب الزوار',
+    phone: '0541399342',
+    address: 'عين الصحراء تقرت - بلوك رقم 547',
     email: 'contact@SpeedAutoCar.com',
     instagram: 'https://instagram.com/SpeedAutoCar',
     facebook: 'https://web.facebook.com/profile.php?id=61587488037995',
@@ -90,7 +90,7 @@ export default function SettingsManager() {
             <div>
               <label className="text-white/70 font-medium mb-3 flex items-center gap-2">
                 <Phone className="w-4 h-4 text-red-400 shrink-0" />
-                رقم الهاتف (واتساب / اتصال)
+                رقم الهاتف (الاتصال المباشر)
               </label>
               <input type="text" name="phone" value={settings.phone} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" />
             </div>
