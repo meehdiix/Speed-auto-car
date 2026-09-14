@@ -1,0 +1,6 @@
+{
+  "name": "Speed Auto Car",
+  "description": "بوابة استيراد السيارات الكورية والصينية إلى الجزائر بأفضل الأسعار وأسرع مدة شحن شاملة الجمركة",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

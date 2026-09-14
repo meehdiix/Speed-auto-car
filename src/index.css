@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-signature: "Great Vibes", cursive;
+  --font-amiri: "Amiri", serif;
+  --font-elegant: "Playfair Display", serif;
+}
+
+body {
+  background-color: #121212;
+  color: #f3f4f6;
+  @apply font-sans;
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Fix for smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

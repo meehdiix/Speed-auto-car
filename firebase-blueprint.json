@@ -1,0 +1,25 @@
+{
+  "collections": {
+    "cars": {
+      "description": "Cars in the inventory.",
+      "securityRules": {
+        "read": "true",
+        "create": "request.auth != null",
+        "update": "request.auth != null",
+        "delete": "request.auth != null"
+      },
+      "fields": {
+        "title": "string",
+        "origin": "string",
+        "year": "string",
+        "mileage": "string",
+        "price": "string",
+        "pixelId": "string",
+        "description": "string",
+        "images": "array",
+        "status": "string",
+        "createdAt": "timestamp"
+      }
+    }
+  }
+}

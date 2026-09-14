@@ -1,0 +1,3999 @@
+=================================================================
+              SPEED AUTO CAR - FULL SOURCE CODE EXPORT           
+=================================================================
+
+
+
+
+/************************************************************************
+ * FILE: src/App.tsx
+ ************************************************************************/
+
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+const Home = lazy(() => import('./pages/Home'));
+const ProductTemplate = lazy(() => import('./pages/ProductTemplate'));
+const About = lazy(() => import('./pages/AboutUs'));
+const Contact = lazy(() => import('./pages/Contact'));
+
+// Admin Pages
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const InventoryManager = lazy(() => import('./pages/admin/InventoryManager'));
+const SettingsManager = lazy(() => import('./pages/admin/SettingsManager'));
+const AnalyticsManager = lazy(() => import('./pages/admin/AnalyticsManager'));
+const PixelManager = lazy(() => import('./pages/admin/PixelManager'));
+
+// Layout wrapper for public pages to include Navbar and Footer
+function PublicLayout() {
+  return (
+    <div dir="rtl" className="min-h-screen flex flex-col font-sans">
+      <Navbar />
+      <main className="flex-grow">
+        <Suspense fallback={<div className="flex h-[80vh] items-center justify-center text-white"><span className="animate-pulse">جاري التحميل...</span></div>}>
+          <Outlet />
+        </Suspense>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    document.fonts.ready.then(() => {
+      setFontsLoaded(true);
+    });
+  }, []);
+
+  if (!fontsLoaded) {
+    return <div className="min-h-screen bg-black flex items-center justify-center"></div>;
+  }
+
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen bg-gray-950 flex items-center justify-center text-white"><span className="animate-pulse">جاري التحميل...</span></div>}>
+        <Routes>
+          {/* Public Website Routes */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductTemplate />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+          </Route>
+
+          {/* Admin Dashboard Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="analytics" element={<AnalyticsManager />} />
+            <Route path="inventory" element={<InventoryManager />} />
+            <Route path="pixels" element={<PixelManager />} />
+            <Route path="settings" element={<SettingsManager />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Features.tsx
+ ************************************************************************/
+
+import { useState, useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { ShieldCheck, Search, Banknote, Ship } from 'lucide-react';
+
+const features = [
+  {
+    icon: <Search className="w-8 h-8" />,
+    title: 'نبحث لك عن الأفضل',
+    desc: 'نقوم بالبحث في الأسواق الكورية والصينية عن السيارة التي تطابق مواصفاتك وميزانيتك بدقة عالية.'
+  },
+  {
+    icon: <ShieldCheck className="w-8 h-8" />,
+    title: 'فحص شامل وشفاف',
+    desc: 'قبل الشراء، نقوم بفحص السيارة فنياً وميكانيكياً ونرسل لك تقريراً مفصلاً بالصور والفيديو لضمان الجودة.'
+  },
+  {
+    icon: <Banknote className="w-8 h-8" />,
+    title: 'أنت الممول، نحن المنفذ',
+    desc: 'نعمل كوسيط أمين؛ أنت من يمول عملية الشراء، ونحن نتكفل بإتمام الصفقة بأفضل سعر دون وسطاء إضافيين.'
+  },
+  {
+    icon: <Ship className="w-8 h-8" />,
+    title: 'شحن آمن للجزائر',
+    desc: 'نتابع كافة إجراءات الشحن والتصدير حتى تصل سيارتك إلى الموانئ الجزائرية بأمان تام وفي أسرع وقت.'
+  }
+];
+
+export default function Features() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const scrollLeft = scrollRef.current.scrollLeft;
+    const itemWidth = scrollRef.current.clientWidth * 0.85; 
+    const index = Math.round(Math.abs(scrollLeft) / itemWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), features.length - 1));
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', handleScroll);
+      return () => el.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  return (
+    <section className="py-16 md:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden bg-[#121212]">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 flex items-center justify-center gap-2">
+          <span className="font-amiri text-red-400 font-normal">لماذا</span>
+          <span>تختار</span>
+          <span className="font-signature font-normal text-red-400" dir="ltr">Speed Auto Car</span>
+        </h2>
+        <p className="text-white/70 max-w-3xl mx-auto font-medium text-lg md:text-xl leading-relaxed">
+          نحن لسنا مجرد بائعين، بل نحن فريقك ووكيلك في الخارج. نسهل عليك عملية استيراد السيارات المعقدة ونجعلها آمنة ومضمونة.
+        </p>
+      </div>
+
+      <div className="relative">
+        <div 
+          ref={scrollRef}
+          className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-8 md:overflow-visible transition-all hide-scroll"
+        >
+          {features.map((feature, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1, duration: 0.5 }}
+              className="flex-none w-[85%] md:w-auto snap-center bg-white/5 border border-white/10 p-10 rounded-[2rem] hover:bg-white/10 hover:border-red-500/30 transition-all shadow-lg group relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-red-500/20 transition-colors"></div>
+              
+              <div className="w-20 h-20 rounded-2xl bg-black/50 border border-white/10 flex items-center justify-center text-red-500 mb-8 group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)] relative z-10">
+                {feature.icon}
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4 relative z-10">{feature.title}</h3>
+              <p className="text-white/70 leading-relaxed text-lg relative z-10">
+                {feature.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+        
+        {/* Mobile Scroll Indicators */}
+        <div className="flex md:hidden justify-center items-center gap-3 mt-4">
+          {features.map((_, idx) => (
+            <div 
+              key={idx}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                activeIndex === idx ? 'w-10 bg-red-500' : 'w-3 bg-white/20'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Footer.tsx
+ ************************************************************************/
+
+import { Phone, MapPin, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export default function Footer() {
+  return (
+    <footer className="bg-black/80 backdrop-blur-xl relative">
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#121212] to-transparent pointer-events-none"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-right relative">
+          <div className="col-span-1 md:col-span-2">
+            <h2 className="text-3xl font-signature font-normal mb-4" dir="ltr">
+              <span className="text-white">Speed</span> <span className="text-red-500">Auto</span>
+            </h2>
+            <p className="text-white/70 mb-6 max-w-md font-medium leading-relaxed text-base md:text-lg">
+              سبيد أوتو كار - وسيطك الموثوق لاستيراد السيارات من الصين وكوريا إلى الجزائر. نسهل عليك البحث، الفحص، الشراء بأموالك، ونضمن لك شحناً آمناً حتى وصول سيارتك.
+            </p>
+            <div className="flex gap-4">
+              <a href="https://www.facebook.com/profile.php?id=61584760943641" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 hover:bg-red-600 hover:text-white transition-colors shadow-sm">
+                <Facebook className="w-6 h-6" />
+              </a>
+              <a href="https://wa.me/213779004601" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-green-600/20 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-600 hover:text-white transition-colors shadow-sm">
+                <MessageCircle className="w-6 h-6" />
+              </a>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-bold text-white mb-4">روابط سريعة</h3>
+            <ul className="space-y-4 font-medium text-lg">
+              <li><Link to="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> الرئيسية</Link></li>
+              <li><Link to="/#services" className="text-white/70 hover:text-white transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> تصفح السيارات</Link></li>
+              <li><Link to="/about" className="text-white/70 hover:text-white transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> كيف نعمل؟</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold text-white mb-4">تواصل معنا</h3>
+            <ul className="space-y-5">
+              <li className="flex items-start gap-4">
+                <div className="bg-white/10 p-2 rounded-full">
+                   <Phone className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                   <p className="text-white/50 text-sm mb-1">الهاتف / واتساب</p>
+                   <a href="tel:0670089119" className="text-white font-bold hover:text-red-400 transition-colors inline-block tracking-wide text-lg" dir="ltr">0670 08 91 19</a>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="bg-white/10 p-2 rounded-full">
+                   <MapPin className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white/50 text-sm mb-1">الموقع</p>
+                  <p className="text-white font-bold text-lg">الجزائر</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-12 pt-8 border-t border-white/10 text-center text-sm text-white/50 font-medium">
+          <p>جميع الحقوق محفوظة لشركة Speed Auto Car © {new Date().getFullYear()}</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Hero.tsx
+ ************************************************************************/
+
+import { motion } from 'motion/react';
+import { CarFront, ArrowLeft, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export default function Hero() {
+  return (
+    <div className="relative min-h-[85dvh] md:min-h-[100dvh] flex flex-col justify-between overflow-hidden bg-[#121212]">
+      {/* High Quality Car Image Background with slow zoom effect */}
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+        <motion.img 
+          initial={{ scale: 1 }}
+          animate={{ scale: 1.1 }}
+          transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
+          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000" 
+          alt="Premium Car"
+          className="object-cover w-full h-full"
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-[#121212]/80"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#121212] to-transparent z-0"></div>
+      </div>
+
+      {/* Main Hero Content */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32 md:mt-24 pb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center max-w-4xl mx-auto flex flex-col items-center mb-16 md:mb-0 mt-8 md:mt-28"
+        >
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 mb-16 sm:mb-12 -translate-y-2 rounded-full bg-red-500/20 border border-red-500/30 text-red-100 text-xs sm:text-xs font-bold tracking-wide shadow-sm"
+          >
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </div>
+            الوسيط الأول لاستيراد السيارات
+          </motion.div>
+          
+          <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-signature text-white leading-[1.1] mb-6 sm:mb-5 drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+            Speed Auto Car
+          </h1>
+          <p className="text-sm sm:text-base lg:text-lg text-white/90 font-medium leading-relaxed mb-20 sm:mb-16 max-w-[95%] sm:max-w-2xl mx-auto drop-shadow-lg">
+            من الصين وكوريا إلى الجزائر. أنت تمول، ونحن نتكفل بالبحث، الفحص، والشراء لضمان وصول سيارتك بأفضل حالة وأنسب سعر.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full px-4">
+            <a 
+              href="tel:0670089119"
+              className="px-5 py-2.5 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white rounded-full font-bold text-xs sm:text-sm transition-all shadow-[0_4px_24px_rgba(239,68,68,0.2)] flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <Phone className="w-3.5 h-3.5"/>
+              اتصل بنا الأن
+            </a>
+            <a 
+              href="#services"
+              className="px-5 py-2.5 bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/20 text-white rounded-full font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 group w-full sm:w-auto"
+            >
+              تصفح السيارات
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1.5 transition-transform" />
+            </a>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Floating Indicators */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+         <div className="hidden md:flex justify-between items-end gap-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="bg-black/50 backdrop-blur-md border border-white/10 p-5 rounded-3xl shadow-xl max-w-[280px] flex flex-col gap-4 text-right"
+            >
+              <div className="flex items-center justify-between text-white">
+                <span className="text-xs font-bold bg-red-500/20 text-red-100 border border-red-500/30 px-3 py-1.5 rounded-full">شفافية مطلقة</span>
+              </div>
+              <p className="text-white/90 text-sm font-medium leading-snug">نقوم بفحص السيارة بالكامل وإرسال تقرير مفصل لك قبل الشراء بأموالك.</p>
+            </motion.div>
+
+            <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.8, duration: 0.6 }}
+            >
+              <Link to="#services" className="flex items-center gap-5 bg-black/50 backdrop-blur-md hover:bg-black/70 border border-white/10 p-3 pr-6 rounded-full shadow-xl transition-all group">
+                <div className="text-right">
+                  <p className="text-white font-bold block text-base">اكتشف الماركات</p>
+                  <p className="text-white/60 text-sm font-medium">كيا، هيونداي، جيلي والمزيد</p>
+                </div>
+                <div className="bg-red-500 text-white p-4 rounded-full group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                  <CarFront className="w-6 h-6" />
+                </div>
+              </Link>
+            </motion.div>
+         </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/LiquidCTA.tsx
+ ************************************************************************/
+
+import { motion } from 'motion/react';
+import { Phone } from 'lucide-react';
+
+export default function LiquidCTA() {
+  return (
+    <section className="relative pt-8 pb-16 md:pt-16 md:pb-24 overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 bg-[#121212] flex items-center justify-center overflow-hidden">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+          }}
+          transition={{ 
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear" 
+          }}
+          className="w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] rounded-full bg-red-600/10 blur-[100px] absolute"
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.5, 1],
+            rotate: [0, -90, 0],
+          }}
+          transition={{ 
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear" 
+          }}
+          className="w-[60vw] h-[60vw] md:w-[30vw] md:h-[30vw] rounded-full bg-green-500/10 blur-[100px] absolute translate-x-1/4 -translate-y-1/4"
+        />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#121212] to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#121212] to-transparent z-10 pointer-events-none"></div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] p-12 md:p-20 rounded-[3rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] relative overflow-hidden"
+        >
+          {/* Internal Glow */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+            ابدأ رحلة استيراد سيارتك <span className="font-amiri text-red-400 font-normal">اليوم</span>
+          </h2>
+          <p className="text-white/70 text-lg md:text-xl mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
+            تواصل معنا الآن، وسيقوم فريقنا بالرد على جميع استفساراتك وتقديم أفضل العروض التي تناسب ميزانيتك.
+          </p>
+
+          {/* Liquid Glass Button */}
+          <a
+            href="tel:0670089119"
+            className="group relative inline-flex items-center justify-center gap-3 md:gap-4 px-8 md:px-10 py-3 md:py-3 rounded-full font-bold text-base md:text-lg text-white transition-all duration-300 ease-out hover:scale-105 active:scale-95 overflow-hidden whitespace-nowrap"
+          >
+            {/* Button Glass Background */}
+            <div className="absolute inset-0 bg-red-500/20 backdrop-blur-md border border-white/20 rounded-full transition-all duration-500 group-hover:bg-red-500/40 group-hover:border-white/40"></div>
+            
+            {/* Liquid Shine Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+              <div className="absolute -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shine_2s_infinite]"></div>
+            </div>
+
+            {/* Glowing Shadow */}
+            <div className="absolute -inset-2 bg-red-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full z-[-1]"></div>
+
+            <Phone className="w-6 h-6 relative z-10 drop-shadow-md group-hover:animate-pulse" />
+            <span className="relative z-10 drop-shadow-md tracking-wide">إتصل بنا الأن</span>
+          </a>
+        </motion.div>
+      </div>
+
+      <style>{`
+        @keyframes shine {
+          100% {
+            left: 200%;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Navbar.tsx
+ ************************************************************************/
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Link } from 'react-router-dom';
+import { ChevronDown, Menu, Phone, X, Star, Car } from 'lucide-react';
+import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [mobileView, setMobileView] = useState<'main' | 'catalog'>('main');
+  const [catalogItems, setCatalogItems] = useState<{title: string, href: string}[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'cars'), where('status', '==', 'متاح'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const dbItems = snapshot.docs.map(doc => ({
+        title: doc.data().title || 'سيارة',
+        href: `/product/${doc.id}`
+      }));
+      
+      // Ensure Geely Coolray 2026 is always available and prominent in catalog
+      const coolrayItem = {
+        title: 'جيلي كولراي 2026 باتل (Full Option)',
+        href: '/product/coolray-2026-battle'
+      };
+      
+      const hasCoolray = dbItems.some(item => item.title.toLowerCase().includes('coolray') || item.title.includes('كولراي'));
+      const combined = hasCoolray ? dbItems : [coolrayItem, ...dbItems];
+      setCatalogItems(combined);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      
+      setIsScrolled(currentScrollY > 20);
+      setLastScrollY(currentScrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  const [phoneNumber, setPhoneNumber] = useState('0670089119');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'general');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().phone) {
+          setPhoneNumber(docSnap.data().phone);
+        }
+      } catch (err) {
+        console.error("Error fetching settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 pt-2 sm:pt-3 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className={`relative border border-t-[rgba(255,255,255,0.15)] border-white/[0.02] rounded-full px-4 sm:px-6 py-1.5 sm:py-2 flex items-center justify-between transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_30px_rgba(255,255,255,0.03)] ${isScrolled ? 'bg-transparent backdrop-blur-2xl' : 'bg-transparent backdrop-blur-md'}`}>
+          <div className="absolute inset-0 rounded-full animate-[pulse_3s_ease-in-out_infinite] bg-white/[0.02] pointer-events-none"></div>
+          
+          {/* Logo: Full 'SpeedAutoCar' on Desktop/PC, 'HM' on Mobile */}
+          <Link to="/" dir="ltr" className="flex items-center relative z-10 font-normal tracking-wide hover:opacity-90 transition-opacity">
+            {/* Desktop Brand */}
+            <span className="hidden md:flex items-center font-signature text-xl lg:text-2xl">
+              <span className="text-white">Speed</span>
+              <span className="text-red-500 ml-1">Auto</span>
+            </span>
+
+            {/* Mobile HM Monogram */}
+            <span className="md:hidden flex items-center font-signature text-xl">
+              <span className="text-white">H</span>
+              <span className="text-red-500 ml-0.5">M</span>
+            </span>
+          </Link>
+
+          {/* Glowing Stars (Liquid Glass White) - Mobile Only */}
+          <div className="md:hidden flex items-center gap-1 opacity-90 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none bg-white/10 border border-white/20 backdrop-blur-md px-3 py-1 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+            {[1, 2, 3, 4, 5].map((star, i) => (
+              <div key={star} className="relative flex items-center justify-center">
+                <div className="absolute inset-0 bg-white/30 blur-[1px] rounded-full animate-pulse" style={{ animationDelay: `${i * 150}ms` }}></div>
+                <Star
+                  className="w-3 h-3 text-white fill-white/60 drop-shadow-[0_0_6px_rgba(255,255,255,0.9)] animate-[pulse_2s_ease-in-out_infinite] relative z-10"
+                  strokeWidth={1.5}
+                  style={{ animationDelay: `${i * 150}ms` }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-6 relative z-10">
+            <Link to="/" className="text-white/80 hover:text-white font-bold transition-colors text-sm">
+              الرئيسية
+            </Link>
+
+            {/* Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setCatalogOpen(true)}
+              onMouseLeave={() => setCatalogOpen(false)}
+            >
+              <button className="flex items-center gap-1 text-white/80 hover:text-white font-bold transition-colors py-2 text-sm">
+                تصفح السيارات
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              
+              <AnimatePresence>
+                {catalogOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full right-0 mt-2 w-56 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden p-2"
+                  >
+                    {catalogItems.length > 0 ? (
+                      catalogItems.map((item, idx) => (
+                        <Link
+                          key={idx}
+                          to={item.href}
+                          onClick={() => setCatalogOpen(false)}
+                          className="block px-4 py-3 text-white/90 hover:bg-white/10 hover:text-white rounded-xl transition-colors whitespace-nowrap font-medium"
+                        >
+                          {item.title}
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-white/50 text-sm">
+                        لا توجد سيارات متوفرة حالياً
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link to="/about" className="text-white/80 hover:text-white font-bold transition-colors text-sm">
+              كيف نعمل؟
+            </Link>
+            <Link to="/contact" className="text-white/80 hover:text-white font-bold transition-colors text-sm">
+              تواصل معنا
+            </Link>
+          </div>
+
+          {/* Action Button */}
+          <div className="hidden md:block relative z-10">
+            <a
+              href={`tel:${phoneNumber.replace(/\s+/g, '')}`}
+              className="bg-red-500/20 hover:bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white px-4 py-1.5 rounded-full font-bold text-[10px] sm:text-xs flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+            >
+              <Phone className="w-3 h-3" />
+              <span dir="ltr">اتصل بنا الأن</span>
+            </a>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden relative z-10">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white p-1.5"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden mt-2 bg-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden"
+            >
+              <div className="p-4 flex flex-col gap-4">
+                <AnimatePresence mode="wait">
+                  {mobileView === 'main' ? (
+                    <motion.div 
+                      key="main"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="flex flex-col gap-4"
+                    >
+                      <Link to="/" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-white font-bold hover:bg-white/10 rounded-xl transition-colors text-lg">الرئيسية</Link>
+                      <button 
+                        onClick={() => setMobileView('catalog')} 
+                        className="px-4 py-3 text-white font-bold hover:bg-white/10 rounded-xl transition-colors flex items-center justify-between w-full text-lg"
+                      >
+                        تصفح السيارات
+                        <ChevronDown className="w-5 h-5 transform -rotate-90" />
+                      </button>
+                      <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-white font-bold hover:bg-white/10 rounded-xl transition-colors text-lg">كيف نعمل؟</Link>
+                      <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-white font-bold hover:bg-white/10 rounded-xl transition-colors text-lg">تواصل معنا</Link>
+                    </motion.div>
+                  ) : (
+                    <motion.div 
+                      key="catalog"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      className="flex flex-col gap-2"
+                    >
+                      <button 
+                        onClick={() => setMobileView('main')}
+                        className="px-4 py-3 text-white/60 hover:text-white font-bold mb-2 flex items-center gap-2 transition-colors border-b border-white/10 pb-4 text-lg"
+                      >
+                        <ChevronDown className="w-5 h-5 transform rotate-90" />
+                        الرجوع
+                      </button>
+                      {catalogItems.length > 0 ? (
+                        catalogItems.map((item, idx) => (
+                          <Link
+                            key={idx}
+                            to={item.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="px-4 py-4 text-white font-bold hover:bg-white/10 rounded-xl transition-colors text-lg"
+                          >
+                            {item.title}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-4 py-4 text-white/50">
+                          لا توجد سيارات متوفرة حالياً
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </nav>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Process.tsx
+ ************************************************************************/
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'motion/react';
+import { MessageCircle, Search, ShieldCheck, Ship } from 'lucide-react';
+import useEmblaCarousel from 'embla-carousel-react';
+
+const steps = [
+  {
+    icon: <MessageCircle className="w-8 h-8" />,
+    num: '1',
+    title: 'الطلب والاستفسار',
+    desc: 'تتواصل معنا عبر واتساب وتخبرنا بنوع السيارة التي تريدها (ماركة، سنة، ميزانية).'
+  },
+  {
+    icon: <Search className="w-8 h-8" />,
+    num: '2',
+    title: 'البحث والاختيار',
+    desc: 'نقوم بالبحث في الأسواق الكورية أو الصينية عن أفضل الخيارات التي تطابق طلبك ونعرضها عليك.'
+  },
+  {
+    icon: <ShieldCheck className="w-8 h-8" />,
+    num: '3',
+    title: 'الفحص والشراء',
+    desc: 'بعد اختيارك للسيارة، نقوم بفحصها بالكامل في بلد المنشأ. إذا كانت سليمة، تقوم بتمويل الشراء وننفذ الصفقة.'
+  },
+  {
+    icon: <Ship className="w-8 h-8" />,
+    num: '4',
+    title: 'الشحن للجزائر',
+    desc: 'نتكفل بإجراءات التصدير وشحن السيارة عبر البحر حتى تصل إلى الموانئ الجزائرية بأمان وتسجل باسمك.'
+  }
+];
+
+export default function Process() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center',
+    direction: 'rtl',
+    breakpoints: {
+      '(min-width: 768px)': { active: false }
+    }
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setActiveIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((current) => {
+        const next = (current + 1) % steps.length;
+        if (emblaApi && emblaApi.internalEngine().options.active) {
+          emblaApi.scrollTo(next);
+        }
+        return next;
+      });
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [emblaApi]);
+
+  return (
+    <section className="pt-8 pb-16 md:pt-16 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="text-center mb-0 md:mb-12">
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          خطوات استيراد <span className="font-amiri text-red-400 font-normal">سيارتك</span>
+        </h2>
+        <p className="text-white/70 max-w-2xl mx-auto font-medium text-lg md:text-xl">
+          خطوات بسيطة ومدروسة لضمان وصول سيارتك بأعلى معايير الأمان والجودة.
+        </p>
+      </div>
+      
+      <div className="relative">
+        {/* Connecting line (Desktop only) */}
+        <div className="hidden md:block absolute top-24 left-[12.5%] right-[12.5%] h-px bg-white/10 z-0">
+          <motion.div 
+            className="absolute top-1/2 -translate-y-1/2 h-[2px] w-24 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_20px_rgba(239,68,68,0.8)] -mr-12"
+            animate={{ right: `${activeIndex * 33.333}%` }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          />
+        </div>
+        
+        {/* Carousel Container */}
+        <div className="overflow-hidden md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 pb-12 pt-10 md:pt-12 md:pb-8" ref={emblaRef} dir="rtl">
+          <div className="flex md:grid md:grid-cols-4 gap-6 md:gap-8 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
+            {steps.map((step, idx) => (
+              <motion.div 
+                key={idx} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.15, duration: 0.6 }}
+                className={`w-[85vw] md:w-auto flex-none min-w-0 relative z-10 flex flex-col items-center text-center group bg-[#121212]/40 border border-white/5 p-8 rounded-[2rem] md:bg-transparent md:border-none md:p-0 md:rounded-none overflow-hidden md:overflow-visible ${activeIndex === idx ? 'active-pulse' : ''}`}
+              >
+                {/* Huge Number Background (Mobile only) */}
+                <div className="absolute -top-6 -right-4 text-[10rem] font-black text-white/[0.02] group-hover:text-red-500/[0.05] transition-colors duration-500 z-0 select-none pointer-events-none md:hidden mobile-bg-num">
+                  {step.num}
+                </div>
+
+                <div className="relative z-10 flex flex-col items-center h-full">
+                  {/* Icon Box */}
+                  <div className="w-20 h-20 md:w-24 md:h-24 bg-[#121212] border border-white/10 rounded-2xl flex items-center justify-center text-red-400 mb-6 shadow-xl group-hover:-translate-y-2 group-hover:border-red-500/50 transition-all duration-300 md:rotate-3 md:group-hover:rotate-0 relative z-10 mobile-icon-box">
+                    {step.icon}
+                  </div>
+                  
+                  {/* Step Number Badge */}
+                  <div className="bg-red-500/10 text-red-400 text-sm font-bold px-4 py-1.5 rounded-full mb-5 border border-red-500/20 shadow-sm">
+                    الخطوة {step.num}
+                  </div>
+
+                  <h3 className="text-2xl font-bold text-white mb-3">{step.title}</h3>
+                  <p className="text-white/60 font-medium leading-relaxed">{step.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Scroll Indicator */}
+        <div className="flex md:hidden justify-center items-center gap-2 mt-4">
+          {steps.map((_, idx) => (
+            <div 
+              key={idx} 
+              className={`h-2 rounded-full transition-all duration-500 ${
+                activeIndex === idx ? 'w-8 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'w-2 bg-white/20'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slow-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 0 rgba(239, 68, 68, 0); 
+            border-color: rgba(255, 255, 255, 0.05); 
+          }
+          50% { 
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.25); 
+            border-color: rgba(239, 68, 68, 0.4); 
+          }
+        }
+        @keyframes number-pulse {
+          0%, 100% { color: rgba(255, 255, 255, 0.02); }
+          50% { color: rgba(239, 68, 68, 0.08); }
+        }
+        @keyframes icon-pulse {
+          0%, 100% { 
+            transform: translateY(0);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+          }
+          50% { 
+            transform: translateY(-8px);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+          }
+        }
+        .active-pulse .mobile-icon-box {
+          animation: icon-pulse 3s ease-in-out infinite;
+        }
+        @media (max-width: 767px) {
+          .active-pulse {
+            animation: slow-pulse 3s ease-in-out infinite;
+          }
+          .active-pulse .mobile-bg-num {
+            animation: number-pulse 3s ease-in-out infinite;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Services.tsx
+ ************************************************************************/
+
+import { useState, useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
+
+export default function Services() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, 'cars'),
+      where('status', '==', 'متاح')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const dbCars = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Default featured car Geely Coolray 2026 Battle Trim
+      const featuredCoolray = {
+        id: 'coolray-2026-battle',
+        title: 'جيلي كولراي 2026 باتل (Battle)',
+        origin: 'chinese',
+        year: '2026',
+        price: '3,890,000 دج',
+        images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=2000&auto=format&fit=crop'],
+        status: 'متاح'
+      };
+
+      const hasCoolray = dbCars.some((car: any) => 
+        car.title?.toLowerCase().includes('coolray') || car.title?.includes('كولراي')
+      );
+
+      const allServices = hasCoolray ? dbCars : [featuredCoolray, ...dbCars];
+      setServices(allServices);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const handleScroll = () => {
+    if (!scrollRef.current || services.length === 0) return;
+    const scrollLeft = scrollRef.current.scrollLeft;
+    const itemWidth = scrollRef.current.clientWidth * 0.85; 
+    const index = Math.round(Math.abs(scrollLeft) / itemWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), services.length - 1));
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', handleScroll);
+      return () => el.removeEventListener('scroll', handleScroll);
+    }
+  }, [services]);
+
+  if (loading) {
+    return (
+      <section id="services" className="pt-0 pb-16 md:pt-4 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-center py-20">
+          <div className="animate-pulse flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-white/50 font-medium">جاري تحميل السيارات...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (services.length === 0) {
+    return null;
+  }
+
+  return (
+    <section id="services" className="pt-0 pb-16 md:pt-4 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col mb-10 md:mb-12">
+        <div className="max-w-3xl text-right">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">أحدث السيارات <span className="font-amiri text-red-400 font-normal">المتوفرة</span></h2>
+          <p className="text-lg md:text-xl text-white/70 font-medium leading-relaxed">
+            استكشف مجموعة من أحدث السيارات التي نوفرها لعملائنا من الأسواق العالمية. نقوم بشراء هذه السيارات بناءً على طلبك وبتمويلك الخاص.
+          </p>
+        </div>
+      </div>
+
+      <div className="relative">
+        <div 
+          ref={scrollRef}
+          className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible transition-all hide-scroll"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {services.map((service, idx) => (
+            <motion.div 
+              key={service.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              className="flex-none w-[85%] md:w-auto snap-center"
+            >
+              <Link to={`/product/${service.id}`} className="group block relative rounded-[2rem] overflow-hidden aspect-[4/5] shadow-[0_8px_30px_rgba(0,0,0,0.5)] bg-neutral-900 border border-white/10">
+                <div className="absolute inset-0">
+                  <img src={service.images && service.images.length > 0 ? service.images[0] : 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=2000&auto=format&fit=crop'} alt={service.title} loading="lazy" className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                
+                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                   {service.origin === 'korean' ? 'كوريا الجنوبية' : 'الصين'}
+                </div>
+
+                <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end items-start mb-2 text-right w-full">
+                   <h3 className="text-xl font-bold text-white tracking-tight drop-shadow-md mb-2">{service.title || 'سيارة'}</h3>
+                   <span className="text-white/80 text-sm font-bold bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20 group-hover:bg-white group-hover:text-black transition-colors w-full text-center mt-2">
+                     عرض التفاصيل
+                   </span>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+        
+        {/* Mobile Scroll Indicators */}
+        <div className="flex md:hidden justify-center items-center gap-3 mt-2">
+          {services.map((_, idx) => (
+            <div 
+              key={idx}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                activeIndex === idx ? 'w-10 bg-red-500' : 'w-3 bg-white/20'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/components/Stats.tsx
+ ************************************************************************/
+
+import { motion } from 'motion/react';
+
+const stats = [
+  { value: '+500', label: 'سيارة مستوردة', desc: 'تم تسليمها للعملاء بنجاح' },
+  { value: '100%', label: 'عميل راضٍ', desc: 'شفافية ومصداقية تامة' },
+  { value: '30', label: 'يوماً', desc: 'متوسط مدة الشحن' }
+];
+
+export default function Stats() {
+  return (
+    <section className="py-8 md:py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="bg-[#121212]/60 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 md:p-12 shadow-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0 md:divide-x md:divide-x-reverse divide-white/10 text-center">
+          {stats.map((stat, idx) => (
+            <motion.div 
+              key={idx} 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1, duration: 0.5 }}
+              className="py-4 md:py-0 md:px-8 flex flex-col items-center justify-center group"
+            >
+              <h3 className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight group-hover:scale-105 transition-transform duration-300" dir="ltr">{stat.value}</h3>
+              <h4 className="text-2xl font-bold text-red-400 mb-2 font-amiri">{stat.label}</h4>
+              <p className="text-white/60 text-base font-medium">{stat.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+
+
+/************************************************************************
+ * FILE: src/components/Testimonials.tsx
+ ************************************************************************/
+
+import { motion } from 'motion/react';
+import { Star, Quote } from 'lucide-react';
+
+const reviews = [
+  {
+    name: 'أحمد ب.',
+    car: 'Kia Sportage',
+    text: 'تجربة ممتازة مع سبيد أوتو كار. شفافية تامة في التعامل، والسيارة وصلت مطابقة تماماً للصور والفيديوهات التي أرسلوها لي من كوريا.'
+  },
+  {
+    name: 'كريم م.',
+    car: 'Hyundai Tucson',
+    text: 'كنت متخوفاً من فكرة الاستيراد ودفع المال مسبقاً، لكن الفريق كان محترفاً جداً وطمأنني في كل خطوة حتى استلمت سيارتي.'
+  },
+  {
+    name: 'سفيان ط.',
+    car: 'Geely Monjaro',
+    text: 'أفضل وكيل لاستيراد السيارات من الصين. اختصروا علي الكثير من الجهد والوقت، والأسعار كانت تنافسية جداً مقارنة بالسوق المحلي.'
+  }
+];
+
+export default function Testimonials() {
+  return (
+    <section className="pt-8 pb-16 md:pt-16 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          ماذا يقول <span className="font-amiri text-red-400 font-normal">عملاؤنا</span>
+        </h2>
+        <p className="text-white/70 max-w-2xl mx-auto font-medium text-lg md:text-xl">
+          نفخر بثقة عملائنا ونعتبرها رأس مالنا الحقيقي في هذا المجال.
+        </p>
+      </div>
+      <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory pb-8 -mx-4 px-4 md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {reviews.map((review, idx) => (
+          <motion.div 
+            key={idx}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.15, duration: 0.6 }}
+            className="w-[85vw] md:w-auto flex-none snap-center bg-[#121212]/80 backdrop-blur-sm border border-white/5 p-8 md:p-10 rounded-[2rem] relative group hover:bg-[#1a1a1a] hover:border-white/10 transition-all duration-300 flex flex-col"
+          >
+            <Quote className="absolute top-8 left-8 w-12 h-12 text-white/5 group-hover:text-red-500/10 transition-colors duration-300" />
+            <div className="flex items-center gap-1 text-yellow-500 mb-8">
+              {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current" />)}
+            </div>
+            <p className="text-white/80 text-lg font-medium leading-relaxed mb-8">
+              "{review.text}"
+            </p>
+            <div className="flex items-center justify-between border-t border-white/10 pt-6 mt-auto">
+              <h4 className="text-white font-bold text-lg">{review.name}</h4>
+              <span className="text-red-400 text-sm font-bold bg-red-500/10 px-3 py-1.5 rounded-full border border-red-500/20">{review.car}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/firebase.ts
+ ************************************************************************/
+
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBJzH207mmnsyZtvPBMubF7ZJsVwGRaIo0",
+  authDomain: "gen-lang-client-0446894856.firebaseapp.com",
+  projectId: "gen-lang-client-0446894856",
+  storageBucket: "gen-lang-client-0446894856.firebasestorage.app",
+  messagingSenderId: "562438917098",
+  appId: "1:562438917098:web:3bd45fa4f710ca887e8093"
+};
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app, "ai-studio-0d4d0a50-18fc-483c-a019-c84f88da188f");
+export const auth = getAuth(app);
+
+
+
+/************************************************************************
+ * FILE: src/index.css
+ ************************************************************************/
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-signature: "Great Vibes", cursive;
+  --font-amiri: "Amiri", serif;
+  --font-elegant: "Playfair Display", serif;
+}
+
+body {
+  background-color: #121212;
+  color: #f3f4f6;
+  @apply font-sans;
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Fix for smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+
+
+/************************************************************************
+ * FILE: src/main.tsx
+ ************************************************************************/
+
+import {StrictMode} from 'react';
+import {createRoot} from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+
+
+
+/************************************************************************
+ * FILE: src/pages/AboutUs.tsx
+ ************************************************************************/
+
+import { motion } from 'motion/react';
+import { Target, Search, FileCheck, Ship, MessageCircle, Phone } from 'lucide-react';
+
+export default function About() {
+  return (
+    <div className="pt-32 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 1. Hero Section */}
+      <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-24"
+      >
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-8"><span className="font-amiri text-red-400 font-normal">كيف</span> نعمل؟</h1>
+        <p className="text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed font-bold">
+          نحن في <span className="font-signature font-normal text-red-400">Speed Auto Car</span> نلعب دور الوسيط الآمن بينك وبين أسواق السيارات في الصين وكوريا. لا نبيع السيارات بأنفسنا، بل نشتريها لك بأموالك الخاصة بعد التأكد من جودتها.
+        </p>
+      </motion.section>
+
+      {/* 2. The Process */}
+      <section className="mb-32">
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-12 text-center">خطوات استيراد <span className="font-amiri text-red-400 font-normal">سيارتك</span></h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center relative"
+          >
+            <div className="absolute -top-6 -right-6 w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-lg">1</div>
+            <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
+              <MessageCircle className="w-10 h-10" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-4">الطلب والاستفسار</h3>
+            <p className="text-white/70 text-lg leading-relaxed">
+              تتواصل معنا عبر واتساب وتخبرنا بنوع السيارة التي تريدها (ماركة، سنة، ميزانية).
+            </p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center relative"
+          >
+            <div className="absolute -top-6 -right-6 w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-lg">2</div>
+            <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
+              <Search className="w-10 h-10" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-4">البحث والاختيار</h3>
+            <p className="text-white/70 text-lg leading-relaxed">
+              نقوم بالبحث في الأسواق الكورية أو الصينية عن أفضل الخيارات التي تطابق طلبك ونعرضها عليك.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center relative"
+          >
+            <div className="absolute -top-6 -right-6 w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-lg">3</div>
+            <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
+              <FileCheck className="w-10 h-10" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-4">الفحص والشراء</h3>
+            <p className="text-white/70 text-lg leading-relaxed">
+              بعد اختيارك للسيارة، نقوم بفحصها بالكامل في بلد المنشأ. إذا كانت سليمة، تقوم بتمويل الشراء وننفذ الصفقة.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center relative"
+          >
+            <div className="absolute -top-6 -right-6 w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-lg">4</div>
+            <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
+              <Ship className="w-10 h-10" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-4">الشحن للجزائر</h3>
+            <p className="text-white/70 text-lg leading-relaxed">
+              نتكفل بإجراءات التصدير وشحن السيارة عبر البحر حتى تصل إلى الموانئ الجزائرية بأمان وتسجل باسمك.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 3. CTA */}
+      <motion.section 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="max-w-3xl mx-auto bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-[2.5rem] p-10 md:p-14 text-center relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-red-500/5 blur-3xl rounded-full"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center text-red-400 mb-6">
+             <Phone className="w-8 h-8" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">جاهز لاستيراد سيارة <span className="font-amiri text-red-400 font-normal">أحلامك</span>؟</h2>
+          <p className="text-white/60 text-lg md:text-xl mb-10 max-w-xl mx-auto">
+            نحن هنا للإجابة على كافة استفساراتك وتسهيل كل خطوة في رحلتك.
+          </p>
+          <a
+            href="tel:0670089119"
+            className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold text-lg transition-all shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:-translate-y-1"
+          >
+            <Phone className="w-5 h-5"/>
+            إتصل بنا الأن
+          </a>
+        </div>
+      </motion.section>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/Contact.tsx
+ ************************************************************************/
+
+import { motion } from 'motion/react';
+import { Phone, MapPin, MessageCircle, Send } from 'lucide-react';
+
+export default function Contact() {
+  return (
+    <div className="pt-32 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 1. Hero Section */}
+      <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-20"
+      >
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6"><span className="font-amiri text-red-400 font-normal">تواصل</span> معنا</h1>
+        <p className="text-2xl text-white/70 max-w-3xl mx-auto leading-relaxed font-medium">
+          أسرع طريقة للتواصل معنا هي عبر واتساب. نحن متواجدون للرد على استفساراتك حول السيارات وعملية الاستيراد.
+        </p>
+      </motion.section>
+
+      {/* 2. Important Contact Method (WhatsApp) */}
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+        className="max-w-4xl mx-auto mb-20 bg-green-500 text-white rounded-[3rem] p-10 md:p-16 text-center shadow-[0_10px_40px_rgba(34,197,94,0.4)] relative overflow-hidden"
+      >
+        <div className="absolute -top-20 -right-20 opacity-20">
+          <MessageCircle className="w-64 h-64" />
+        </div>
+        <div className="relative z-10 flex flex-col items-center">
+          <MessageCircle className="w-20 h-20 mb-8" />
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">استفسر براحة <span className="font-amiri text-red-400 font-normal">تامة</span></h2>
+          <p className="text-xl md:text-2xl font-bold mb-10 text-white/90">اضغط على الزر أدناه وسيحولك مباشرة إلى محادثة معنا عبر واتساب.</p>
+          <a 
+            href="https://wa.me/213779004601" 
+            target="_blank" 
+            rel="noreferrer"
+            className="bg-white text-green-600 px-10 py-5 rounded-full font-bold text-2xl hover:bg-gray-100 transition-all shadow-lg inline-block"
+          >
+            تحدث معنا على واتساب
+          </a>
+        </div>
+      </motion.section>
+
+      {/* 3. Contact Info Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center flex flex-col items-center"
+          >
+            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
+              <Phone className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-4">رقم الهاتف</h3>
+            <a href="tel:0670089119" className="text-white/80 hover:text-white transition-colors text-2xl font-bold" dir="ltr">
+              0670 08 91 19
+            </a>
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] text-center flex flex-col items-center"
+          >
+            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
+              <MapPin className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-4">مقرنا</h3>
+            <p className="text-white/80 text-2xl font-bold">
+              الجزائر
+            </p>
+          </motion.div>
+      </section>
+
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/Home.tsx
+ ************************************************************************/
+
+import Hero from '../components/Hero';
+import Services from '../components/Services';
+import Process from '../components/Process';
+import Testimonials from '../components/Testimonials';
+import Stats from '../components/Stats';
+import LiquidCTA from '../components/LiquidCTA';
+
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <Services />
+      <Process />
+      <Testimonials />
+      <Stats />
+      <LiquidCTA />
+    </>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/ProductTemplate.tsx
+ ************************************************************************/
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
+import useEmblaCarousel from 'embla-carousel-react';
+import { 
+  Phone, ShieldCheck, Clock, Sparkles,
+  Gauge, Fuel, Star, CheckCircle2, 
+  MapPin, HelpCircle, Camera, X, Flame, 
+  Car, Layers, Quote, ChevronDown, Check,
+  SlidersHorizontal, ChevronLeft, ChevronRight,
+  FileCheck, Ship, KeyRound, Trophy,
+  Share2, MessageCircle
+} from 'lucide-react';
+import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
+
+interface TrimOption {
+  id: string;
+  name: string;
+  badge: string;
+  price: string;
+  subtitle: string;
+  tag: string;
+  heroSpecs: Array<{ icon: any; label: string; value: string }>;
+}
+
+export default function ProductTemplate() {
+  const { id } = useParams();
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeImg, setActiveImg] = useState('');
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('0670089119');
+  
+  // Color palette state
+  const availableColors = [
+    { id: 'white', name: 'أبيض لؤلؤي', hex: '#FFFFFF', border: 'border-white/20' },
+    { id: 'grey', name: 'رمادي معدني', hex: '#6B7280', border: 'border-white/10' },
+    { id: 'black', name: 'أسود لامع', hex: '#000000', border: 'border-white/20' },
+  ];
+  const [selectedColor, setSelectedColor] = useState('white');
+  
+  // Trim selector state
+  const [selectedTrimId, setSelectedTrimId] = useState('battle');
+  const [isTrimDropdownOpen, setIsTrimDropdownOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [bookingForm, setBookingForm] = useState({ name: '', phone: '' });
+  const [bookingStatus, setBookingStatus] = useState('');
+
+  // Available trims for Geely Coolray 2026
+  const coolrayTrims: TrimOption[] = [
+    {
+      id: 'starlight',
+      name: 'Starlight',
+      badge: 'STARLIGHT (BASE)',
+      price: '3,100,000 دج',
+      subtitle: 'الفئة الأساسية (Base Trim)',
+      tag: 'اقتصادية',
+      heroSpecs: [
+        { icon: Fuel, label: 'المحرك', value: '1.5L Turbo (181 HP / 290 Nm)' },
+        { icon: Gauge, label: 'ناقل الحركة', value: '7 سرعات 7DCT مبلل' },
+        { icon: Layers, label: 'الشاشات', value: 'شاشتان 12.3 و 10.25 إنش' },
+        { icon: ShieldCheck, label: 'الأمان', value: 'ABS, EBD, ESP ووسادتان هوائيتان' },
+        { icon: Camera, label: 'الكاميرات', value: 'كاميرا خلفية وحساسات ركن' },
+        { icon: Flame, label: 'التجهيزات', value: 'جنوط 17، مقاعد جلد صناعي' },
+      ]
+    },
+    {
+      id: 'super-power',
+      name: 'Super Power',
+      badge: 'SUPER POWER',
+      price: '3,390,000 دج',
+      subtitle: 'الفئة المتوسطة الأولى (Mid-Low Trim)',
+      tag: 'عملية',
+      heroSpecs: [
+        { icon: Fuel, label: 'المحرك', value: '1.5L Turbo (181 HP)' },
+        { icon: Layers, label: 'الشاشات', value: 'شاشتان 12.3 و 10.25 إنش' },
+        { icon: Camera, label: 'الكاميرات', value: 'كاميرات 360° محيطية' },
+        { icon: ShieldCheck, label: 'الأمان', value: '4 وسائد هوائية (أمامية وجانبية)' },
+        { icon: Flame, label: 'التجهيزات', value: 'سقف بانورامي وجنوط 18 إنش' },
+        { icon: Sparkles, label: 'الراحة', value: 'تكييف أوتوماتيكي ومقعد كهربائي' },
+      ]
+    },
+    {
+      id: 'super-max',
+      name: 'Super Max',
+      badge: 'SUPER MAX',
+      price: '3,590,000 دج',
+      subtitle: 'الفئة المتوسطة العليا (Mid-High Trim)',
+      tag: 'رفاهية',
+      heroSpecs: [
+        { icon: Fuel, label: 'المحرك', value: '1.5L Turbo (181 HP)' },
+        { icon: Camera, label: 'الكاميرات', value: 'كاميرات 360° مع داش كام مدمج' },
+        { icon: ShieldCheck, label: 'الأمان', value: '6 وسائد هوائية كاملة' },
+        { icon: Sparkles, label: 'الرفاهية', value: 'إضاءة محيطية 72 لون' },
+        { icon: Layers, label: 'المقاعد', value: 'مقاعد جلد فاخر مع تدفئة' },
+        { icon: Flame, label: 'الباب الخلفي', value: 'باب صندوق كهربائي' },
+      ]
+    },
+    {
+      id: 'flagship',
+      name: 'Flagship',
+      badge: 'FLAGSHIP',
+      price: '3,750,000 دج',
+      subtitle: 'فئة التكنولوجيا والرفاهية (Tech & Luxury Trim)',
+      tag: 'فاخرة',
+      heroSpecs: [
+        { icon: Camera, label: 'الكاميرات', value: 'كاميرات 360° مع شاسيه شفاف' },
+        { icon: Sparkles, label: 'القيادة الذاتية', value: 'نظام L2 ADAS (قيادة شبه ذاتية)' },
+        { icon: Car, label: 'الركن الذكي', value: 'نظام ركن آلي للسيارة' },
+        { icon: ShieldCheck, label: 'الأمان', value: 'كبح طوارئ آلي وتنبيه النقطة العمياء' },
+        { icon: Phone, label: 'التكنولوجيا', value: 'شحن لاسلكي للهاتف' },
+        { icon: Layers, label: 'الرفاهية', value: 'جلد فاخر وإضاءة 72 لون' },
+      ]
+    },
+    {
+      id: 'battle',
+      name: 'Battle',
+      badge: 'BATTLE',
+      price: '3,890,000 دج',
+      subtitle: 'الفئة الرياضية القصوى (Top Sport Trim)',
+      tag: 'الأكثر طلباً',
+      heroSpecs: [
+        { icon: Flame, label: 'الشكل الرياضي', value: 'لون مزدوج وسبويلر كاربون خلفي' },
+        { icon: Gauge, label: 'العادم', value: 'عادم رياضي حقيقي رباعي الفتحات' },
+        { icon: Layers, label: 'المقصورة', value: 'مقاعد شامواه رياضية (Alcantara)' },
+        { icon: Camera, label: 'الكاميرات', value: 'كاميرات 360° مع شاسيه شفاف' },
+        { icon: Sparkles, label: 'القيادة الذاتية', value: 'نظام L2 ADAS وركن آلي' },
+        { icon: Car, label: 'التجهيزات', value: 'جنوط 18 إنش سوداء بكاليبر أحمر' },
+      ]
+    }
+  ];
+
+  // Selected trim object
+  const activeTrim = coolrayTrims.find(t => t.id === selectedTrimId) || coolrayTrims[0];
+
+  // Default fallback car model
+  const defaultCoolray = {
+    id: 'coolray-2026-battle',
+    title: 'Geely Coolray 2026',
+    year: '2026',
+    mileage: '0 كم جديدة من المصنع',
+    mainImg: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=2000&auto=format&fit=crop',
+    thumbs: [
+      'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=2000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?q=80&w=1800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=1800&auto=format&fit=crop'
+    ],
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    
+    const fetchProduct = async () => {
+      try {
+        if (!id || id === 'coolray-2026-battle' || id === 'geely-coolray-2026') {
+          setProduct(defaultCoolray);
+          setActiveImg(defaultCoolray.mainImg);
+          setLoading(false);
+          return;
+        }
+
+        const docRef = doc(db, 'cars', id);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const thumbsList = data.images && data.images.length > 0 ? data.images : defaultCoolray.thumbs;
+          const mainImgUrl = thumbsList[0];
+
+          setProduct({
+            id: docSnap.id,
+            title: data.title || 'Geely Coolray 2026',
+            year: data.year || '2026',
+            mileage: data.mileage ? `${data.mileage} كم` : '0 كم (جديدة على الزيرو)',
+            mainImg: mainImgUrl,
+            thumbs: thumbsList,
+          });
+          setActiveImg(mainImgUrl);
+        } else {
+          setProduct(defaultCoolray);
+          setActiveImg(defaultCoolray.mainImg);
+        }
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setProduct(defaultCoolray);
+        setActiveImg(defaultCoolray.mainImg);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'general');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().phone) {
+          setPhoneNumber(docSnap.data().phone);
+        }
+      } catch (err) {
+        console.error("Error fetching settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const steps = [
+    {
+      icon: <FileCheck className="w-8 h-8 md:w-10 md:h-10" />,
+      num: '1',
+      title: 'توقيع العقد وإيداع العربون',
+      desc: 'في مقرنا مع تثبيت رقم الشاسيه، المواصفات، والسعر النهائي الثابت في وصل رسمي وقانوني.'
+    },
+    {
+      icon: <Ship className="w-8 h-8 md:w-10 md:h-10" />,
+      num: '2',
+      title: 'الشحن السريع (30 يوم)',
+      desc: 'فحص مصور للسيارة بالفيديو قبل الشحن، وتزويدك برابط مباشر لتتبع الحاوية في البحر.'
+    },
+    {
+      icon: <KeyRound className="w-8 h-8 md:w-10 md:h-10" />,
+      num: '3',
+      title: 'الجمركة واستلام المفتاح',
+      desc: 'نتكفل بكامل إجراءات الجمركة واستخراج البطاقة الرمادية وتسليمك السيارة جاهزة للاستخدام.'
+    }
+  ];
+
+  const faqs = [
+    {
+      q: 'كم مدة الشحن حتى استلام السيارة في الجزائر؟',
+      a: 'مدة الشحن المحددة رسمياً في العقد هي 30 يوماً فقط من تاريخ انطلاق الحاوية من الميناء وحتى وصولها وبدء التخليص الجمركي في الجزائر، مع تزويدك برابط مباشر لتتبع مسار السفينة لحظة بلحظة.'
+    },
+    {
+      q: 'ما هي الضمانات والوثائق المقدمة عند التعاقد؟',
+      a: 'يتم توقيع عقد استيراد رسمي وموثق في مقرنا يثبت رقم الشاسيه والمواصفات الدقيقة والسعر النهائي الثابت، مع تسليمك وصل إيداع العربون القانوني وفحص فيديو مصور للسيارة قبل شحنها.'
+    },
+    {
+      q: 'كيف تضمنون أفضل سعر استيراد في الجزائر؟',
+      a: 'نحن نتعامل مباشرة مع المصانع والموردين الحصريين بدون أي وسطاء أو عمولات مضاعفة، مما يمكننا من تقديم السعر الأفضل والأكثر تنافسية.'
+    },
+    {
+      q: 'كيف تتم عملية التعاقد ودفع العربون؟',
+      a: 'تتصل بنا لتحديد موعد في مكتبنا، حيث يتم توقيع عقد استيراد رسمي وموثق يحدد مواصفات السيارة ورقم الشاسيه والسعر النهائي الثابت، مع تسليمك وصل إيداع العربون القانوني.'
+    }
+  ];
+
+  const reviews = [
+    {
+      name: 'كريم بلحاج',
+      wilaya: 'الجزائر العاصمة',
+      car: 'Geely Coolray 2026',
+      text: 'وصلتني السيارة في 29 يوماً بالضبط كما هو مدون في العقد. السعر كان نهائياً وشاملاً ولم يطلبوا أي مصاريف إضافية. احترافية عالية جداً.'
+    },
+    {
+      name: 'محمد بوعلام',
+      wilaya: 'وهران',
+      car: 'Geely Coolray 2026',
+      text: 'السيارة وصلت جديدة تماماً على الزيرو. الإجراءات كانت واضحة وسريعة من أول اتصال حتى استلام المفتاح مع كامل الأوراق.'
+    },
+    {
+      name: 'عبد الرزاق عثماني',
+      wilaya: 'سطيف',
+      car: 'Hyundai Tucson 2025',
+      text: 'الشفافية في السعر النهائي ومدة الشحن هي أكثر ما يميز الفريق. تجربة استيراد ممتازة ومريحة للغاية.'
+    }
+  ];
+
+  // Scroll states for all cards sections
+  const [activeSpecIndex, setActiveSpecIndex] = useState(0);
+  const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+  const [activeFaqIndex, setActiveFaqIndex] = useState(0);
+
+  // Embla carousel instances for mobile view (deactivates on desktop md:)
+  const [specsEmblaRef, specsEmblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center',
+    direction: 'rtl',
+    breakpoints: { '(min-width: 768px)': { active: false } }
+  });
+
+  const [stepsEmblaRef, stepsEmblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center',
+    direction: 'rtl',
+    breakpoints: { '(min-width: 768px)': { active: false } }
+  });
+
+  const [reviewsEmblaRef, reviewsEmblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center',
+    direction: 'rtl',
+    breakpoints: { '(min-width: 768px)': { active: false } }
+  });
+
+  const [faqsEmblaRef, faqsEmblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center',
+    direction: 'rtl',
+    breakpoints: { '(min-width: 768px)': { active: false } }
+  });
+
+  const navigateLightbox = useCallback((direction: 'next' | 'prev') => {
+    if (!product || !product.thumbs) return;
+    const currentIndex = product.thumbs.indexOf(activeImg);
+    if (currentIndex === -1) return;
+
+    let newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+    if (newIndex >= product.thumbs.length) newIndex = 0;
+    if (newIndex < 0) newIndex = product.thumbs.length - 1;
+    
+    setActiveImg(product.thumbs[newIndex]);
+  }, [product, activeImg]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isLightboxOpen) return;
+      if (e.key === 'ArrowRight') navigateLightbox('next');
+      if (e.key === 'ArrowLeft') navigateLightbox('prev');
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, navigateLightbox]);
+
+  // Embla select callbacks
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: product?.title || 'Geely Coolray',
+          text: 'شاهد هذه السيارة بأفضل سعر استيراد في الجزائر!',
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        // Fallback quiet success
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
+  const onSpecsSelect = useCallback(() => {
+    if (!specsEmblaApi) return;
+    setActiveSpecIndex(specsEmblaApi.selectedScrollSnap());
+  }, [specsEmblaApi]);
+
+  const onStepsSelect = useCallback(() => {
+    if (!stepsEmblaApi) return;
+    setActiveStepIndex(stepsEmblaApi.selectedScrollSnap());
+  }, [stepsEmblaApi]);
+
+  const onReviewsSelect = useCallback(() => {
+    if (!reviewsEmblaApi) return;
+    setActiveReviewIndex(reviewsEmblaApi.selectedScrollSnap());
+  }, [reviewsEmblaApi]);
+
+  const onFaqsSelect = useCallback(() => {
+    if (!faqsEmblaApi) return;
+    setActiveFaqIndex(faqsEmblaApi.selectedScrollSnap());
+  }, [faqsEmblaApi]);
+
+  // Hook subscriptions
+  useEffect(() => {
+    if (!specsEmblaApi) return;
+    specsEmblaApi.on('select', onSpecsSelect);
+    specsEmblaApi.on('reInit', onSpecsSelect);
+    return () => {
+      specsEmblaApi.off('select', onSpecsSelect);
+      specsEmblaApi.off('reInit', onSpecsSelect);
+    };
+  }, [specsEmblaApi, onSpecsSelect]);
+
+  useEffect(() => {
+    if (!stepsEmblaApi) return;
+    stepsEmblaApi.on('select', onStepsSelect);
+    stepsEmblaApi.on('reInit', onStepsSelect);
+    return () => {
+      stepsEmblaApi.off('select', onStepsSelect);
+      stepsEmblaApi.off('reInit', onStepsSelect);
+    };
+  }, [stepsEmblaApi, onStepsSelect]);
+
+  useEffect(() => {
+    if (!reviewsEmblaApi) return;
+    reviewsEmblaApi.on('select', onReviewsSelect);
+    reviewsEmblaApi.on('reInit', onReviewsSelect);
+    return () => {
+      reviewsEmblaApi.off('select', onReviewsSelect);
+      reviewsEmblaApi.off('reInit', onReviewsSelect);
+    };
+  }, [reviewsEmblaApi, onReviewsSelect]);
+
+  useEffect(() => {
+    if (!faqsEmblaApi) return;
+    faqsEmblaApi.on('select', onFaqsSelect);
+    faqsEmblaApi.on('reInit', onFaqsSelect);
+    return () => {
+      faqsEmblaApi.off('select', onFaqsSelect);
+      faqsEmblaApi.off('reInit', onFaqsSelect);
+    };
+  }, [faqsEmblaApi, onFaqsSelect]);
+
+  // Auto-rotate steps on timer (matching Home page Process)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStepIndex((current) => {
+        const next = (current + 1) % steps.length;
+        if (stepsEmblaApi && stepsEmblaApi.internalEngine().options.active) {
+          stepsEmblaApi.scrollTo(next);
+        }
+        return next;
+      });
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [stepsEmblaApi, steps.length]);
+
+  // Home Page style scroll indicators
+  const ScrollIndicatorDots = ({ total, active }: { total: number; active: number }) => (
+    <div className="flex md:hidden justify-center items-center gap-2 mt-6 select-none pointer-events-none">
+      {Array.from({ length: total }).map((_, idx) => (
+        <div 
+          key={idx} 
+          className={`h-2 rounded-full transition-all duration-500 ${
+            active === idx ? 'w-8 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'w-2 bg-white/20'
+          }`}
+        />
+      ))}
+    </div>
+  );
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingForm.name || !bookingForm.phone) return;
+    
+    setBookingStatus('submitting');
+    try {
+      await addDoc(collection(db, 'appointments'), {
+        carId: product.id,
+        carTitle: product.title,
+        trim: activeTrim.name,
+        color: availableColors.find(c => c.id === selectedColor)?.name,
+        name: bookingForm.name,
+        phone: bookingForm.phone,
+        status: 'جديد',
+        createdAt: serverTimestamp()
+      });
+      setBookingStatus('success');
+      setTimeout(() => {
+        setIsBookingModalOpen(false);
+        setBookingStatus('');
+        setBookingForm({ name: '', phone: '' });
+      }, 3000);
+    } catch (err) {
+      console.error('Error submitting booking:', err);
+      setBookingStatus('error');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#121212] pt-32 pb-20 flex flex-col items-center justify-center text-white">
+        <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-white/50 text-sm font-medium">جاري تحميل بيانات السيارة...</p>
+      </div>
+    );
+  }
+
+  if (!product) return null;
+
+  return (
+    <div dir="rtl" className="min-h-screen bg-[#121212] text-white font-sans selection:bg-red-600 selection:text-white pb-28">
+      
+      {/* Main Container */}
+      <div className="max-w-6xl mx-auto pt-24 md:pt-28 pb-12 px-4 sm:px-6">
+        
+        {/* 🌟 HERO PRODUCT SHOWCASE (Refined Desktop Image Size & Balanced Grid) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start mb-16">
+          
+          {/* Left: Auto-scaling Photo Stage (lg:col-span-5) */}
+          <div className="lg:col-span-5 mx-auto w-full space-y-3">
+            {/* Main Image */}
+            <div 
+              onClick={() => setIsLightboxOpen(true)}
+              className="w-full rounded-[2rem] overflow-hidden border border-white/10 bg-[#181818] relative cursor-pointer group shadow-2xl"
+            >
+              <img
+                src={activeImg}
+                alt={product.title}
+                className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-105"
+              />
+              
+              {/* Dynamic Trim Badge on Photo */}
+              <div className="absolute top-4 right-4 z-10">
+                <span className="bg-red-600/90 backdrop-blur-md text-white font-bold text-xs tracking-wider px-3.5 py-1.5 rounded-full border border-red-400/30 shadow-lg">
+                  {activeTrim.badge}
+                </span>
+              </div>
+
+              {/* Share Button (Top Left) */}
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleShare(); }}
+                className="absolute top-4 left-4 z-10 p-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all active:scale-95 shadow-lg"
+                aria-label="Share"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Scrollable Thumbnails Strip */}
+            <div>
+              <div className="flex gap-2.5 overflow-x-auto pb-1 hide-scroll">
+                {product.thumbs.map((img: string, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImg(img)}
+                    className={`relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl overflow-hidden border transition-all ${
+                      activeImg === img 
+                        ? 'border-red-500 ring-2 ring-red-500/30 opacity-100' 
+                        : 'border-white/10 opacity-40 hover:opacity-80'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-contain bg-[#181818]" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Sleek Buy Box with Standout Trim Selector (lg:col-span-7) */}
+          <div className="lg:col-span-7 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[2rem] p-5 sm:p-7 space-y-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+            
+            {/* Title & Subtitle */}
+            <div className="relative">
+              {/* 🏆 Best Import Price Golden Pill */}
+              <div className="flex justify-center mb-3">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 border border-amber-400/30 text-amber-300 text-xs sm:text-[13px] font-bold shadow-[0_0_15px_rgba(245,158,11,0.15)] backdrop-blur-md select-none">
+                  <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                  <span>أفضل سعر وخدمة إستيراد في الجزائر</span>
+                </div>
+              </div>
+
+              <h1 dir="ltr" className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight whitespace-nowrap overflow-hidden text-ellipsis text-right">
+                Geely Coolray {activeTrim.name} 2026
+              </h1>
+              <p className="text-xs sm:text-sm text-red-400/90 font-medium mt-1">
+                {activeTrim.subtitle}
+              </p>
+            </div>
+
+            {/* 🌟 SLEEK STANDOUT TRIM DROPDOWN PILL */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsTrimDropdownOpen(!isTrimDropdownOpen)}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 bg-black/40 hover:bg-black/60 active:scale-[0.99] border border-red-500/30 hover:border-red-400/50 rounded-2xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.12)] group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 border border-red-400/20">
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-white/50 block font-medium leading-tight">فئة السيارة</span>
+                    <span className="text-xs sm:text-sm font-bold text-white group-hover:text-red-300 transition-colors">
+                      {activeTrim.name}
+                    </span>
+                  </div>
+                </div>
+                
+                <ChevronDown className={`w-4 h-4 text-white/60 transition-transform duration-200 ${isTrimDropdownOpen ? 'rotate-180 text-red-400' : ''}`} />
+              </button>
+
+              {/* Floating Dropdown Menu */}
+              <AnimatePresence>
+                {isTrimDropdownOpen && (
+                  <>
+                    {/* Backdrop to close */}
+                    <div 
+                      className="fixed inset-0 z-20" 
+                      onClick={() => setIsTrimDropdownOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full right-0 left-0 mt-2 z-30 bg-[#16181f]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden p-1.5 space-y-1"
+                    >
+                      {coolrayTrims.map((trim) => {
+                        const isSelected = selectedTrimId === trim.id;
+                        return (
+                          <button
+                            key={trim.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedTrimId(trim.id);
+                              setIsTrimDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-right transition-all ${
+                              isSelected
+                                ? 'bg-red-600/20 border border-red-500/40 text-white'
+                                : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-red-400 ring-4 ring-red-400/20' : 'bg-white/20'}`} />
+                              <span className="text-xs sm:text-sm font-bold">{trim.name}</span>
+                            </div>
+                            <div className="text-left shrink-0 mr-2 flex items-center gap-1.5">
+                              <span className={`text-xs font-bold ${isSelected ? 'text-red-300' : 'text-white/50'}`}>
+                                {trim.price}
+                              </span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-red-400 shrink-0" />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* 🎨 COMPACT COLOR PALETTE SELECTOR */}
+            <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-white/50 font-medium">الألوان:</span>
+                <span className="text-xs text-white/90 font-bold">{availableColors.find(c => c.id === selectedColor)?.name}</span>
+              </div>
+              
+              <div className="flex items-center gap-3 px-1">
+                {availableColors.map((color) => {
+                  const isSelected = selectedColor === color.id;
+                  return (
+                    <button
+                      key={color.id}
+                      onClick={() => setSelectedColor(color.id)}
+                      className={`relative w-8 h-8 rounded-full transition-all flex items-center justify-center ${
+                        isSelected ? 'border-[1.5px] border-red-500/70 scale-110' : 'border border-transparent hover:scale-105 opacity-80'
+                      }`}
+                      aria-label={color.name}
+                      title={color.name}
+                    >
+                      {/* Color Circle */}
+                      <div 
+                        className={`w-6 h-6 rounded-full border shadow-inner ${color.border} flex items-center justify-center`}
+                        style={{ backgroundColor: color.hex }}
+                      >
+                        {/* Check Icon for light/dark colors */}
+                        {isSelected && (
+                          <Check className={`w-3.5 h-3.5 ${color.id === 'white' ? 'text-black' : 'text-white'}`} strokeWidth={3} />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Clean Price Panel */}
+            <div className="bg-black/30 border border-white/10 rounded-2xl p-4">
+              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                {activeTrim.price}
+              </div>
+              <div className="text-xs text-white/60 flex items-center gap-1.5 mt-1.5 font-medium">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>شامل الشحن البحري والجمركة الكاملة</span>
+              </div>
+            </div>
+
+            {/* Key Facts (Perfect RTL Alignment) */}
+            <div className="divide-y divide-white/5 text-xs sm:text-sm">
+              <div className="py-2.5 flex items-center justify-between gap-4">
+                <span className="text-white/60 flex items-center gap-2 shrink-0">
+                  <Clock className="w-4 h-4 text-red-400" />
+                  مدة الشحن:
+                </span>
+                <span className="font-bold text-red-400 text-left">30 يوماً فقط</span>
+              </div>
+
+              <div className="py-2.5 flex items-center justify-between gap-4">
+                <span className="text-white/60 flex items-center gap-2 shrink-0">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  الضمان:
+                </span>
+                <span className="font-bold text-emerald-400 text-left">عقد رسمي موثق</span>
+              </div>
+
+              <div className="py-2.5 flex items-center justify-between gap-4">
+                <span className="text-white/60 flex items-center gap-2 shrink-0">
+                  <Car className="w-4 h-4 text-amber-400" />
+                  حالة السيارة:
+                </span>
+                <span className="font-bold text-white text-left">0 كم جديدة من المصنع</span>
+              </div>
+            </div>
+
+            {/* 🎯 CTA Buttons */}
+            <div className="pt-1 flex flex-col gap-3">
+              <button
+                onClick={() => setIsBookingModalOpen(true)}
+                className="w-full py-3 bg-red-600 hover:bg-red-500 active:scale-[0.99] text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-[0_4px_24px_rgba(239,68,68,0.3)]"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                <span>طلب حجز موعد شراء</span>
+              </button>
+              
+              <a
+                href={`tel:${phoneNumber}`}
+                className="w-full py-2.5 bg-white/5 hover:bg-white/10 active:scale-[0.99] border border-white/10 text-white rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-all"
+              >
+                <Phone className="w-4 h-4 text-white/70" />
+                <span>أو إتصل بنا مباشرة</span>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* 🌟 SPECS SECTION (Dynamic Trim Specs) */}
+        <div className="mb-16">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 flex items-center flex-wrap gap-x-2 pt-3 pb-2">
+            <span>أبرز مواصفات نسخة</span>
+            <span dir="ltr" className="font-signature text-red-400 font-normal text-3xl sm:text-4xl md:text-5xl inline-block px-1 leading-none">
+              {activeTrim.name.split(' ')[0]} 2026
+            </span>
+          </h2>
+
+          <div className="relative">
+            <div 
+              ref={specsEmblaRef}
+              className="overflow-hidden md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 py-8 -my-8"
+              dir="rtl"
+            >
+              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
+                {activeTrim.heroSpecs.map((spec: any, idx: number) => {
+                  const IconComp = spec.icon || Sparkles;
+                  const isActive = activeSpecIndex === idx;
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`w-[68vw] sm:w-[46vw] md:w-auto flex-none min-w-0 bg-[#181818] border rounded-2xl p-5 flex flex-col justify-between transition-all duration-500 relative overflow-hidden group ${
+                        isActive 
+                          ? 'border-red-500/40 shadow-[0_0_25px_rgba(239,68,68,0.22)] md:border-white/[0.08] md:shadow-none' 
+                          : 'border-white/[0.08] shadow-none'
+                      }`}
+                    >
+                      {/* Ambient subtle inner glow on active */}
+                      <div className={`absolute inset-0 bg-gradient-to-b from-red-500/[0.08] to-transparent pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100 md:opacity-0' : 'opacity-0'}`} />
+
+                      <div className="relative z-10">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-all duration-300 ${
+                          isActive 
+                            ? 'bg-red-500/20 text-red-400 md:bg-red-500/10' 
+                            : 'bg-red-500/10 text-red-400'
+                        }`}>
+                          <IconComp className="w-5 h-5" />
+                        </div>
+                      </div>
+                      <div className="relative z-10">
+                        <div className="text-xs text-white/40 mb-1">{spec.label}</div>
+                        <div className="text-sm font-bold text-white leading-snug">{spec.value}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <ScrollIndicatorDots total={activeTrim.heroSpecs.length} active={activeSpecIndex} />
+          </div>
+        </div>
+
+        {/* 🌟 3-STEP IMPORT PROCESS (Matching Home Process Design with Centered Desktop Line & Smooth Phone Pulse) */}
+        <section className="pt-4 pb-16 relative">
+          <div className="text-center mb-0 md:mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              كيف تتم عملية <span className="font-amiri text-red-400 font-normal">الاستيراد</span> حتى استلام السيارة؟
+            </h2>
+            <p className="text-white/70 max-w-xl mx-auto font-medium text-sm md:text-base">
+              خطوات سهلة ومضمونة لضمان وصول سيارتك بأعلى معايير الأمان والشفافية.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting Line (Desktop Only - accurately positioned at top-24 with pt-10 md:pt-12 on children container) */}
+            <div className="hidden md:block absolute top-24 left-[16.666%] right-[16.666%] h-px bg-white/10 z-0">
+              <motion.div 
+                className="absolute top-1/2 -translate-y-1/2 h-[2px] w-24 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_20px_rgba(239,68,68,0.8)] -mr-12"
+                animate={{ right: `${activeStepIndex * 50}%` }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+              />
+            </div>
+
+            {/* Embla Steps Carousel */}
+            <div 
+              ref={stepsEmblaRef}
+              className="overflow-hidden md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 pb-12 pt-10 md:pt-12 md:pb-8" 
+              dir="rtl"
+            >
+              <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
+                {steps.map((step, idx) => (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.15, duration: 0.6 }}
+                    className={`w-[85vw] md:w-auto flex-none min-w-0 relative z-10 flex flex-col items-center text-center group bg-[#121212]/40 border border-white/5 p-8 rounded-[2rem] md:bg-transparent md:border-none md:p-0 md:rounded-none overflow-hidden md:overflow-visible ${activeStepIndex === idx ? 'active-pulse' : ''}`}
+                  >
+                    {/* Huge Number Background (Mobile Only) */}
+                    <div className="absolute -top-6 -right-4 text-[10rem] font-black text-white/[0.02] group-hover:text-red-500/[0.05] transition-colors duration-500 z-0 select-none pointer-events-none md:hidden mobile-bg-num">
+                      {step.num}
+                    </div>
+
+                    <div className="relative z-10 flex flex-col items-center h-full">
+                      {/* Icon Box */}
+                      <div className="w-20 h-20 md:w-24 md:h-24 bg-[#121212] border border-white/10 rounded-2xl flex items-center justify-center text-red-400 mb-6 shadow-xl group-hover:-translate-y-2 group-hover:border-red-500/50 transition-all duration-300 md:rotate-3 md:group-hover:rotate-0 relative z-10 mobile-icon-box">
+                        {step.icon}
+                      </div>
+
+                      {/* Step Number Badge */}
+                      <div className="bg-red-500/10 text-red-400 text-sm font-bold px-4 py-1.5 rounded-full mb-5 border border-red-500/20 shadow-sm">
+                        الخطوة {step.num}
+                      </div>
+
+                      <h3 className="text-2xl font-bold text-white mb-3">{step.title}</h3>
+                      <p className="text-white/60 font-medium leading-relaxed max-w-xs">{step.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile Scroll Indicator */}
+            <ScrollIndicatorDots total={steps.length} active={activeStepIndex} />
+          </div>
+        </section>
+
+        {/* 🌟 CUSTOMER REVIEWS (Matching Home Testimonials with Scroll Indicator & Outside Glow) */}
+        <section className="pt-4 pb-14">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              تجارب زبائن <span className="font-amiri text-red-400 font-normal">استلموا سياراتهم</span>
+            </h2>
+            <p className="text-white/70 max-w-xl mx-auto font-medium text-sm md:text-base">
+              آراء حقيقية من عملائنا بعد تجربة الاستيراد واستلام سياراتهم.
+            </p>
+          </div>
+
+          <div className="relative">
+            <div 
+              ref={reviewsEmblaRef}
+              className="overflow-hidden md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 py-8 -my-8"
+              dir="rtl"
+            >
+              <div className="flex md:grid md:grid-cols-3 gap-6 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
+                {reviews.map((review, idx) => {
+                  const isActive = activeReviewIndex === idx;
+                  return (
+                    <div 
+                      key={idx}
+                      className={`w-[85vw] md:w-auto flex-none min-w-0 bg-[#181818]/95 backdrop-blur-sm border p-6 sm:p-8 rounded-[2rem] relative group transition-all duration-500 flex flex-col justify-between overflow-hidden ${
+                        isActive 
+                          ? 'border-red-500/40 shadow-[0_0_25px_rgba(239,68,68,0.22)] md:border-white/[0.08] md:shadow-none' 
+                          : 'border-white/[0.08] shadow-none'
+                      }`}
+                    >
+                      {/* Ambient subtle inner glow on active */}
+                      <div className={`absolute inset-0 bg-gradient-to-b from-red-500/[0.07] to-transparent pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100 md:opacity-0' : 'opacity-0'}`} />
+
+                      <div className="relative z-10">
+                        <Quote className="w-8 h-8 text-white/5 mb-4 group-hover:text-red-500/10 transition-colors" />
+                        <div className="flex items-center gap-1 text-yellow-500 mb-4">
+                          {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                        </div>
+                        <p className="text-white/80 text-sm sm:text-base font-medium leading-relaxed mb-6">
+                          "{review.text}"
+                        </p>
+                      </div>
+                      <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-4 mt-auto">
+                        <div>
+                          <h4 className="text-white font-bold text-sm">{review.name}</h4>
+                          <span className="text-white/40 text-xs flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3 h-3 text-red-400" />
+                            {review.wilaya}
+                          </span>
+                        </div>
+                        <span className="text-red-400 text-xs font-bold bg-red-500/10 px-2.5 py-1 rounded-full border border-red-500/20">
+                          {review.car}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <ScrollIndicatorDots total={reviews.length} active={activeReviewIndex} />
+          </div>
+        </section>
+
+        {/* 🌟 SCROLLABLE FAQ CARDS (With Scroll Indicator & Outside Glow) */}
+        <section className="pt-4 pb-14">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              الأسئلة <span className="font-amiri text-red-400 font-normal">الشائعة</span>
+            </h2>
+            <p className="text-white/70 max-w-xl mx-auto font-medium text-sm md:text-base">
+              إجابات واضحة ومباشرة على استفسارات الشحن والجمركة.
+            </p>
+          </div>
+
+          <div className="relative">
+            <div 
+              ref={faqsEmblaRef}
+              className="overflow-hidden md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 py-8 -my-8"
+              dir="rtl"
+            >
+              <div className="flex md:grid md:grid-cols-2 gap-4 sm:gap-6 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
+                {faqs.map((faq, idx) => {
+                  const isActive = activeFaqIndex === idx;
+                  return (
+                    <div 
+                      key={idx}
+                      className={`w-[85vw] md:w-auto flex-none min-w-0 bg-[#181818]/95 backdrop-blur-sm border p-6 rounded-[2rem] flex flex-col justify-start transition-all duration-500 relative overflow-hidden ${
+                        isActive 
+                          ? 'border-red-500/40 shadow-[0_0_25px_rgba(239,68,68,0.22)] md:border-white/[0.08] md:shadow-none' 
+                          : 'border-white/[0.08] shadow-none'
+                      }`}
+                    >
+                      {/* Ambient subtle inner glow on active */}
+                      <div className={`absolute inset-0 bg-gradient-to-b from-red-500/[0.07] to-transparent pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100 md:opacity-0' : 'opacity-0'}`} />
+
+                      <div className="relative z-10 flex items-center gap-2.5 mb-3 text-red-400 font-bold text-sm sm:text-base">
+                        <HelpCircle className="w-4 h-4 shrink-0" />
+                        <span>{faq.q}</span>
+                      </div>
+                      <p className="relative z-10 text-white/60 text-xs sm:text-sm font-medium leading-relaxed">
+                        {faq.a}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <ScrollIndicatorDots total={faqs.length} active={activeFaqIndex} />
+          </div>
+        </section>
+
+        {/* 🌟 BOTTOM LIQUID CTA SECTION (Matching Home LiquidCTA) */}
+        <section className="relative pt-6 pb-12 overflow-visible">
+          <div className="max-w-3xl mx-auto relative z-10 text-center px-2">
+            <div className="bg-[#181818]/90 border border-white/[0.08] p-8 sm:p-14 rounded-[3rem] shadow-2xl relative overflow-hidden">
+              {/* Top Accent Line */}
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+              
+              {/* Seamless Radial Ambient Glow (Eliminates sharp clipping artifacts) */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.14)_0%,rgba(239,68,68,0.03)_50%,transparent_75%)] pointer-events-none rounded-[3rem]"></div>
+              
+              <h2 className="text-[1.25rem] min-[400px]:text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 leading-tight relative z-10 whitespace-nowrap">
+                جاهز لحجز موعد <span className="font-amiri text-red-400 font-normal">توقيع العقد؟</span>
+              </h2>
+              <p className="text-white/70 text-sm sm:text-base mb-8 max-w-xl mx-auto font-medium leading-relaxed relative z-10">
+                اتصل بنا مباشرة لتأكيد موعد حضورك بالمكتب وإيداع العربون للشروع في شحن سيارتك.
+              </p>
+
+              <div className="relative inline-block z-10">
+                <a
+                  href={`tel:${phoneNumber}`}
+                  className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-red-600/30 hover:bg-red-600/40 active:scale-95 border border-red-400/40 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_40px_rgba(239,68,68,0.45)]"
+                >
+                  <Phone className="w-4 h-4 text-red-300" />
+                  <span>إتصل بنا الآن</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      {/* 🚀 SLIM STICKY BOTTOM CONVERSION BAR (Mobile & Desktop) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#121212]/95 backdrop-blur-xl border-t border-white/10 py-3 px-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] md:hidden">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <div className="shrink-0 hidden min-[380px]:block">
+            <span className="text-[10px] text-white/40 block leading-tight mb-0.5">سعر ({activeTrim.name.split(' ')[0]})</span>
+            <span className="text-sm font-bold text-white tracking-tight">{activeTrim.price}</span>
+          </div>
+
+          <div className="flex items-center gap-2 w-full min-[380px]:w-auto justify-end">
+            <a
+              href={`https://wa.me/213${phoneNumber.replace(/^0/, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-[380px]:flex-none px-4 py-2.5 bg-green-500/10 hover:bg-green-500/20 active:scale-95 border border-green-500/30 text-green-400 rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>واتساب</span>
+            </a>
+            <a
+              href={`tel:${phoneNumber}`}
+              className="flex-1 min-[380px]:flex-none px-4 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+            >
+              <Phone className="w-4 h-4" />
+              <span>إتصال</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* 🌟 LIGHTBOX IMAGE ZOOM MODAL */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 md:p-12"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <button 
+              className="absolute top-4 right-4 z-50 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+              onClick={() => setIsLightboxOpen(false)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Left/Prev Navigation */}
+            <button 
+              className="absolute left-4 md:left-8 z-50 p-3 md:p-4 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white transition-all active:scale-95"
+              onClick={(e) => { e.stopPropagation(); navigateLightbox('prev'); }}
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+
+            <img
+              src={activeImg}
+              alt={product.title}
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl select-none"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            {/* Right/Next Navigation */}
+            <button 
+              className="absolute right-4 md:right-8 z-50 p-3 md:p-4 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white transition-all active:scale-95"
+              onClick={(e) => { e.stopPropagation(); navigateLightbox('next'); }}
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style>{`
+        @keyframes slow-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 0 rgba(239, 68, 68, 0); 
+            border-color: rgba(255, 255, 255, 0.05); 
+          }
+          50% { 
+            box-shadow: 0 0 28px rgba(239, 68, 68, 0.28); 
+            border-color: rgba(239, 68, 68, 0.45); 
+          }
+        }
+        @keyframes number-pulse {
+          0%, 100% { color: rgba(255, 255, 255, 0.02); }
+          50% { color: rgba(239, 68, 68, 0.08); }
+        }
+        @keyframes icon-pulse {
+          0%, 100% { 
+            transform: translateY(0);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+          }
+          50% { 
+            transform: translateY(-8px);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+          }
+        }
+        .active-pulse .mobile-icon-box {
+          animation: icon-pulse 3s ease-in-out infinite;
+        }
+        @media (max-width: 767px) {
+          .active-pulse {
+            animation: slow-pulse 3s ease-in-out infinite;
+          }
+          .active-pulse .mobile-bg-num {
+            animation: number-pulse 3s ease-in-out infinite;
+          }
+        }
+      `}</style>
+
+      {/* 🌟 BOOKING MODAL */}
+      <AnimatePresence>
+        {isBookingModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsBookingModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-[#181818] border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-hidden"
+            >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-600 to-red-400" />
+              <button 
+                onClick={() => setIsBookingModalOpen(false)}
+                className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="text-center mb-8 mt-2">
+                <h3 className="text-2xl font-bold text-white mb-2">طلب موعد شراء</h3>
+                <p className="text-white/60 text-sm">سيتم التواصل معك هاتفياً لتأكيد الموعد</p>
+              </div>
+
+              {bookingStatus === 'success' ? (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-8 text-center"
+                >
+                  <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 border border-emerald-500/30">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h4 className="text-xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h4>
+                  <p className="text-white/60 text-sm">سنتصل بك قريباً على الرقم الذي قدمته.</p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleBookingSubmit} className="space-y-4">
+                  <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 flex gap-4 items-center">
+                    <img src={activeImg} className="w-16 h-16 rounded-lg object-contain bg-[#121212] border border-white/10" alt="car" />
+                    <div>
+                      <div className="text-white font-bold text-sm line-clamp-1">{product.title}</div>
+                      <div className="text-red-400 text-xs font-bold mt-1">{activeTrim.name}</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-white/70 text-sm font-medium mb-2">الاسم الكامل</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={bookingForm.name}
+                      onChange={e => setBookingForm({...bookingForm, name: e.target.value})}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all"
+                      placeholder="أدخل اسمك الكريم"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/70 text-sm font-medium mb-2">رقم الهاتف</label>
+                    <input 
+                      type="tel" 
+                      required
+                      dir="ltr"
+                      value={bookingForm.phone}
+                      onChange={e => setBookingForm({...bookingForm, phone: e.target.value})}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left"
+                      placeholder="05xx xx xx xx"
+                    />
+                  </div>
+                  
+                  {bookingStatus === 'error' && (
+                    <div className="text-red-400 text-sm text-center py-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                      حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى أو الاتصال بنا مباشرة.
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit"
+                    disabled={bookingStatus === 'submitting'}
+                    className="w-full mt-4 bg-red-600 hover:bg-red-500 active:scale-[0.99] disabled:opacity-50 disabled:active:scale-100 text-white font-bold py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center"
+                  >
+                    {bookingStatus === 'submitting' ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      'تأكيد طلب الحجز'
+                    )}
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/admin/AdminDashboard.tsx
+ ************************************************************************/
+
+import React, { useState, useEffect } from 'react';
+import { CarFront, MousePointerClick, TrendingUp, Users, ArrowUpRight, PhoneCall, Target } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase';
+
+export default function AdminDashboard() {
+  const [carCount, setCarCount] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'cars'), (snapshot) => {
+      setCarCount(snapshot.size);
+    });
+    return unsubscribe;
+  }, []);
+
+  const stats = [
+    { label: 'إجمالي السيارات', value: carCount.toString(), icon: <CarFront className="w-7 h-7 text-red-400" />, change: 'مباشر', positive: true },
+    { label: 'زوار الموقع', value: '0', icon: <Users className="w-7 h-7 text-purple-400" />, change: 'اليوم', positive: true },
+    { label: 'نقرات اتصال مباشر', value: '0', icon: <PhoneCall className="w-7 h-7 text-green-400" />, change: 'اليوم', positive: true },
+    { label: 'إجمالي Pixels النشطة', value: '0', icon: <MousePointerClick className="w-7 h-7 text-orange-400" />, change: 'نشط', positive: true },
+  ];
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div>
+        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">نظرة عامة على النشاط</h1>
+        <p className="text-white/50 text-lg">مرحباً بك في لوحة تحكم النظام الإداري، إليك ملخص الأداء.</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, idx) => (
+          <div key={idx} className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:bg-white/[0.05] transition-all duration-500 shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full -mr-16 -mt-16 transition-transform duration-700 group-hover:scale-110"></div>
+            <div className="flex justify-between items-start mb-6 relative z-10">
+              <div className="p-3.5 bg-white/5 rounded-2xl border border-white/5 shadow-inner">
+                {stat.icon}
+              </div>
+              <div className={`text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 ${stat.positive ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-500/20'}`}>
+                {stat.change} <ArrowUpRight className="w-3 h-3" />
+              </div>
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-4xl font-black text-white mb-2 tracking-tight">{stat.value}</h3>
+              <p className="text-white/50 font-medium text-sm uppercase tracking-wider">{stat.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-purple-500/5"></div>
+        <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+          <div className="w-2 h-6 bg-red-500 rounded-full"></div>
+          إجراءات سريعة
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
+          <Link to="/admin/inventory" className="flex flex-col gap-4 p-6 bg-black/20 hover:bg-black/40 rounded-2xl transition-all duration-300 border border-white/5 hover:border-red-500/30 group">
+            <div className="p-4 bg-red-500/10 rounded-xl w-max group-hover:bg-red-500/20 group-hover:scale-110 transition-all">
+              <CarFront className="w-6 h-6 text-red-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg mb-1">إضافة سيارة جديدة</h3>
+              <p className="text-white/40 text-sm leading-relaxed">رفع صور ومواصفات سيارة جديدة للمخزون بكل سهولة.</p>
+            </div>
+          </Link>
+          
+          <Link to="/admin/pixels" className="flex flex-col gap-4 p-6 bg-black/20 hover:bg-black/40 rounded-2xl transition-all duration-300 border border-white/5 hover:border-purple-500/30 group">
+            <div className="p-4 bg-purple-500/10 rounded-xl w-max group-hover:bg-purple-500/20 group-hover:scale-110 transition-all">
+              <Target className="w-6 h-6 text-purple-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg mb-1">إدارة البيكسل (Pixels)</h3>
+              <p className="text-white/40 text-sm leading-relaxed">تتبع الحملات وإضافة Pixel مخصص لكل سيارة معروضة.</p>
+            </div>
+          </Link>
+
+          <Link to="/admin/analytics" className="flex flex-col gap-4 p-6 bg-black/20 hover:bg-black/40 rounded-2xl transition-all duration-300 border border-white/5 hover:border-green-500/30 group">
+            <div className="p-4 bg-green-500/10 rounded-xl w-max group-hover:bg-green-500/20 group-hover:scale-110 transition-all">
+              <PhoneCall className="w-6 h-6 text-green-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg mb-1">تحليل الاتصالات (Leads)</h3>
+              <p className="text-white/40 text-sm leading-relaxed">شاهد من قام بالضغط على زر الاتصال ومن أي منطقة.</p>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/admin/AdminLayout.tsx
+ ************************************************************************/
+
+import React, { useState, useEffect } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { CarFront, Settings, LogOut, LayoutDashboard, BarChart3, Target, ChevronRight, ChevronLeft } from 'lucide-react';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { auth } from '../../firebase';
+
+export default function AdminLayout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isLocalAuth, setIsLocalAuth] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('admin_auth') === 'true') {
+      setIsLocalAuth(true);
+      setLoading(false);
+    }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (!localStorage.getItem('admin_auth')) {
+        setLoading(false);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    // Auth Bypass for the requested credentials
+    if (username.trim().toLowerCase() === 'mehdi' && password === 'mehdi4008') {
+      localStorage.setItem('admin_auth', 'true');
+      setIsLocalAuth(true);
+      return;
+    }
+
+    try {
+      const emailToUse = username.trim().toLowerCase() + '@admin.com';
+      await signInWithEmailAndPassword(auth, emailToUse, password);
+    } catch (err) {
+      setError('بيانات الدخول غير صحيحة.');
+    }
+  };
+
+  const handleLogout = async () => {
+    localStorage.removeItem('admin_auth');
+    setIsLocalAuth(false);
+    await signOut(auth);
+    navigate('/');
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#050505]"><div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div></div>;
+  }
+
+  if (!user && !isLocalAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#050505] p-4 relative overflow-hidden">
+        {/* Ambient background blur */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/20 rounded-full mix-blend-screen filter blur-[120px] opacity-70"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full mix-blend-screen filter blur-[120px] opacity-70"></div>
+        
+        <div className="max-w-md w-full bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-3xl p-8 text-center shadow-2xl relative z-10">
+          <h2 className="text-2xl font-bold text-white mb-2">تسجيل الدخول</h2>
+          <p className="text-white/50 mb-8">لوحة تحكم مدير النظام</p>
+          
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl mb-6 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input 
+              type="text" 
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="اسم المستخدم" 
+              required
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all backdrop-blur-md" 
+              dir="ltr" 
+            />
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="كلمة المرور" 
+              required
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all backdrop-blur-md" 
+              dir="ltr" 
+            />
+            <button type="submit" className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]">
+              دخول
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  const navItems = [
+    { name: 'لوحة القيادة', path: '/admin', icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
+    { name: 'إحصائيات وتحليلات', path: '/admin/analytics', icon: <BarChart3 className="w-5 h-5 shrink-0" /> },
+    { name: 'إدارة السيارات', path: '/admin/inventory', icon: <CarFront className="w-5 h-5 shrink-0" /> },
+    { name: 'تتبع وحملات', path: '/admin/pixels', icon: <Target className="w-5 h-5 shrink-0" /> },
+    { name: 'الإعدادات العامة', path: '/admin/settings', icon: <Settings className="w-5 h-5 shrink-0" /> },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#050505] flex flex-col md:flex-row font-sans relative overflow-hidden" dir="rtl">
+      {/* Ambient background glows for liquid glass effect */}
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-red-500/10 rounded-full mix-blend-screen filter blur-[150px] pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/10 rounded-full mix-blend-screen filter blur-[150px] pointer-events-none"></div>
+
+      {/* Sidebar */}
+      <aside className={`${isCollapsed ? 'md:w-20' : 'md:w-72'} w-full bg-white/[0.02] backdrop-blur-xl border-l border-white/10 shrink-0 flex flex-col relative z-20 shadow-2xl transition-all duration-300`}>
+        <div className={`p-6 border-b border-white/5 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} relative`}>
+          {!isCollapsed && (
+            <div className="flex items-center gap-3 w-full">
+              <div className="font-signature text-2xl text-red-500 font-bold leading-none tracking-wider" dir="ltr">
+                <span className="text-white">Speed</span> Auto
+              </div>
+            </div>
+          )}
+          {isCollapsed && (
+            <div className="font-signature text-2xl text-red-500 font-bold leading-none" dir="ltr">
+              <span className="text-white">H</span>A
+            </div>
+          )}
+        </div>
+        
+        <nav className="flex-grow p-4 space-y-2 overflow-y-auto scrollbar-hide">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3.5 px-3 py-3 rounded-xl transition-all duration-300 outline-none focus:outline-none ${
+                  isActive 
+                    ? 'bg-white/10 text-white border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-md' 
+                    : 'text-white/50 hover:bg-white/5 hover:text-white/90 border border-transparent'
+                } ${isCollapsed ? 'justify-center' : ''}`}
+              >
+                <div className={`${isActive ? 'text-red-400' : 'text-white/40 group-hover:text-white/70'} transition-colors`}>
+                  {item.icon}
+                </div>
+                {!isCollapsed && <span className="font-medium text-[15px] whitespace-nowrap">{item.name}</span>}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 border-t border-white/5 space-y-2">
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={`hidden md:flex items-center gap-3.5 px-3 py-3 w-full rounded-xl text-white/50 hover:bg-white/5 hover:text-white transition-all duration-300 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 border-none group ${isCollapsed ? 'justify-center' : ''}`}
+          >
+            {isCollapsed ? (
+              <ChevronLeft className="w-5 h-5 shrink-0 transition-transform" />
+            ) : (
+              <>
+                <ChevronRight className="w-5 h-5 shrink-0 group-hover:translate-x-1 transition-transform" />
+                <span className="font-medium text-[15px] whitespace-nowrap">تصغير القائمة</span>
+              </>
+            )}
+          </button>
+          <a 
+            href="/"
+            target="_blank"
+            className={`flex items-center gap-3.5 px-3 py-3 w-full rounded-xl text-white/50 hover:bg-white/5 hover:text-white transition-all duration-300 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 border-none group ${isCollapsed ? 'justify-center' : ''}`}
+          >
+            <LayoutDashboard className="w-5 h-5 shrink-0 group-hover:-translate-y-1 transition-transform" />
+            {!isCollapsed && <span className="font-medium text-[14px] whitespace-nowrap">زيارة الموقع</span>}
+          </a>
+          <button 
+            onClick={handleLogout}
+            className={`flex items-center gap-3.5 px-3 py-3 w-full rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 border-none group ${isCollapsed ? 'justify-center' : ''}`}
+          >
+            <LogOut className="w-5 h-5 shrink-0 group-hover:-translate-x-1 transition-transform" />
+            {!isCollapsed && <span className="font-medium text-[15px] whitespace-nowrap">تسجيل الخروج</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-grow p-4 md:p-8 overflow-y-auto relative z-10 scrollbar-hide">
+        <div className="max-w-7xl mx-auto">
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/admin/AnalyticsManager.tsx
+ ************************************************************************/
+
+import React from 'react';
+import { PhoneCall, MapPin, BarChart3, TrendingUp, Users } from 'lucide-react';
+
+export default function AnalyticsManager() {
+  const callLeads: any[] = [];
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div>
+        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">إحصائيات وتحليلات</h1>
+        <p className="text-white/50 text-lg">تتبع النقرات، المكالمات، والمناطق الجغرافية للزوار.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Call Leads Activity */}
+        <div className="lg:col-span-2 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-green-500 rounded-full"></div>
+            سجل نقرات الاتصال المباشر (Leads)
+          </h2>
+          
+          <div className="space-y-4 relative z-10">
+            {callLeads.length === 0 ? (
+              <div className="text-center py-8 text-white/40">
+                لا توجد بيانات حتى الآن.
+              </div>
+            ) : (
+              callLeads.map((lead) => (
+                <div key={lead.id} className="bg-black/20 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-black/40 hover:border-green-500/30 transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-green-500/20 transition-all">
+                      <PhoneCall className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold">{lead.carTitle}</h3>
+                      <p className="text-white/50 text-sm flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3" /> {lead.location}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-left sm:text-right">
+                    <p className="text-white font-bold dir-ltr">{lead.phone}</p>
+                    <p className="text-green-400/70 text-xs font-medium">{lead.time}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Top Locations */}
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-red-500 rounded-full"></div>
+            أكثر المناطق نشاطاً
+          </h2>
+          
+          <div className="space-y-6 relative z-10">
+            <div className="text-center py-8 text-white/40">
+              لا توجد بيانات حتى الآن.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/admin/InventoryManager.tsx
+ ************************************************************************/
+
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Image as ImageIcon, MapPin, Hash, CheckCircle2 } from 'lucide-react';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
+
+export default function InventoryManager() {
+  const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [carOrigin, setCarOrigin] = useState<'korean' | 'chinese'>('korean');
+  const [title, setTitle] = useState('');
+  const [year, setYear] = useState('');
+  const [mileage, setMileage] = useState('');
+  const [price, setPrice] = useState('');
+  const [pixelId, setPixelId] = useState('');
+  const [description, setDescription] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [cars, setCars] = useState<any[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'cars'), (snapshot) => {
+      const carsData = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
+      setCars(carsData);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImageFiles(Array.from(e.target.files));
+    }
+  };
+
+  const [uploadText, setUploadText] = useState('');
+
+  const handleSubmit = async () => {
+    if (!title || !year || !price) return alert("الرجاء ملء الحقول الإجبارية");
+    if (imageFiles.length === 0) return alert("الرجاء إضافة صورة واحدة على الأقل");
+    
+    setSubmitting(true);
+    try {
+      // 1. Fetch Cloudinary settings
+      setUploadText('جاري التحقق من الإعدادات...');
+      const settingsDoc = await getDoc(doc(db, 'settings', 'general'));
+      const settings = settingsDoc.data();
+      
+      if (!settings?.cloudinaryCloudName || !settings?.cloudinaryUploadPreset) {
+        throw new Error("CLOUDINARY_NOT_CONFIGURED");
+      }
+
+      const cloudName = settings.cloudinaryCloudName;
+      const uploadPreset = settings.cloudinaryUploadPreset;
+      
+      const imageUrls: string[] = [];
+      
+      // 2. Upload to Cloudinary
+      for (let i = 0; i < imageFiles.length; i++) {
+        setUploadText(`جاري رفع الصورة ${i + 1} من ${imageFiles.length}...`);
+        const file = imageFiles[i];
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+        
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error("CLOUDINARY_UPLOAD_FAILED");
+        }
+        
+        const data = await response.json();
+        imageUrls.push(data.secure_url);
+      }
+
+      setUploadText('جاري حفظ البيانات...');
+
+      await addDoc(collection(db, 'cars'), {
+        title,
+        origin: carOrigin,
+        year,
+        mileage: carOrigin === 'chinese' ? '0' : mileage,
+        price,
+        pixelId,
+        description,
+        images: imageUrls,
+        status: 'متاح',
+        createdAt: serverTimestamp()
+      });
+
+      setIsAdding(false);
+      // Reset form
+      setTitle(''); setYear(''); setMileage(''); setPrice(''); setPixelId(''); setDescription(''); setImageFiles([]);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error && err.message === "CLOUDINARY_NOT_CONFIGURED") {
+        alert("لم تقم بإعداد Cloudinary في قسم الإعدادات. يرجى إدخال Cloud Name و Upload Preset أولاً.");
+      } else if (err instanceof Error && err.message === "CLOUDINARY_UPLOAD_FAILED") {
+        alert("فشل رفع الصور إلى Cloudinary. يرجى التحقق من Cloud Name و Upload Preset.");
+      } else {
+        alert("حدث خطأ أثناء الحفظ. يرجى المحاولة مرة أخرى.");
+      }
+    } finally {
+      setSubmitting(false);
+      setUploadText('');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("هل أنت متأكد من حذف هذه السيارة؟")) {
+      await deleteDoc(doc(db, 'cars', id));
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">إدارة المخزون</h1>
+          <p className="text-white/50 text-lg">إضافة وتعديل وحذف السيارات المعروضة</p>
+        </div>
+        <button 
+          onClick={() => setIsAdding(true)}
+          className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white px-6 py-3.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+        >
+          <Plus className="w-5 h-5" />
+          إضافة سيارة جديدة
+        </button>
+      </div>
+
+      {isAdding && (
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 mb-6 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent"></div>
+          
+          <h2 className="text-2xl font-bold text-white mb-8 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-red-500 rounded-full"></div>
+            تفاصيل السيارة الجديدة
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 relative z-10">
+            {/* Origin Selection */}
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-medium mb-3">مصدر / حالة السيارة</label>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setCarOrigin('korean')}
+                  className={`flex-1 py-4 px-6 rounded-2xl flex items-center justify-center gap-3 border transition-all duration-300 ${
+                    carOrigin === 'korean' 
+                      ? 'bg-red-500/20 border-red-500/50 text-white shadow-[0_0_15px_rgba(37,99,235,0.2)]' 
+                      : 'bg-black/20 border-white/10 text-white/50 hover:bg-black/40'
+                  }`}
+                >
+                  <MapPin className={`w-5 h-5 ${carOrigin === 'korean' ? 'text-red-400' : ''}`} />
+                  <span className="font-bold">سيارات كورية (مستعملة)</span>
+                  {carOrigin === 'korean' && <CheckCircle2 className="w-5 h-5 text-red-400" />}
+                </button>
+                <button
+                  onClick={() => setCarOrigin('chinese')}
+                  className={`flex-1 py-4 px-6 rounded-2xl flex items-center justify-center gap-3 border transition-all duration-300 ${
+                    carOrigin === 'chinese' 
+                      ? 'bg-purple-500/20 border-purple-500/50 text-white shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
+                      : 'bg-black/20 border-white/10 text-white/50 hover:bg-black/40'
+                  }`}
+                >
+                  <MapPin className={`w-5 h-5 ${carOrigin === 'chinese' ? 'text-purple-400' : ''}`} />
+                  <span className="font-bold">سيارات صينية (جديدة زيرو)</span>
+                  {carOrigin === 'chinese' && <CheckCircle2 className="w-5 h-5 text-purple-400" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-medium mb-2">اسم السيارة / الموديل</label>
+              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="مثال: كيا K3" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all" />
+            </div>
+            
+            <div>
+              <label className="block text-white/70 font-medium mb-2">سنة الصنع</label>
+              <input type="text" value={year} onChange={(e) => setYear(e.target.value)} placeholder="2022" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all" />
+            </div>
+
+            {/* Conditionally hide mileage for Chinese cars */}
+            {carOrigin === 'korean' && (
+              <div className="animate-in fade-in zoom-in duration-300">
+                <label className="block text-white/70 font-medium mb-2">المسافة المقطوعة (كم)</label>
+                <input type="text" value={mileage} onChange={(e) => setMileage(e.target.value)} placeholder="42,000" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all" />
+              </div>
+            )}
+            
+            <div className={carOrigin === 'chinese' ? "md:col-span-2" : ""}>
+              <label className="block text-white/70 font-medium mb-2">السعر (دج)</label>
+              <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="3,200,000" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all" />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-medium mb-2 flex items-center gap-2">
+                <Hash className="w-4 h-4 text-purple-400" />
+                Pixel ID المخصص لهذه السيارة (اختياري)
+              </label>
+              <input type="text" value={pixelId} onChange={(e) => setPixelId(e.target.value)} placeholder="مثال: 123456789012345" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all" dir="ltr" />
+              <p className="text-white/40 text-sm mt-2">سيتم إطلاق حدث (ViewContent) لهذا البيكسل فقط عند زيارة العميل لصفحة هذه السيارة.</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-medium mb-2">الوصف والمواصفات</label>
+              <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="تفاصيل السيارة والمواصفات الكاملة..." className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all"></textarea>
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-medium mb-2">صور السيارة ({imageFiles.length} تم اختيارها)</label>
+              <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
+              <div 
+                onClick={() => fileInputRef.current?.click()} 
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files) {
+                    setImageFiles(Array.from(e.dataTransfer.files));
+                  }
+                }}
+                className="border-2 border-dashed border-white/10 bg-black/20 rounded-2xl p-10 text-center hover:bg-black/40 hover:border-red-500/50 transition-all cursor-pointer group"
+              >
+                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <ImageIcon className="w-8 h-8 text-red-400" />
+                </div>
+                <p className="text-white font-bold text-lg mb-2">اسحب الصور وأفلتها هنا</p>
+                <p className="text-white/40">أو اضغط لاختيار الملفات (سيتم رفعها مباشرة عبر Firebase Storage)</p>
+              </div>
+              
+              {imageFiles.length > 0 && (
+                <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {imageFiles.map((file, idx) => (
+                    <div key={idx} className="relative flex-none w-24 h-24 rounded-xl overflow-hidden border border-white/10">
+                      <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-contain bg-black" />
+                      <button 
+                        onClick={() => setImageFiles(files => files.filter((_, i) => i !== idx))}
+                        className="absolute top-1 right-1 bg-black/60 p-1 rounded-full text-white hover:text-red-400 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex gap-4 relative z-10">
+            <button 
+              onClick={handleSubmit} 
+              disabled={submitting}
+              className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] disabled:opacity-50"
+            >
+              {submitting ? (uploadText || 'جاري الحفظ...') : 'حفظ ونشر'}
+            </button>
+            <button onClick={() => setIsAdding(false)} className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold px-8 py-3.5 rounded-xl transition-all">
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+        
+        <div className="p-6 border-b border-white/10 flex flex-col sm:flex-row gap-4 justify-between items-center relative z-10">
+          <div className="relative w-full sm:w-96">
+            <Search className="w-5 h-5 text-white/40 absolute right-4 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="ابحث عن سيارة..." 
+              className="w-full bg-black/40 border border-white/10 rounded-xl pr-12 pl-4 py-3 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all"
+            />
+          </div>
+          <button className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-xl font-medium transition-all border border-white/10 w-full sm:w-auto justify-center">
+            <Filter className="w-4 h-4" />
+            تصفية
+          </button>
+        </div>
+        
+        <div className="overflow-x-auto relative z-10">
+          <table className="w-full text-right whitespace-nowrap">
+            <thead className="bg-black/20 text-white/50 font-medium text-sm">
+              <tr>
+                <th className="px-6 py-4">السيارة</th>
+                <th className="px-6 py-4">المصدر</th>
+                <th className="px-6 py-4">السنة</th>
+                <th className="px-6 py-4">المسافة (كم)</th>
+                <th className="px-6 py-4">السعر</th>
+                <th className="px-6 py-4">الصور</th>
+                <th className="px-6 py-4">الحالة</th>
+                <th className="px-6 py-4">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {cars.map((car) => (
+                <tr key={car.id} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="px-6 py-5">
+                    <div className="font-bold text-white">{car.title}</div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${car.origin === 'korean' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-purple-500/10 border-purple-500/20 text-purple-400'}`}>
+                      {car.origin === 'korean' ? 'كورية' : 'صينية زيرو'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-white/70">{car.year}</td>
+                  <td className="px-6 py-5 text-white/70">{car.mileage || '---'}</td>
+                  <td className="px-6 py-5 text-white/70 font-bold">{car.price} دج</td>
+                  <td className="px-6 py-5 text-white/70">
+                    <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1 rounded-full w-max">
+                      <ImageIcon className="w-4 h-4 text-white/50" />
+                      <span className="text-sm font-bold text-white">{car.images?.length || 0}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                      car.status === 'متاح' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-orange-500/10 border-orange-500/20 text-orange-400'
+                    }`}>
+                      {car.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <button className="p-2 bg-white/5 hover:bg-red-500/20 rounded-lg text-white/50 hover:text-red-400 transition-colors border border-transparent hover:border-red-500/30">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(car.id)} className="p-2 bg-white/5 hover:bg-red-500/20 rounded-lg text-white/50 hover:text-red-400 transition-colors border border-transparent hover:border-red-500/30">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/admin/PixelManager.tsx
+ ************************************************************************/
+
+import React, { useState, useEffect } from 'react';
+import { Target, Search, Plus, ExternalLink, Activity, Code2, Trash2 } from 'lucide-react';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../firebase';
+
+export default function PixelManager() {
+  const [pixels, setPixels] = useState<any[]>([]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  
+  const [name, setName] = useState('');
+  const [pixelId, setPixelId] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'pixels'), (snapshot) => {
+      const pixelsData = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
+      setPixels(pixelsData);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!name || !pixelId) return alert('الرجاء إدخال اسم البيكسل ومعرفه');
+    setSubmitting(true);
+    try {
+      await addDoc(collection(db, 'pixels'), {
+        name,
+        pixelId,
+        events: 0,
+        status: 'نشط',
+        createdAt: serverTimestamp()
+      });
+      setIsAdding(false);
+      setName('');
+      setPixelId('');
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء الحفظ');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا البيكسل؟')) {
+      await deleteDoc(doc(db, 'pixels', id));
+    }
+  };
+
+  const activePixelsCount = pixels.filter(p => p.status === 'نشط').length;
+  const totalEventsCount = pixels.reduce((sum, p) => sum + (p.events || 0), 0);
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">إدارة البيكسل (Pixels)</h1>
+          <p className="text-white/50 text-lg">تحكم كامل في رموز التتبع لحملات فيسبوك الإعلانية.</p>
+        </div>
+        <button 
+          onClick={() => setIsAdding(true)}
+          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)]"
+        >
+          <Plus className="w-5 h-5 shrink-0" />
+          إضافة بيكسل جديد
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <div className="flex items-center gap-4 mb-4 relative z-10">
+            <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center border border-purple-500/20">
+              <Code2 className="w-6 h-6 text-purple-400" />
+            </div>
+            <div>
+              <p className="text-white/50 text-sm font-medium mb-1">البيكسل النشط (Global)</p>
+              <h3 className="text-2xl font-bold text-white">{activePixelsCount}</h3>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <div className="flex items-center gap-4 mb-4 relative z-10">
+            <div className="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center border border-red-500/20">
+              <Target className="w-6 h-6 text-red-400" />
+            </div>
+            <div>
+              <p className="text-white/50 text-sm font-medium mb-1">أحداث البيكسل (اليوم)</p>
+              <h3 className="text-2xl font-bold text-white">{totalEventsCount}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden group flex items-center justify-center">
+          <a href="https://business.facebook.com/" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors group-hover:scale-105">
+            <ExternalLink className="w-5 h-5" />
+            <span className="font-bold underline decoration-white/30 underline-offset-4">فتح مدير إعلانات فيسبوك</span>
+          </a>
+        </div>
+      </div>
+
+      {isAdding && (
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-transparent pointer-events-none"></div>
+          
+          <h2 className="text-2xl font-bold text-white mb-8 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
+            إضافة بيكسل جديد
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 relative z-10">
+            <div>
+              <label className="block text-white/70 font-medium mb-2">اسم الحملة / البيكسل</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: حملة كيا سبورتاج" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all" />
+            </div>
+            <div>
+              <label className="block text-white/70 font-medium mb-2 flex items-center gap-2"><Code2 className="w-4 h-4 text-purple-400" /> Pixel ID</label>
+              <input type="text" value={pixelId} onChange={(e) => setPixelId(e.target.value)} placeholder="مثال: 123456789012345" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all" dir="ltr" />
+            </div>
+          </div>
+          <div className="flex gap-4 relative z-10">
+            <button 
+              onClick={handleSubmit} 
+              disabled={submitting}
+              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold px-8 py-2.5 rounded-xl transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] disabled:opacity-50"
+            >
+              {submitting ? 'جاري الحفظ...' : 'حفظ'}
+            </button>
+            <button onClick={() => setIsAdding(false)} className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold px-8 py-2.5 rounded-xl transition-all">
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+        
+        <div className="p-6 border-b border-white/10 flex flex-col sm:flex-row gap-4 justify-between items-center relative z-10">
+          <div className="relative w-full sm:w-96">
+            <Search className="w-5 h-5 text-white/40 absolute right-4 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="ابحث عن بيكسل..." 
+              className="w-full bg-black/40 border border-white/10 rounded-xl pr-12 pl-4 py-2.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all"
+            />
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto relative z-10">
+          <table className="w-full text-right whitespace-nowrap">
+            <thead className="bg-black/20 text-white/50 font-medium text-sm">
+              <tr>
+                <th className="px-6 py-4">اسم البيكسل / الحملة</th>
+                <th className="px-6 py-4">Pixel ID</th>
+                <th className="px-6 py-4">إجمالي الأحداث (Events)</th>
+                <th className="px-6 py-4">الحالة</th>
+                <th className="px-6 py-4">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {pixels.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-white/40">
+                    لم يتم إضافة أي بيكسل بعد.
+                  </td>
+                </tr>
+              ) : (
+                pixels.map((pixel) => (
+                  <tr key={pixel.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-white flex items-center gap-3">
+                        <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center border border-white/10">
+                          <Target className="w-4 h-4 text-purple-400" />
+                        </div>
+                        {pixel.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <code className="text-white/70 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10 font-mono text-sm" dir="ltr">
+                        {pixel.pixelId}
+                      </code>
+                    </td>
+                    <td className="px-6 py-5 text-white/70">
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-white/30" />
+                        <span className="font-bold text-white">{pixel.events || 0}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
+                        pixel.status === 'نشط' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-gray-500/10 border-gray-500/20 text-gray-400'
+                      }`}>
+                        {pixel.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <button onClick={() => handleDelete(pixel.id)} className="p-2 bg-white/5 hover:bg-red-500/20 rounded-lg text-white/50 hover:text-red-400 transition-colors border border-transparent hover:border-red-500/30">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: src/pages/admin/SettingsManager.tsx
+ ************************************************************************/
+
+import React, { useState, useEffect } from 'react';
+import { Settings, Save, Phone, MapPin, Mail, Instagram, Facebook } from 'lucide-react';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../firebase';
+
+export default function SettingsManager() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState({
+    phone: '0670089119',
+    address: 'الجزائر العاصمة، باب الزوار',
+    email: 'contact@SpeedAutoCar.com',
+    instagram: 'https://instagram.com/SpeedAutoCar',
+    facebook: 'https://facebook.com/SpeedAutoCar',
+    cloudinaryCloudName: '',
+    cloudinaryUploadPreset: ''
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'general');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setSettings(docSnap.data() as any);
+        }
+      } catch (err) {
+        console.error("Error fetching settings:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'settings', 'general'), {
+        ...settings,
+        updatedAt: serverTimestamp()
+      });
+      alert('تم حفظ الإعدادات بنجاح!');
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء حفظ الإعدادات.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center py-12 text-white/50">جاري التحميل...</div>;
+  }
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">الإعدادات العامة</h1>
+          <p className="text-white/50 text-lg">تخصيص معلومات الاتصال والروابط الخاصة بالمعرض</p>
+        </div>
+        <button 
+          onClick={handleSave}
+          disabled={saving}
+          className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] disabled:opacity-50"
+        >
+          <Save className="w-5 h-5 shrink-0" />
+          {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Contact Information */}
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-red-500 rounded-full"></div>
+            معلومات الاتصال
+          </h2>
+          
+          <div className="space-y-6 relative z-10">
+            <div>
+              <label className="text-white/70 font-medium mb-3 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-red-400 shrink-0" />
+                رقم الهاتف (واتساب / اتصال)
+              </label>
+              <input type="text" name="phone" value={settings.phone} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" />
+            </div>
+            
+            <div>
+              <label className="text-white/70 font-medium mb-3 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-purple-400 shrink-0" />
+                عنوان المعرض
+              </label>
+              <input type="text" name="address" value={settings.address} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all" />
+            </div>
+
+            <div>
+              <label className="text-white/70 font-medium mb-3 flex items-center gap-2">
+                <Mail className="w-4 h-4 text-green-400 shrink-0" />
+                البريد الإلكتروني
+              </label>
+              <input type="email" name="email" value={settings.email} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" />
+            </div>
+          </div>
+        </div>
+
+        {/* Social Media Links */}
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
+            منصات التواصل الاجتماعي
+          </h2>
+          
+          <div className="space-y-6 relative z-10">
+            <div>
+              <label className="text-white/70 font-medium mb-3 flex items-center gap-2">
+                <Instagram className="w-4 h-4 text-pink-500 shrink-0" />
+                رابط حساب إنستجرام
+              </label>
+              <input type="url" name="instagram" value={settings.instagram} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" />
+            </div>
+            
+            <div>
+              <label className="text-white/70 font-medium mb-3 flex items-center gap-2">
+                <Facebook className="w-4 h-4 text-red-500 shrink-0" />
+                رابط صفحة فيسبوك
+              </label>
+              <input type="url" name="facebook" value={settings.facebook} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" />
+            </div>
+          </div>
+        </div>
+
+        {/* Cloudinary Settings */}
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden lg:col-span-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-emerald-500 rounded-full"></div>
+            إعدادات تخزين الصور (Cloudinary)
+          </h2>
+          
+          <div className="space-y-6 relative z-10">
+            <p className="text-white/50 text-sm">أدخل بيانات حساب Cloudinary الخاص بك للسماح برفع الصور مجاناً في لوحة التحكم (إضافة سيارة).</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-white/70 font-medium mb-3 block">Cloud Name</label>
+                <input type="text" name="cloudinaryCloudName" value={settings.cloudinaryCloudName} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" placeholder="ex: dqwertyui" />
+              </div>
+              
+              <div>
+                <label className="text-white/70 font-medium mb-3 block">Upload Preset (Unsigned)</label>
+                <input type="text" name="cloudinaryUploadPreset" value={settings.cloudinaryUploadPreset} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" placeholder="ex: my_preset" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+
+
+/************************************************************************
+ * FILE: index.html
+ ************************************************************************/
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@400;500;700;800;900&family=Great+Vibes&family=Playfair+Display:ital,wght@0,700&display=block">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@400;500;700;800;900&family=Great+Vibes&family=Playfair+Display:ital,wght@0,700&display=block" rel="stylesheet">
+    <title>Speed Auto Car - استيراد السيارات إلى الجزائر</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+
+
+/************************************************************************
+ * FILE: package.json
+ ************************************************************************/
+
+{
+  "name": "react-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist server.js",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "@vitejs/plugin-react": "^5.0.4",
+    "dotenv": "^17.2.3",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "express": "^4.21.2",
+    "firebase": "^12.18.0",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "react-router-dom": "^7.18.2",
+    "recharts": "^3.10.1",
+    "vite": "^6.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.3",
+    "@types/express": "^4.17.21"
+  }
+}
+
+
+
+/************************************************************************
+ * FILE: tsconfig.json
+ ************************************************************************/
+
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
+
+
+
+/************************************************************************
+ * FILE: vite.config.ts
+ ************************************************************************/
+
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import {defineConfig} from 'vite';
+
+export default defineConfig(() => {
+  return {
+    plugins: [react(), tailwindcss()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, '.'),
+      },
+    },
+    server: {
+      // HMR is disabled in AI Studio via DISABLE_HMR env var.
+      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      hmr: process.env.DISABLE_HMR !== 'true',
+      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
+      watch: process.env.DISABLE_HMR === 'true' ? null : {},
+    },
+  };
+});
+
+
+
+/************************************************************************
+ * FILE: .env.example
+ ************************************************************************/
+
+# GEMINI_API_KEY: Required for Gemini AI API calls.
+# AI Studio automatically injects this at runtime from user secrets.
+# Users configure this via the Secrets panel in the AI Studio UI.
+GEMINI_API_KEY="MY_GEMINI_API_KEY"
+
+# APP_URL: The URL where this applet is hosted.
+# AI Studio automatically injects this at runtime with the Cloud Run service URL.
+# Used for self-referential links, OAuth callbacks, and API endpoints.
+APP_URL="MY_APP_URL"
