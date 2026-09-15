@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -305,53 +305,60 @@ export default function ProductTemplate() {
     }
   }
 
-  // Map to the correct inventory images based on trim
-  let displayImages = activeTrim?.images?.length > 0 ? activeTrim.images : (product?.images || defaultCoolray.thumbs);
-  
-  const applyPermutation = (customImages: string[]) => {
-    const defaultTrimImages = activeTrimsList[0]?.images || [];
-    const activeTrimCatalogImages = activeTrim?.images?.length > 0 ? activeTrim.images : defaultCoolray.thumbs;
+  // Stringify dependencies to avoid infinite re-renders from inline objects/arrays
+  const depsString = JSON.stringify({
+    trimId: activeTrim?.id,
+    prodImages: product?.images,
+    hasCustom: product?.hasCustomImages,
+    famCars: familyCarsDb?.map(c => ({ id: c.id, images: c.images }))
+  });
+
+  const displayImages = useMemo(() => {
+    let images = activeTrim?.images?.length > 0 ? activeTrim.images : (product?.images || defaultCoolray.thumbs);
     
-    const orderedActiveTrimImages: string[] = [];
-    const usedIndices = new Set();
+    const applyPermutation = (customImages: string[]) => {
+      const defaultTrimImages = activeTrimsList[0]?.images || [];
+      const activeTrimCatalogImages = activeTrim?.images?.length > 0 ? activeTrim.images : defaultCoolray.thumbs;
+      
+      const orderedActiveTrimImages: string[] = [];
+      const usedIndices = new Set();
+      
+      customImages.forEach((customImg: string) => {
+        const indexInDefault = defaultTrimImages.indexOf(customImg);
+        if (indexInDefault !== -1 && indexInDefault < activeTrimCatalogImages.length) {
+          orderedActiveTrimImages.push(activeTrimCatalogImages[indexInDefault]);
+          usedIndices.add(indexInDefault);
+        } else {
+          orderedActiveTrimImages.push(customImg);
+        }
+      });
+      
+      activeTrimCatalogImages.forEach((img: string, idx: number) => {
+        if (!usedIndices.has(idx)) {
+          orderedActiveTrimImages.push(img);
+        }
+      });
+      
+      return orderedActiveTrimImages;
+    };
     
-    customImages.forEach((customImg: string) => {
-      const indexInDefault = defaultTrimImages.indexOf(customImg);
-      if (indexInDefault !== -1 && indexInDefault < activeTrimCatalogImages.length) {
-        orderedActiveTrimImages.push(activeTrimCatalogImages[indexInDefault]);
-        usedIndices.add(indexInDefault);
-      } else {
-        orderedActiveTrimImages.push(customImg);
+    if (familyCarsDb && familyCarsDb.length > 0 && activeTrim) {
+      const matchedDbTrim = familyCarsDb.find(c => 
+        c.titleLower.includes(activeTrim.id) || 
+        c.titleLower.includes(activeTrim.name.toLowerCase()) || 
+        (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
+      );
+      
+      if (matchedDbTrim && matchedDbTrim.images?.length > 0) {
+        images = matchedDbTrim.images;
+      } else if (product?.hasCustomImages) {
+        images = applyPermutation(product.images);
       }
-    });
-    
-    activeTrimCatalogImages.forEach((img: string, idx: number) => {
-      if (!usedIndices.has(idx)) {
-        orderedActiveTrimImages.push(img);
-      }
-    });
-    
-    return orderedActiveTrimImages;
-  };
-  
-  if (familyCarsDb && familyCarsDb.length > 0 && activeTrim) {
-    // Attempt to find an exact trim match in the user's DB entries
-    const matchedDbTrim = familyCarsDb.find(c => 
-      c.titleLower.includes(activeTrim.id) || 
-      c.titleLower.includes(activeTrim.name.toLowerCase()) || 
-      (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
-    );
-    
-    if (matchedDbTrim && matchedDbTrim.images?.length > 0) {
-      displayImages = matchedDbTrim.images;
     } else if (product?.hasCustomImages) {
-      // If the user organized the master images, apply their exact organization (permutation) to this specific trim's images!
-      displayImages = applyPermutation(product.images);
+      images = applyPermutation(product.images);
     }
-  } else if (product?.hasCustomImages) {
-    // Apply the exact organization pattern to the currently selected trim's pictures
-    displayImages = applyPermutation(product.images);
-  }
+    return images;
+  }, [depsString]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (displayImages && displayImages.length > 0) {
       if (!displayImages.includes(activeImg)) {
@@ -953,20 +960,19 @@ export default function ProductTemplate() {
                     type="button"
                     aria-label="الصورة السابقة"
                     title="الصورة السابقة"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 hover:border-red-500 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 shadow-xl active:scale-90 opacity-90 sm:opacity-0 sm:group-hover/gallery:opacity-100 focus:opacity-100"
+                    className="hidden md:flex absolute -right-[22px] top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 hover:border-red-500 text-white items-center justify-center backdrop-blur-md transition-all duration-200 shadow-xl active:scale-90 opacity-0 group-hover/gallery:opacity-100 focus:opacity-100"
                   >
-                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <ChevronRight className="w-6 h-6" />
                   </button>
-
                   {/* Left Navigation Arrow (Next in RTL Arabic) */}
                   <button
                     onClick={scrollGalleryNext}
                     type="button"
                     aria-label="الصورة التالية"
                     title="الصورة التالية"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 hover:border-red-500 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 shadow-xl active:scale-90 opacity-90 sm:opacity-0 sm:group-hover/gallery:opacity-100 focus:opacity-100"
+                    className="hidden md:flex absolute -left-[22px] top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 hover:border-red-500 text-white items-center justify-center backdrop-blur-md transition-all duration-200 shadow-xl active:scale-90 opacity-0 group-hover/gallery:opacity-100 focus:opacity-100"
                   >
-                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <ChevronLeft className="w-6 h-6" />
                   </button>
 
                   {/* 📍 BOTTOM OVERLAY: Indicator Dots */}

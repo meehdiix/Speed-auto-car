@@ -13,6 +13,7 @@ export default function SettingsManager() {
     instagram: 'https://instagram.com/SpeedAutoCar',
     facebook: 'https://web.facebook.com/profile.php?id=61587488037995',
     tiktok: 'https://www.tiktok.com/@wadieabid',
+    heroBackgroundImage: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000',
     cloudinaryCloudName: '',
     cloudinaryUploadPreset: ''
   });
@@ -144,6 +145,30 @@ export default function SettingsManager() {
                 رابط صفحة تيك توك
               </label>
               <input type="url" name="tiktok" value={settings.tiktok || ''} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" />
+            </div>
+          </div>
+        </div>
+
+        {/* Site Assets Settings */}
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden lg:col-span-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <h2 className="text-xl font-bold text-white mb-6 relative z-10 flex items-center gap-3">
+            <div className="w-2 h-6 bg-red-500 rounded-full"></div>
+            صور وواجهة الموقع
+          </h2>
+          <div className="space-y-6 relative z-10">
+            <div>
+              <label className="text-white/70 font-medium mb-3 block">رابط صورة الواجهة الرئيسية (Hero)</label>
+              <input 
+                type="text" 
+                name="heroBackgroundImage" 
+                value={settings.heroBackgroundImage || ''} 
+                onChange={handleChange} 
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left" 
+                dir="ltr" 
+                placeholder="https://..." 
+              />
+              <p className="text-white/40 text-xs mt-2">يمكنك رفع الصورة في (مكتبة الوسائط) ونسخ الرابط ولصقه هنا.</p>
             </div>
           </div>
         </div>

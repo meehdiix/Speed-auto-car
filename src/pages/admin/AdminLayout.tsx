@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { CarFront, Settings, LogOut, LayoutDashboard, BarChart3, Target, ChevronRight, ChevronLeft } from 'lucide-react';
+import { CarFront, Settings, LogOut, LayoutDashboard, BarChart3, Target, ChevronRight, ChevronLeft, Image as ImageIcon } from 'lucide-react';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { auth } from '../../firebase';
 
@@ -110,6 +110,7 @@ export default function AdminLayout() {
     { name: 'لوحة القيادة', path: '/admin', icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
     { name: 'إحصائيات وتحليلات', path: '/admin/analytics', icon: <BarChart3 className="w-5 h-5 shrink-0" /> },
     { name: 'إدارة السيارات', path: '/admin/inventory', icon: <CarFront className="w-5 h-5 shrink-0" /> },
+    { name: 'مكتبة الوسائط', path: '/admin/media', icon: <ImageIcon className="w-5 h-5 shrink-0" /> },
     { name: 'تتبع وحملات', path: '/admin/pixels', icon: <Target className="w-5 h-5 shrink-0" /> },
     { name: 'الإعدادات العامة', path: '/admin/settings', icon: <Settings className="w-5 h-5 shrink-0" /> },
   ];

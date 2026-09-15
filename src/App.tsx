@@ -38,6 +38,7 @@ const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const InventoryManager = lazy(() => import('./pages/admin/InventoryManager'));
 const SettingsManager = lazy(() => import('./pages/admin/SettingsManager'));
+const MediaManager = lazy(() => import('./pages/admin/MediaManager'));
 const AnalyticsManager = lazy(() => import('./pages/admin/AnalyticsManager'));
 const PixelManager = lazy(() => import('./pages/admin/PixelManager'));
 
@@ -118,6 +119,7 @@ export default function App() {
             <Route path="inventory" element={<InventoryManager />} />
             <Route path="pixels" element={<PixelManager />} />
             <Route path="settings" element={<SettingsManager />} />
+            <Route path="media" element={<MediaManager />} />
           </Route>
         </Routes>
       </Suspense>

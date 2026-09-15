@@ -1,20 +1,67 @@
 import { motion } from 'motion/react';
 import { CarFront, ArrowLeft, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function Hero() {
+  const [bgMedia, setBgMedia] = useState('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'general');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().heroBackgroundImage) {
+          setBgMedia(docSnap.data().heroBackgroundImage);
+        }
+      } catch (e) {
+        console.error('Error fetching settings', e);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const isVideo = bgMedia.match(/\.(mp4|webm|ogg)$/i) || bgMedia.includes('/video/upload');
+
+  // Cloudinary optimization for both image and video
+  const optimizeMedia = (url: string) => {
+    if (!url.includes('cloudinary.com')) return url;
+    if (url.includes('/upload/q_auto')) return url; // Already optimized
+    
+    if (isVideo) {
+      return url.replace('/upload/', '/upload/q_auto,f_auto/');
+    } else {
+      return url.replace('/upload/', '/upload/q_auto,f_auto,w_2000/');
+    }
+  };
+
+  const optimizedMediaUrl = optimizeMedia(bgMedia);
+
   return (
     <div className="relative min-h-[85dvh] md:min-h-[100dvh] flex flex-col justify-between overflow-hidden bg-[#121212]">
-      {/* High Quality Car Image Background with slow zoom effect */}
+      {/* High Quality Car Background (Image or Video) with slow zoom effect */}
       <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-        <motion.img 
-          initial={{ scale: 1 }}
-          animate={{ scale: 1.1 }}
-          transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
-          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000" 
-          alt="Premium Car"
-          className="object-cover w-full h-full"
-        />
+        {isVideo ? (
+          <video 
+            src={optimizedMediaUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="object-cover w-full h-full pointer-events-none scale-105"
+          />
+        ) : (
+          <motion.img 
+            initial={{ scale: 1 }}
+            animate={{ scale: 1.1 }}
+            transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
+            src={optimizedMediaUrl} 
+            alt="Premium Car"
+            className="object-cover w-full h-full pointer-events-none"
+          />
+        )}
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-[#121212]/80"></div>
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#121212] to-transparent z-0"></div>

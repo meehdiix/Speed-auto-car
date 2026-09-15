@@ -1,8 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
-
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 const firebaseConfig = {
   apiKey: "AIzaSyBJzH207mmnsyZtvPBMubF7ZJsVwGRaIo0",
   authDomain: "gen-lang-client-0446894856.firebaseapp.com",
@@ -11,8 +8,12 @@ const firebaseConfig = {
   messagingSenderId: "562438917098",
   appId: "1:562438917098:web:3bd45fa4f710ca887e8093"
 };
-
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, "ai-studio-0d4d0a50-18fc-483c-a019-c84f88da188f");
-export const auth = getAuth(app);
-export const storage = getStorage(app);
+const storage = getStorage(app);
+const testRef = ref(storage, 'test.txt');
+try {
+  await uploadString(testRef, 'hello world');
+  console.log("Success:", await getDownloadURL(testRef));
+} catch(e) {
+  console.error("Error:", e);
+}
