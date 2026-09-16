@@ -1263,6 +1263,12 @@ export default function ProductTemplate() {
               <a
                 id="btn-call-direct"
                 href={`tel:${phoneNumber}`}
+                onMouseDown={() => trackPhoneCall({
+                  carTitle: product?.title,
+                  trimName: activeTrim?.name,
+                  price: activeTrim?.price,
+                  buttonLabel: 'إتصل بنا مباشرة'
+                })}
                 onClick={() => trackPhoneCall({
                   carTitle: product?.title,
                   trimName: activeTrim?.name,
@@ -1550,6 +1556,12 @@ export default function ProductTemplate() {
                 <a
                   id="btn-call-contract"
                   href={`tel:${phoneNumber}`}
+                  onMouseDown={() => trackPhoneCall({
+                    carTitle: product?.title,
+                    trimName: activeTrim?.name,
+                    price: activeTrim?.price,
+                    buttonLabel: 'إتصل بنا الآن (توقيع العقد)'
+                  })}
                   onClick={() => trackPhoneCall({
                     carTitle: product?.title,
                     trimName: activeTrim?.name,
@@ -1596,6 +1608,12 @@ export default function ProductTemplate() {
             <a
               id="btn-sticky-call"
               href={`tel:${phoneNumber}`}
+              onMouseDown={() => trackPhoneCall({
+                carTitle: product?.title,
+                trimName: activeTrim?.name,
+                price: activeTrim?.price,
+                buttonLabel: 'إتصل بنا الآن مباشرة (شريط التثبيت)'
+              })}
               onClick={() => trackPhoneCall({
                 carTitle: product?.title,
                 trimName: activeTrim?.name,

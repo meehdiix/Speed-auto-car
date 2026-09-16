@@ -331,7 +331,7 @@ export const carsCatalog: Record<string, CarModel> = {
     origin: 'chinese',
     year: '2025',
     status: 'متاح',
-    tiktokPixelId: 'DALC1BBC77UDHLL44M0G',
+    tiktokPixelId: 'DALDKHBC77U05QM9RMN0',
     description: 'سيدان رياضية فاست باك بأداء متميز',
     availableColors: [
       { id: 'yellow', name: 'أصفر نيون', hex: '#FFD700', border: 'border-yellow-500' },

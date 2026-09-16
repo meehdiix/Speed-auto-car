@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Target, Search, FileCheck, Ship, Phone, PhoneCall } from 'lucide-react';
+import { trackPhoneCall } from '../utils/pixelTracker';
 
 export default function About() {
   return (
@@ -108,6 +109,7 @@ export default function About() {
           </p>
           <a
             href="tel:0541399342"
+            onClick={() => trackPhoneCall({ buttonLabel: 'إتصل بنا الأن (من نحن)' })}
             className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold text-lg transition-all shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:-translate-y-1"
           >
             <Phone className="w-5 h-5"/>

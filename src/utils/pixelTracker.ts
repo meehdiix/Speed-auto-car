@@ -265,37 +265,40 @@ export function trackPhoneCall(params?: {
   const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'عام';
   const priceNum = parseNumericPrice(params?.price);
 
-  // 1. TikTok Pixel Conversion Events (Emits CompletePayment, Contact, SubmitForm, PlaceAnOrder, ClickButton)
+  // 1. TikTok Pixel Conversion Events (Emits Contact, CompletePayment, SubmitForm, ClickButton)
   try {
     if (window.ttq && typeof window.ttq.track === 'function') {
-      const payload = {
+      // 📞 1. Contact Event (Officially recognized by TikTok Pixel Helper for phone & lead calls)
+      window.ttq.track('Contact', {
         content_id: 'mg-5',
+        content_type: 'product',
         content_name: carName,
-        content_category: 'Vehicle Lead',
-        button_name: label,
-        value: priceNum || 3000000,
-        currency: 'DZD'
-      };
+        button_name: label
+      });
 
-      // 🛒 CompletePayment (Purchase optimization event for TikTok Ads)
-      window.ttq.track('CompletePayment', payload);
+      // 🛒 2. CompletePayment Event (TikTok Purchase Event with valid USD currency)
+      window.ttq.track('CompletePayment', {
+        content_id: 'mg-5',
+        content_type: 'product',
+        content_name: carName,
+        quantity: 1,
+        value: 15000,
+        currency: 'USD'
+      });
 
-      // 📞 Contact event
-      window.ttq.track('Contact', payload);
+      // 📝 3. SubmitForm Event (Lead event)
+      window.ttq.track('SubmitForm', {
+        content_name: carName,
+        button_name: label
+      });
 
-      // 📝 SubmitForm (Lead optimization event)
-      window.ttq.track('SubmitForm', payload);
-
-      // 📦 PlaceAnOrder event
-      window.ttq.track('PlaceAnOrder', payload);
-
-      // 👆 ClickButton event
+      // 👆 4. ClickButton Event
       window.ttq.track('ClickButton', {
         button_name: label,
         content_name: carName
       });
 
-      console.log(`🔥 [TikTok Pixel] Multi-Event Fired: CompletePayment, Contact, SubmitForm for ${carName} (${label})`);
+      console.log(`🔥 [TikTok Pixel] Events sent: Contact, CompletePayment, SubmitForm, ClickButton (${label})`);
     }
   } catch (err) {
     console.warn('[TikTok Pixel] Track error:', err);
@@ -304,22 +307,20 @@ export function trackPhoneCall(params?: {
   // 2. Meta Pixel Events (Purchase, Contact, Lead)
   try {
     if (window.fbq && typeof window.fbq === 'function') {
+      window.fbq('track', 'Contact', {
+        content_name: carName,
+        button_name: label
+      });
       window.fbq('track', 'Purchase', {
         content_name: carName,
         content_ids: ['mg-5'],
-        value: priceNum || 3000000,
-        currency: 'DZD'
-      });
-      window.fbq('track', 'Contact', {
-        content_name: carName,
-        button_name: label,
-        value: priceNum || 3000000,
-        currency: 'DZD'
+        value: 15000,
+        currency: 'USD'
       });
       window.fbq('track', 'Lead', {
         content_name: carName,
-        value: priceNum || 3000000,
-        currency: 'DZD'
+        value: 15000,
+        currency: 'USD'
       });
     }
   } catch {
@@ -347,24 +348,33 @@ export function trackWhatsApp(params?: {
   // 1. TikTok Pixel Contact Event with WhatsApp category
   try {
     if (window.ttq && typeof window.ttq.track === 'function') {
-      const payload = {
+      window.ttq.track('Contact', {
         content_id: 'mg-5',
+        content_type: 'product',
         content_name: carName,
-        content_category: 'WhatsApp',
-        button_name: label,
-        value: priceNum || 3000000,
-        currency: 'DZD'
-      };
+        button_name: label
+      });
 
-      window.ttq.track('CompletePayment', payload);
-      window.ttq.track('Contact', payload);
-      window.ttq.track('SubmitForm', payload);
+      window.ttq.track('CompletePayment', {
+        content_id: 'mg-5',
+        content_type: 'product',
+        content_name: carName,
+        quantity: 1,
+        value: 15000,
+        currency: 'USD'
+      });
+
+      window.ttq.track('SubmitForm', {
+        content_name: carName,
+        button_name: label
+      });
+
       window.ttq.track('ClickButton', {
         button_name: label,
         content_name: carName
       });
 
-      console.log(`💬 [TikTok Pixel] Event: CompletePayment + Contact (واتساب: ${label})`, { car: carName });
+      console.log(`💬 [TikTok Pixel] Event: Contact + CompletePayment (واتساب: ${label})`, { car: carName });
     }
   } catch (err) {
     console.warn('[TikTok Pixel] Track error:', err);
@@ -373,22 +383,19 @@ export function trackWhatsApp(params?: {
   // 2. Meta Pixel Contact Event
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        value: priceNum || 3000000,
-        currency: 'DZD'
-      });
       window.fbq('track', 'Contact', {
         content_name: carName,
-        content_category: 'WhatsApp',
-        button_name: label,
-        value: priceNum || 3000000,
-        currency: 'DZD'
+        button_name: label
+      });
+      window.fbq('track', 'Purchase', {
+        content_name: carName,
+        value: 15000,
+        currency: 'USD'
       });
       window.fbq('track', 'Lead', {
         content_name: carName,
-        value: priceNum || 3000000,
-        currency: 'DZD'
+        value: 15000,
+        currency: 'USD'
       });
     }
   } catch {
@@ -414,28 +421,40 @@ export function triggerAllOptimizationEvents(params?: {
   price?: string | number;
 }) {
   const carName = params?.carTitle || 'MG 5 2026';
-  const priceNum = parseNumericPrice(params?.price) || 3000000;
 
   try {
     if (window.ttq && typeof window.ttq.track === 'function') {
-      const payload = {
+      window.ttq.track('Contact', {
+        content_id: 'mg-5',
+        content_name: carName,
+        button_name: 'إتصل بنا الآن'
+      });
+
+      window.ttq.track('CompletePayment', {
         content_id: 'mg-5',
         content_type: 'product',
         content_name: carName,
-        value: priceNum,
-        currency: 'DZD'
-      };
+        quantity: 1,
+        value: 15000,
+        currency: 'USD'
+      });
 
-      window.ttq.track('CompletePayment', payload);
-      window.ttq.track('Contact', { ...payload, button_name: 'إتصل بنا مباشرة' });
-      window.ttq.track('SubmitForm', payload);
-      window.ttq.track('PlaceAnOrder', payload);
-      window.ttq.track('ViewContent', payload);
-      window.ttq.track('ClickButton', { button_name: 'إتصل بنا مباشرة', content_name: carName });
+      window.ttq.track('SubmitForm', {
+        content_name: carName,
+        button_name: 'إتصل بنا الآن'
+      });
 
-      console.log('⚡ [TikTok Pixel] ALL 6 OPTIMIZATION EVENTS FIRED SUCCESSFULLY:', [
-        'CompletePayment', 'Contact', 'SubmitForm', 'PlaceAnOrder', 'ClickButton', 'ViewContent'
-      ]);
+      window.ttq.track('ClickButton', {
+        button_name: 'إتصل بنا الآن',
+        content_name: carName
+      });
+
+      window.ttq.track('ViewContent', {
+        content_id: 'mg-5',
+        content_name: carName
+      });
+
+      console.log('⚡ [TikTok Pixel] ALL OPTIMIZATION EVENTS FIRED SUCCESSFULLY (Contact, CompletePayment, SubmitForm, ClickButton)');
     }
   } catch (e) {
     console.warn('[Pixel Tracker] Error firing all events:', e);
@@ -443,10 +462,10 @@ export function triggerAllOptimizationEvents(params?: {
 
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', { content_name: carName, value: priceNum, currency: 'DZD' });
-      window.fbq('track', 'Contact', { content_name: carName, value: priceNum, currency: 'DZD' });
-      window.fbq('track', 'Lead', { content_name: carName, value: priceNum, currency: 'DZD' });
-      window.fbq('track', 'ViewContent', { content_name: carName, value: priceNum, currency: 'DZD' });
+      window.fbq('track', 'Contact', { content_name: carName });
+      window.fbq('track', 'Purchase', { content_name: carName, value: 15000, currency: 'USD' });
+      window.fbq('track', 'Lead', { content_name: carName, value: 15000, currency: 'USD' });
+      window.fbq('track', 'ViewContent', { content_name: carName });
     }
   } catch {
     // safe

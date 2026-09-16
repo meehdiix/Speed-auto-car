@@ -29,8 +29,8 @@ export default function MetaPixelTracker() {
       });
 
       // Always ensure the active MG 5 TikTok pixel is loaded
-      if (!tiktokIds.includes('DALC1BBC77UDHLL44M0G')) {
-        tiktokIds.push('DALC1BBC77UDHLL44M0G');
+      if (!tiktokIds.includes('DALDKHBC77U05QM9RMN0')) {
+        tiktokIds.push('DALDKHBC77U05QM9RMN0');
       }
 
       if (tiktokIds.length > 0) {
