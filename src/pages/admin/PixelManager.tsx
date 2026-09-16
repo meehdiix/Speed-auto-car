@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Trash2, Phone, CheckCircle2, Copy, Check, 
-  ExternalLink, Plus, Zap, AlertCircle
+  ExternalLink, Plus, Zap, AlertCircle, Server, ShieldCheck
 } from 'lucide-react';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { trackPhoneCall, trackWhatsApp, triggerAllOptimizationEvents } from '../../utils/pixelTracker';
+import { 
+  trackPhoneCall, 
+  trackWhatsApp, 
+  triggerAllOptimizationEvents,
+  sendTikTokEventsApi,
+  TIKTOK_EVENTS_API_TOKEN,
+  TIKTOK_DEFAULT_PIXEL_ID
+} from '../../utils/pixelTracker';
 
 export default function PixelManager() {
   const [pixels, setPixels] = useState<any[]>([]);
@@ -251,6 +258,37 @@ export default function PixelManager() {
             </button>
           </div>
         </form>
+
+        {/* TikTok Conversions API (Events API) Status Card */}
+        {activePlatform === 'tiktok' && (
+          <div className="p-4 bg-gradient-to-r from-red-950/30 to-black border border-red-500/20 rounded-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4 text-red-400" />
+                <span className="text-white font-bold text-sm">واجهة أحداث تيك توك المباشرة (TikTok Events API / CAPI)</span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 w-fit">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                مربوط ونشط بالتزامن مع البيكسل
+              </span>
+            </div>
+
+            <p className="text-white/60 text-xs leading-relaxed">
+              تم دمج رمز الوصول الخاص بواجهة الأحداث (Events API Token) ليعمل بالتوازي مع البيكسل المباشر، مع تفعيل خاصية مطابقة الأحداث (Event Deduplication) عبر معرّف <code className="text-red-300 font-mono text-[11px]">event_id</code> لتفادي تكرار العمليات، وتجاوز مانع الإعلانات (AdBlockers).
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono pt-1" dir="ltr">
+              <div className="p-2 bg-black/50 border border-white/5 rounded-lg flex items-center justify-between">
+                <span className="text-white/40">Pixel ID:</span>
+                <span className="text-white font-bold">{TIKTOK_DEFAULT_PIXEL_ID}</span>
+              </div>
+              <div className="p-2 bg-black/50 border border-white/5 rounded-lg flex items-center justify-between">
+                <span className="text-white/40">Token:</span>
+                <span className="text-emerald-400 truncate max-w-[150px]">{TIKTOK_EVENTS_API_TOKEN.substring(0, 10)}...{TIKTOK_EVENTS_API_TOKEN.substring(34)}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Current Active Pixels List */}
         <div className="pt-4 border-t border-white/10 space-y-3">

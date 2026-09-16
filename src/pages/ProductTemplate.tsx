@@ -16,8 +16,7 @@ import { db } from '../firebase';
 import { carsCatalog } from '../data/carsCatalog';
 import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
-import { WhatsappIcon } from '../components/WhatsappIcon';
-import { trackPhoneCall, trackWhatsApp, trackViewContent, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
+import { trackPhoneCall, trackViewContent, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
 
 
 interface TrimOption {
@@ -1258,8 +1257,8 @@ export default function ProductTemplate() {
               </div>
             </div>
 
-            {/* 🎯 CTA Buttons (Direct Phone Call + WhatsApp) */}
-            <div className="pt-1 flex flex-col sm:flex-row gap-3">
+            {/* 🎯 CTA Button (Direct Phone Call) */}
+            <div className="pt-1">
               <a
                 id="btn-call-direct"
                 href={`tel:${phoneNumber}`}
@@ -1275,27 +1274,10 @@ export default function ProductTemplate() {
                   price: activeTrim?.price,
                   buttonLabel: 'إتصل بنا مباشرة'
                 })}
-                className="flex-1 py-3.5 bg-red-600 hover:bg-red-500 active:scale-[0.99] border border-red-500/50 text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all shadow-[0_4px_24px_rgba(239,68,68,0.3)] hover:shadow-[0_4px_30px_rgba(239,68,68,0.5)] cursor-pointer"
+                className="w-full py-4 bg-gradient-to-r from-red-600 via-red-500 to-red-600 hover:brightness-110 active:scale-[0.99] border border-red-400/60 text-white rounded-full font-black text-base sm:text-lg flex items-center justify-center gap-3 transition-all shadow-[0_6px_30px_rgba(239,68,68,0.4)] hover:shadow-[0_8px_36px_rgba(239,68,68,0.6)] cursor-pointer tracking-wide"
               >
-                <Phone className="w-5 h-5" />
+                <Phone className="w-5 h-5 animate-pulse" />
                 <span>إتصل بنا مباشرة</span>
-              </a>
-
-              <a
-                id="btn-whatsapp-direct"
-                href={`https://wa.me/213${phoneNumber.replace(/^0|\D/g, '')}?text=${encodeURIComponent(`السلام عليكم، أريد الاستفسار عن سيارة ${product?.title || ''} (${activeTrim?.name || ''}) معروضة بسعر ${activeTrim?.price || ''}`)}`}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => trackWhatsApp({
-                  carTitle: product?.title,
-                  trimName: activeTrim?.name,
-                  price: activeTrim?.price,
-                  buttonLabel: 'تواصل عبر واتساب'
-                })}
-                className="flex-1 py-3.5 bg-emerald-600/95 hover:bg-emerald-500 active:scale-[0.99] border border-emerald-500/50 text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all shadow-[0_4px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_26px_rgba(16,185,129,0.45)] cursor-pointer"
-              >
-                <WhatsappIcon className="w-5 h-5" />
-                <span>تواصل عبر واتساب</span>
               </a>
             </div>
 
@@ -1573,22 +1555,6 @@ export default function ProductTemplate() {
                   <Phone className="w-4 h-4 text-white" />
                   <span>إتصل بنا الآن</span>
                 </a>
-                <a
-                  id="btn-whatsapp-contract"
-                  href={`https://wa.me/213${phoneNumber.replace(/^0|\D/g, '')}?text=${encodeURIComponent(`السلام عليكم، أريد تأكيد موعد توقيع العقد بخصوص سيارة ${product?.title || ''} (${activeTrim?.name || ''})`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => trackWhatsApp({
-                    carTitle: product?.title,
-                    trimName: activeTrim?.name,
-                    price: activeTrim?.price,
-                    buttonLabel: 'تأكيد عبر واتساب (توقيع العقد)'
-                  })}
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-emerald-600/30 hover:bg-emerald-600/40 active:scale-95 border border-emerald-400/40 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.35)] cursor-pointer"
-                >
-                  <WhatsappIcon className="w-4 h-4 text-emerald-300" />
-                  <span>تأكيد عبر واتساب</span>
-                </a>
               </div>
             </div>
           </div>
@@ -1620,26 +1586,10 @@ export default function ProductTemplate() {
                 price: activeTrim?.price,
                 buttonLabel: 'إتصل بنا الآن مباشرة (شريط التثبيت)'
               })}
-              className="flex-1 min-[380px]:flex-none px-4 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)] cursor-pointer"
+              className="flex-1 min-[380px]:flex-none px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:brightness-110 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_18px_rgba(239,68,68,0.4)] cursor-pointer"
             >
               <Phone className="w-4 h-4" />
               <span>إتصل بنا مباشرة</span>
-            </a>
-            <a
-              id="btn-sticky-whatsapp"
-              href={`https://wa.me/213${phoneNumber.replace(/^0|\D/g, '')}?text=${encodeURIComponent(`السلام عليكم، أريد الاستفسار عن سيارة ${product?.title || ''} (${activeTrim?.name || ''})`)}`}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => trackWhatsApp({
-                carTitle: product?.title,
-                trimName: activeTrim?.name,
-                price: activeTrim?.price,
-                buttonLabel: 'تواصل عبر واتساب (شريط التثبيت)'
-              })}
-              className="w-10 h-10 shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full flex items-center justify-center border border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-pointer"
-              title="واتساب"
-            >
-              <WhatsappIcon className="w-4 h-4" />
             </a>
           </div>
         </div>
