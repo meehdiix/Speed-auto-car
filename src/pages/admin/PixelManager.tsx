@@ -101,16 +101,11 @@ export default function PixelManager() {
 
   const handleTestEvent = () => {
     triggerAllOptimizationEvents({
+      carId: 'mg-5',
       carTitle: 'MG 5 2026',
       price: '3,000,000 دج'
     });
-    trackPhoneCall({
-      carTitle: 'MG 5 2026',
-      trimName: 'فحص فوري',
-      price: '3,000,000 دج',
-      buttonLabel: 'إتصل بنا مباشرة'
-    });
-    showNotification(`تم إرسال كافة أحداث التحويل (CompletePayment, Contact, Lead) لتيك توك بنجاح! ستصبح نشطة الآن.`);
+    showNotification(`تم إرسال أحداث التحويل (Purchase, AddToCart, Contact, ViewContent) مع Content ID: mg-5 ورمز عدم التكرار (event_id) بنجاح!`);
   };
 
   // Filter pixels strictly by platform

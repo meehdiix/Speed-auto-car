@@ -208,6 +208,22 @@ export function trackPageView(pageUrl?: string) {
 
 export const TIKTOK_DEFAULT_PIXEL_ID = 'DALDKHBC77U05QM9RMN0';
 export const TIKTOK_EVENTS_API_TOKEN = 'a4776bca7a43fa12a286aef531c73c6f74e8f870';
+export const DEFAULT_CAR_CONTENT_ID = 'mg-5';
+
+/**
+ * Ensures content_id is ALWAYS valid, non-empty and has no trailing whitespace.
+ * Prevents TikTok "Content ID is missing in your events" critical error.
+ */
+export function sanitizeContentId(id?: string): string {
+  if (id && typeof id === 'string' && id.trim().length > 0) {
+    return id.trim();
+  }
+  return DEFAULT_CAR_CONTENT_ID;
+}
+
+// 🛡️ Global debounce state to prevent double-firing from rapid clicks/touches
+let lastCallTimestamp = 0;
+const CALL_DEBOUNCE_MS = 1200;
 
 /**
  * Extracts TikTok Ad Click ID (ttclid) and browser cookie (_ttp) for optimal match rate
@@ -280,14 +296,14 @@ export async function sendTikTokEventsApi(
       .then(res => res.json())
       .then(data => {
         if (data?.code === 0) {
-          console.log(`📡 [TikTok Events API] ${eventName} successfully tracked:`, data);
+          console.log(`📡 [TikTok Events API] ${eventName} successfully tracked [event_id: ${eventId}]:`, data);
         } else {
           console.log(`ℹ️ [TikTok Events API] response:`, data);
         }
       })
       .catch(err => {
-        // Direct client fetch may be blocked by browser CORS; browser Pixel handles client tracking
-        console.log(`[TikTok Events API] Note: ${err?.message || err}`);
+        // Direct browser fetch may be blocked by browser CORS; browser Pixel handles client tracking
+        console.log(`[TikTok Events API] Browser network note: ${err?.message || err}`);
       });
   } catch (err) {
     console.warn('[TikTok Events API] Execution error:', err);
@@ -303,44 +319,50 @@ export function trackViewContent(params: {
   price?: string | number;
   trimName?: string;
 }) {
-  const priceNum = parseNumericPrice(params.price) || 15000;
+  const validContentId = sanitizeContentId(params.id);
   const carName = `${params.title} ${params.trimName || ''}`.trim();
   const eventId = `view_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-  // TikTok Pixel ViewContent
-  try {
-    if (window.ttq && typeof window.ttq.track === 'function') {
-      window.ttq.track('ViewContent', {
-        content_id: params.id || 'mg-5',
+  const viewPayload = {
+    content_id: validContentId,
+    content_type: 'product',
+    content_name: carName,
+    value: 15000,
+    currency: 'USD',
+    contents: [
+      {
+        content_id: validContentId,
         content_type: 'product',
         content_name: carName,
-        value: 15000,
-        currency: 'USD',
-        event_id: eventId
-      });
-      console.log('🚗 [TikTok Pixel] Event: ViewContent', params.title);
+        quantity: 1,
+        price: 15000
+      }
+    ]
+  };
+
+  // TikTok Pixel ViewContent with event_id in 3rd parameter for deduplication
+  try {
+    if (window.ttq && typeof window.ttq.track === 'function') {
+      window.ttq.track('ViewContent', viewPayload, { event_id: eventId });
+      console.log('🚗 [TikTok Pixel] Event: ViewContent', { car: carName, content_id: validContentId, event_id: eventId });
     }
   } catch {
     // safe
   }
 
   // TikTok Events API (Conversions API)
-  sendTikTokEventsApi('ViewContent', {
-    contents: [{ content_id: params.id || 'mg-5', content_type: 'product', content_name: carName }],
-    value: 15000,
-    currency: 'USD'
-  }, eventId);
+  sendTikTokEventsApi('ViewContent', viewPayload, eventId);
 
   // Meta Pixel ViewContent
   try {
     if (window.fbq && typeof window.fbq === 'function') {
       window.fbq('track', 'ViewContent', {
-        content_ids: [params.id || 'mg-5'],
+        content_ids: [validContentId],
         content_name: carName,
         content_type: 'product',
         value: 15000,
         currency: 'USD'
-      });
+      }, { eventID: eventId });
     }
   } catch {
     // safe
@@ -348,97 +370,175 @@ export function trackViewContent(params: {
 }
 
 /**
- * 📞 PRIMARY MAIN EVENT: Phone Call ("إتصل بنا مباشرة")
- * This is the exact high-value conversion event for TikTok Ads Optimization!
- * TikTok machine learning uses 'Contact' and 'ClickButton' to show the ad to people
- * who are most likely to click the call button.
+ * 🛒 AddToCart Tracker - When a customer selects a trim/spec or expresses buying intent
+ * Satisfies TikTok's requirement for valid content_id in AddToCart events
+ */
+export function trackAddToCart(params?: {
+  id?: string;
+  carTitle?: string;
+  trimName?: string;
+  price?: string | number;
+}) {
+  const validContentId = sanitizeContentId(params?.id);
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const eventId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+  const cartPayload = {
+    content_id: validContentId,
+    content_type: 'product',
+    content_name: carName,
+    quantity: 1,
+    price: 15000,
+    value: 15000,
+    currency: 'USD',
+    contents: [
+      {
+        content_id: validContentId,
+        content_type: 'product',
+        content_name: carName,
+        quantity: 1,
+        price: 15000
+      }
+    ]
+  };
+
+  try {
+    if (window.ttq && typeof window.ttq.track === 'function') {
+      window.ttq.track('AddToCart', cartPayload, { event_id: eventId });
+      console.log('🛒 [TikTok Pixel] Event: AddToCart', { car: carName, content_id: validContentId, event_id: eventId });
+    }
+  } catch (err) {
+    console.warn('[TikTok Pixel] AddToCart error:', err);
+  }
+
+  sendTikTokEventsApi('AddToCart', cartPayload, eventId);
+
+  try {
+    if (window.fbq && typeof window.fbq === 'function') {
+      window.fbq('track', 'AddToCart', {
+        content_ids: [validContentId],
+        content_name: carName,
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: eventId });
+    }
+  } catch {
+    // safe
+  }
+}
+
+/**
+ * 📞 PRIMARY CONVERSION EVENT: Phone Call ("إتصل بنا مباشرة")
+ * Fires:
+ * 1. Purchase (Standard official event for TikTok Pixel & Events Manager)
+ * 2. AddToCart (Guaranteed valid content_id)
+ * 3. Contact
+ * With matching event_id in the 3rd parameter for 100% deduplication
  */
 export function trackPhoneCall(params?: {
+  carId?: string;
   carTitle?: string;
   trimName?: string;
   price?: string | number;
   buttonLabel?: string;
 }) {
+  // 🛡️ Client-side debounce to prevent duplicate events on rapid double-clicks
+  const now = Date.now();
+  if (now - lastCallTimestamp < CALL_DEBOUNCE_MS) {
+    console.log('⏳ [Pixel Tracker] Duplicate click prevented by debounce filter');
+    return;
+  }
+  lastCallTimestamp = now;
+
   const label = params?.buttonLabel || 'إتصل بنا مباشرة';
-  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'عام';
-  const priceNum = parseNumericPrice(params?.price) || 15000;
-  const eventId = `call_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  const validContentId = sanitizeContentId(params?.carId);
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const eventId = `call_${now}_${Math.random().toString(36).substring(2, 8)}`;
 
-  // 1. TikTok Pixel Conversion Events (Emits Contact, CompletePayment, SubmitForm, ClickButton)
-  try {
-    if (window.ttq && typeof window.ttq.track === 'function') {
-      // 📞 1. Contact Event (Officially recognized by TikTok Pixel Helper for phone & lead calls)
-      window.ttq.track('Contact', {
-        content_id: 'mg-5',
-        content_type: 'product',
-        content_name: carName,
-        button_name: label,
-        event_id: eventId
-      });
-
-      // 🛒 2. CompletePayment Event (TikTok Purchase Event with valid USD currency)
-      window.ttq.track('CompletePayment', {
-        content_id: 'mg-5',
+  // Full TikTok compliant product payload with valid content_id
+  const productPayload = {
+    content_id: validContentId,
+    content_type: 'product',
+    content_name: carName,
+    quantity: 1,
+    price: 15000,
+    value: 15000,
+    currency: 'USD',
+    contents: [
+      {
+        content_id: validContentId,
         content_type: 'product',
         content_name: carName,
         quantity: 1,
-        value: 15000,
-        currency: 'USD',
-        event_id: eventId
-      });
+        price: 15000
+      }
+    ]
+  };
 
-      // 📝 3. SubmitForm Event (Lead event)
+  // 1. TikTok Pixel Conversion Events (Deduplicated with matching event_id)
+  try {
+    if (window.ttq && typeof window.ttq.track === 'function') {
+      // 🛒 1. Purchase (Official primary event recognized by TikTok Events Manager)
+      window.ttq.track('Purchase', productPayload, { event_id: eventId });
+
+      // 🛒 2. AddToCart (Fired to activate & validate content_id for Add to Cart)
+      window.ttq.track('AddToCart', productPayload, { event_id: `${eventId}_cart` });
+
+      // 📞 3. Contact Event
+      window.ttq.track('Contact', {
+        ...productPayload,
+        button_name: label
+      }, { event_id: `${eventId}_cnt` });
+
+      // 📝 4. SubmitForm Event
       window.ttq.track('SubmitForm', {
-        content_name: carName,
-        button_name: label,
-        event_id: eventId
-      });
+        ...productPayload,
+        button_name: label
+      }, { event_id: `${eventId}_sub` });
 
-      // 👆 4. ClickButton Event
+      // 👆 5. ClickButton Event
       window.ttq.track('ClickButton', {
         button_name: label,
         content_name: carName,
-        event_id: eventId
-      });
+        content_id: validContentId
+      }, { event_id: `${eventId}_btn` });
 
-      console.log(`🔥 [TikTok Pixel] Events sent: Contact, CompletePayment, SubmitForm, ClickButton (${label}) [event_id: ${eventId}]`);
+      console.log(`🔥 [TikTok Pixel] Standard Events sent: Purchase, AddToCart, Contact (${label}) [event_id: ${eventId}] [content_id: ${validContentId}]`);
     }
   } catch (err) {
     console.warn('[TikTok Pixel] Track error:', err);
   }
 
   // 2. TikTok Events API (Conversions API) - Server redundancy with matching event_id
+  sendTikTokEventsApi('Purchase', productPayload, eventId);
+  sendTikTokEventsApi('AddToCart', productPayload, `${eventId}_cart`);
   sendTikTokEventsApi('Contact', {
-    contents: [{ content_id: 'mg-5', content_type: 'product', content_name: carName }],
-    button_name: label,
-    value: 15000,
-    currency: 'USD'
-  }, eventId);
-
-  sendTikTokEventsApi('CompletePayment', {
-    contents: [{ content_id: 'mg-5', content_type: 'product', content_name: carName, quantity: 1, price: 15000 }],
-    value: 15000,
-    currency: 'USD'
-  }, eventId);
+    ...productPayload,
+    button_name: label
+  }, `${eventId}_cnt`);
 
   // 3. Meta Pixel Events (Purchase, Contact, Lead)
   try {
     if (window.fbq && typeof window.fbq === 'function') {
+      window.fbq('track', 'Purchase', {
+        content_name: carName,
+        content_ids: [validContentId],
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: eventId });
+
       window.fbq('track', 'Contact', {
         content_name: carName,
         button_name: label
-      });
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        content_ids: ['mg-5'],
-        value: 15000,
-        currency: 'USD'
-      });
+      }, { eventID: `${eventId}_cnt` });
+
       window.fbq('track', 'Lead', {
         content_name: carName,
         value: 15000,
         currency: 'USD'
-      });
+      }, { eventID: `${eventId}_lead` });
     }
   } catch {
     // safe
@@ -453,136 +553,180 @@ export function trackPhoneCall(params?: {
  * High-intent lead event for WhatsApp inquiries
  */
 export function trackWhatsApp(params?: {
+  carId?: string;
   carTitle?: string;
   trimName?: string;
   price?: string | number;
   buttonLabel?: string;
 }) {
   const label = params?.buttonLabel || 'تواصل عبر واتساب';
-  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'عام';
-  const priceNum = parseNumericPrice(params?.price);
+  const validContentId = sanitizeContentId(params?.carId);
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const eventId = `wa_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
-  // 1. TikTok Pixel Contact Event with WhatsApp category
-  try {
-    if (window.ttq && typeof window.ttq.track === 'function') {
-      window.ttq.track('Contact', {
-        content_id: 'mg-5',
-        content_type: 'product',
-        content_name: carName,
-        button_name: label
-      });
-
-      window.ttq.track('CompletePayment', {
-        content_id: 'mg-5',
+  const productPayload = {
+    content_id: validContentId,
+    content_type: 'product',
+    content_name: carName,
+    quantity: 1,
+    price: 15000,
+    value: 15000,
+    currency: 'USD',
+    contents: [
+      {
+        content_id: validContentId,
         content_type: 'product',
         content_name: carName,
         quantity: 1,
-        value: 15000,
-        currency: 'USD'
-      });
+        price: 15000
+      }
+    ]
+  };
 
-      window.ttq.track('SubmitForm', {
-        content_name: carName,
+  // 1. TikTok Pixel Events with deduplication event_id in 3rd parameter
+  try {
+    if (window.ttq && typeof window.ttq.track === 'function') {
+      window.ttq.track('Purchase', productPayload, { event_id: eventId });
+      window.ttq.track('AddToCart', productPayload, { event_id: `${eventId}_cart` });
+      window.ttq.track('Contact', {
+        ...productPayload,
         button_name: label
-      });
+      }, { event_id: `${eventId}_cnt` });
 
-      window.ttq.track('ClickButton', {
-        button_name: label,
-        content_name: carName
-      });
-
-      console.log(`💬 [TikTok Pixel] Event: Contact + CompletePayment (واتساب: ${label})`, { car: carName });
+      console.log(`💬 [TikTok Pixel] Event: Purchase + AddToCart + Contact (${label})`, { content_id: validContentId, event_id: eventId });
     }
   } catch (err) {
     console.warn('[TikTok Pixel] Track error:', err);
   }
 
-  // 2. Meta Pixel Contact Event
+  // 2. TikTok Events API
+  sendTikTokEventsApi('Purchase', productPayload, eventId);
+  sendTikTokEventsApi('AddToCart', productPayload, `${eventId}_cart`);
+  sendTikTokEventsApi('Contact', {
+    ...productPayload,
+    button_name: label
+  }, `${eventId}_cnt`);
+
+  // 3. Meta Pixel Events
   try {
     if (window.fbq && typeof window.fbq === 'function') {
+      window.fbq('track', 'Purchase', {
+        content_name: carName,
+        content_ids: [validContentId],
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: eventId });
+
       window.fbq('track', 'Contact', {
         content_name: carName,
         button_name: label
-      });
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        value: 15000,
-        currency: 'USD'
-      });
-      window.fbq('track', 'Lead', {
-        content_name: carName,
-        value: 15000,
-        currency: 'USD'
-      });
+      }, { eventID: `${eventId}_cnt` });
     }
   } catch {
     // safe
   }
 
-  // 3. Record in Admin statistics
+  // 4. Record in Admin statistics
   recordEventInFirestore('WhatsApp');
 }
 
 /**
  * ⚡ Fires ALL TikTok & Meta optimization events at once
  * This immediately activates "Waiting for activity" events in TikTok Ads Manager:
- * - CompletePayment (Purchase)
+ * - Purchase (Standard official event for TikTok Pixel)
+ * - AddToCart (Valid non-empty content_id)
  * - Contact
- * - SubmitForm (Lead)
- * - PlaceAnOrder
- * - ClickButton
  * - ViewContent
+ * - SubmitForm
  */
 export function triggerAllOptimizationEvents(params?: {
+  carId?: string;
   carTitle?: string;
   price?: string | number;
 }) {
+  const validContentId = sanitizeContentId(params?.carId);
   const carName = params?.carTitle || 'MG 5 2026';
+  const eventId = `opt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
-  try {
-    if (window.ttq && typeof window.ttq.track === 'function') {
-      window.ttq.track('Contact', {
-        content_id: 'mg-5',
-        content_name: carName,
-        button_name: 'إتصل بنا الآن'
-      });
-
-      window.ttq.track('CompletePayment', {
-        content_id: 'mg-5',
+  const fullPayload = {
+    content_id: validContentId,
+    content_type: 'product',
+    content_name: carName,
+    quantity: 1,
+    price: 15000,
+    value: 15000,
+    currency: 'USD',
+    contents: [
+      {
+        content_id: validContentId,
         content_type: 'product',
         content_name: carName,
         quantity: 1,
-        value: 15000,
-        currency: 'USD'
-      });
+        price: 15000
+      }
+    ]
+  };
 
+  try {
+    if (window.ttq && typeof window.ttq.track === 'function') {
+      // 1. Purchase (Standard Event)
+      window.ttq.track('Purchase', fullPayload, { event_id: eventId });
+
+      // 2. AddToCart
+      window.ttq.track('AddToCart', fullPayload, { event_id: `${eventId}_cart` });
+
+      // 3. Contact
+      window.ttq.track('Contact', {
+        ...fullPayload,
+        button_name: 'فحص فوري'
+      }, { event_id: `${eventId}_cnt` });
+
+      // 4. ViewContent
+      window.ttq.track('ViewContent', fullPayload, { event_id: `${eventId}_view` });
+
+      // 5. SubmitForm
       window.ttq.track('SubmitForm', {
-        content_name: carName,
-        button_name: 'إتصل بنا الآن'
-      });
+        ...fullPayload,
+        button_name: 'فحص فوري'
+      }, { event_id: `${eventId}_sub` });
 
-      window.ttq.track('ClickButton', {
-        button_name: 'إتصل بنا الآن',
-        content_name: carName
-      });
-
-      window.ttq.track('ViewContent', {
-        content_id: 'mg-5',
-        content_name: carName
-      });
-
-      console.log('⚡ [TikTok Pixel] ALL OPTIMIZATION EVENTS FIRED SUCCESSFULLY (Contact, CompletePayment, SubmitForm, ClickButton)');
+      console.log('⚡ [TikTok Pixel] All Optimization Events fired with valid content_id and deduplication event_id:', { content_id: validContentId, eventId });
     }
   } catch (e) {
     console.warn('[Pixel Tracker] Error firing all events:', e);
   }
 
+  // Also send to Events API for instant server activity
+  sendTikTokEventsApi('Purchase', fullPayload, eventId);
+  sendTikTokEventsApi('AddToCart', fullPayload, `${eventId}_cart`);
+  sendTikTokEventsApi('ViewContent', fullPayload, `${eventId}_view`);
+
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Contact', { content_name: carName });
-      window.fbq('track', 'Purchase', { content_name: carName, value: 15000, currency: 'USD' });
-      window.fbq('track', 'Lead', { content_name: carName, value: 15000, currency: 'USD' });
-      window.fbq('track', 'ViewContent', { content_name: carName });
+      window.fbq('track', 'Purchase', {
+        content_name: carName,
+        content_ids: [validContentId],
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: eventId });
+
+      window.fbq('track', 'AddToCart', {
+        content_name: carName,
+        content_ids: [validContentId],
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: `${eventId}_cart` });
+
+      window.fbq('track', 'ViewContent', {
+        content_name: carName,
+        content_ids: [validContentId],
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: `${eventId}_view` });
     }
   } catch {
     // safe
@@ -598,15 +742,24 @@ export function trackLeadSubmission(params: {
   name?: string;
   phone?: string;
 }) {
+  const validContentId = DEFAULT_CAR_CONTENT_ID;
+  const eventId = `lead_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
   try {
     if (window.ttq && typeof window.ttq.track === 'function') {
       window.ttq.track('SubmitForm', {
+        content_id: validContentId,
+        content_type: 'product',
         content_name: params.formName,
         car_title: params.carTitle || ''
-      });
+      }, { event_id: eventId });
+
       window.ttq.track('CompleteRegistration', {
+        content_id: validContentId,
+        content_type: 'product',
         content_name: params.formName
-      });
+      }, { event_id: `${eventId}_reg` });
+
       console.log('📋 [TikTok Pixel] Event: SubmitForm / Lead', params.formName);
     }
   } catch {
@@ -617,8 +770,9 @@ export function trackLeadSubmission(params: {
     if (window.fbq && typeof window.fbq === 'function') {
       window.fbq('track', 'Lead', {
         content_name: params.formName,
-        car_title: params.carTitle || ''
-      });
+        car_title: params.carTitle || '',
+        content_ids: [validContentId]
+      }, { eventID: eventId });
     }
   } catch {
     // safe

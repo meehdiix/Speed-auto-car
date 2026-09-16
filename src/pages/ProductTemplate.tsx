@@ -16,7 +16,7 @@ import { db } from '../firebase';
 import { carsCatalog } from '../data/carsCatalog';
 import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
-import { trackPhoneCall, trackViewContent, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
+import { trackPhoneCall, trackViewContent, trackAddToCart, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
 
 
 interface TrimOption {
@@ -520,13 +520,13 @@ export default function ProductTemplate() {
   useEffect(() => {
     if (product?.title) {
       trackViewContent({
-        id: product.id,
+        id: product.id || 'mg-5',
         title: product.title,
         price: activeTrim?.price,
         trimName: activeTrim?.name
       });
     }
-  }, [product?.id, product?.title, activeTrim?.name, activeTrim?.price]);
+  }, [product?.id, product?.title]);
 
   const steps = [
     {
@@ -1156,6 +1156,12 @@ export default function ProductTemplate() {
                             onClick={() => {
                               setSelectedTrimId(trim.id);
                               setIsTrimDropdownOpen(false);
+                              trackAddToCart({
+                                id: product?.id || 'mg-5',
+                                carTitle: product?.title,
+                                trimName: trim.name,
+                                price: trim.price
+                              });
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-right transition-all ${
                               isSelected
@@ -1262,13 +1268,8 @@ export default function ProductTemplate() {
               <a
                 id="btn-call-direct"
                 href={`tel:${phoneNumber}`}
-                onMouseDown={() => trackPhoneCall({
-                  carTitle: product?.title,
-                  trimName: activeTrim?.name,
-                  price: activeTrim?.price,
-                  buttonLabel: 'إتصل بنا مباشرة'
-                })}
                 onClick={() => trackPhoneCall({
+                  carId: product?.id || 'mg-5',
                   carTitle: product?.title,
                   trimName: activeTrim?.name,
                   price: activeTrim?.price,
@@ -1538,13 +1539,8 @@ export default function ProductTemplate() {
                 <a
                   id="btn-call-contract"
                   href={`tel:${phoneNumber}`}
-                  onMouseDown={() => trackPhoneCall({
-                    carTitle: product?.title,
-                    trimName: activeTrim?.name,
-                    price: activeTrim?.price,
-                    buttonLabel: 'إتصل بنا الآن (توقيع العقد)'
-                  })}
                   onClick={() => trackPhoneCall({
+                    carId: product?.id || 'mg-5',
                     carTitle: product?.title,
                     trimName: activeTrim?.name,
                     price: activeTrim?.price,
@@ -1574,13 +1570,8 @@ export default function ProductTemplate() {
             <a
               id="btn-sticky-call"
               href={`tel:${phoneNumber}`}
-              onMouseDown={() => trackPhoneCall({
-                carTitle: product?.title,
-                trimName: activeTrim?.name,
-                price: activeTrim?.price,
-                buttonLabel: 'إتصل بنا الآن مباشرة (شريط التثبيت)'
-              })}
               onClick={() => trackPhoneCall({
+                carId: product?.id || 'mg-5',
                 carTitle: product?.title,
                 trimName: activeTrim?.name,
                 price: activeTrim?.price,
