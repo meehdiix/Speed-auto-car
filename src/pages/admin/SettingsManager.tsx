@@ -15,7 +15,9 @@ export default function SettingsManager() {
     tiktok: 'https://www.tiktok.com/@wadieabid',
     heroBackgroundImage: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000',
     cloudinaryCloudName: '',
-    cloudinaryUploadPreset: ''
+    cloudinaryUploadPreset: '',
+    tiktokPixelId: '',
+    metaPixelId: ''
   });
 
   useEffect(() => {
@@ -192,6 +194,60 @@ export default function SettingsManager() {
               <div>
                 <label className="text-white/70 font-medium mb-3 block">Upload Preset (Unsigned)</label>
                 <input type="text" name="cloudinaryUploadPreset" value={settings.cloudinaryUploadPreset} onChange={handleChange} className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 focus:bg-black/60 transition-all text-left" dir="ltr" placeholder="ex: my_preset" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Global Pixel Settings */}
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden lg:col-span-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <div className="flex items-center justify-between mb-6 relative z-10">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+              <div className="w-2 h-6 bg-red-500 rounded-full"></div>
+              معرفات البيكسل العامة (Global Tracking Pixels)
+            </h2>
+          </div>
+          
+          <div className="space-y-6 relative z-10">
+            <p className="text-white/50 text-sm">
+              أدخل معرفات بيكسل تيك توك وفيسبوك الافتراضية هنا لتفعيل التتبع الشامل لجميع زوار الموقع، ونقرات "إتصل بنا مباشرة" وواتساب.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-white/70 font-medium mb-2.5 flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 text-red-500 font-black text-xs flex items-center justify-center shrink-0">TT</span>
+                    معرف تيك توك بيكسل الافتراضي (TikTok Pixel ID)
+                  </span>
+                </label>
+                <input 
+                  type="text" 
+                  name="tiktokPixelId" 
+                  value={settings.tiktokPixelId || ''} 
+                  onChange={handleChange} 
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left font-mono text-sm" 
+                  dir="ltr" 
+                  placeholder="مثال: C1234567890ABCDEF" 
+                />
+                <p className="text-white/40 text-xs mt-1.5">يبدأ بـ C ومكون من 16-20 حرف/رقم من مدير إعلانات تيك توك.</p>
+              </div>
+              
+              <div>
+                <label className="text-white/70 font-medium mb-2.5 flex items-center gap-2">
+                  <Facebook className="w-4 h-4 text-blue-500 shrink-0" />
+                  معرف فيسبوك بيكسل الافتراضي (Meta Pixel ID)
+                </label>
+                <input 
+                  type="text" 
+                  name="metaPixelId" 
+                  value={settings.metaPixelId || ''} 
+                  onChange={handleChange} 
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-blue-500/50 focus:bg-black/60 transition-all text-left font-mono text-sm" 
+                  dir="ltr" 
+                  placeholder="مثال: 123456789012345" 
+                />
+                <p className="text-white/40 text-xs mt-1.5">أرقام فقط من مدير أحداث فيسبوك.</p>
               </div>
             </div>
           </div>

@@ -17,6 +17,7 @@ export default function InventoryManager() {
   const [mileage, setMileage] = useState('');
   const [price, setPrice] = useState('');
   const [pixelId, setPixelId] = useState('');
+  const [tiktokPixelId, setTiktokPixelId] = useState('');
   const [description, setDescription] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -44,6 +45,7 @@ export default function InventoryManager() {
     setMileage(car.mileage || '');
     setPrice(car.price || '');
     setPixelId(car.pixelId || '');
+    setTiktokPixelId(car.tiktokPixelId || '');
     setDescription(car.description || '');
     setExistingImages(car.images || []);
     setImageFiles([]);
@@ -54,7 +56,7 @@ export default function InventoryManager() {
   const resetForm = () => {
     setIsAdding(false);
     setEditingId(null);
-    setTitle(''); setYear(''); setMileage(''); setPrice(''); setPixelId(''); setDescription(''); setImageFiles([]); setExistingImages([]);
+    setTitle(''); setYear(''); setMileage(''); setPrice(''); setPixelId(''); setTiktokPixelId(''); setDescription(''); setImageFiles([]); setExistingImages([]);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,6 +126,7 @@ export default function InventoryManager() {
         mileage: carOrigin === 'chinese' ? '0' : mileage,
         price,
         pixelId,
+        tiktokPixelId,
         description,
         images: finalImageUrls,
         status: 'متاح',
@@ -205,13 +208,36 @@ export default function InventoryManager() {
               <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="3,200,000" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all" />
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-white/70 font-medium mb-2 flex items-center gap-2">
-                <Hash className="w-4 h-4 text-purple-400" />
-                Pixel ID المخصص لهذه السيارة (اختياري)
+                <span className="w-4 h-4 text-red-500 font-black text-xs flex items-center justify-center shrink-0">TT</span>
+                TikTok Pixel ID المخصص للسيارة (اختياري)
               </label>
-              <input type="text" value={pixelId} onChange={(e) => setPixelId(e.target.value)} placeholder="مثال: 123456789012345" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all" dir="ltr" />
-              <p className="text-white/40 text-sm mt-2">سيتم إطلاق حدث (ViewContent) لهذا البيكسل فقط عند زيارة العميل لصفحة هذه السيارة.</p>
+              <input 
+                type="text" 
+                value={tiktokPixelId} 
+                onChange={(e) => setTiktokPixelId(e.target.value)} 
+                placeholder="مثال: C1234567890ABCDEF" 
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all font-mono text-sm" 
+                dir="ltr" 
+              />
+              <p className="text-white/40 text-xs mt-1.5">إذا أردت تخصيص حملة تيك توك محددة لهذه السيارة فقط.</p>
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-medium mb-2 flex items-center gap-2">
+                <Hash className="w-4 h-4 text-blue-400" />
+                Meta (Facebook) Pixel ID المخصص (اختياري)
+              </label>
+              <input 
+                type="text" 
+                value={pixelId} 
+                onChange={(e) => setPixelId(e.target.value)} 
+                placeholder="مثال: 123456789012345" 
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500/50 focus:bg-black/60 transition-all font-mono text-sm" 
+                dir="ltr" 
+              />
+              <p className="text-white/40 text-xs mt-1.5">إذا أردت تخصيص حملة فيسبوك محددة لهذه السيارة فقط.</p>
             </div>
 
             <div className="md:col-span-2">

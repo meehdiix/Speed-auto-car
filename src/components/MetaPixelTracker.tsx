@@ -1,78 +1,77 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, doc } from 'firebase/firestore';
 import { db } from '../firebase';
-
-declare global {
-  interface Window {
-    fbq?: any;
-    _fbq?: any;
-  }
-}
-
-// Injects official Meta Pixel runtime if not already loaded
-function initMetaPixelScript() {
-  if (window.fbq) return;
-
-  /* eslint-disable */
-  (function (f: any, b: any, e: any, v: any, n?: any, t?: any, s?: any) {
-    if (f.fbq) return;
-    n = f.fbq = function () {
-      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
-    };
-    if (!f._fbq) f._fbq = n;
-    n.push = n;
-    n.loaded = true;
-    n.version = '2.0';
-    n.queue = [];
-    t = b.createElement(e);
-    t.async = true;
-    t.src = v;
-    s = b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t, s);
-  })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-  /* eslint-enable */
-}
+import { initTikTokPixelScript, initMetaPixelScript, trackPageView } from '../utils/pixelTracker';
 
 export default function MetaPixelTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    // Listen for active pixels configured in admin dashboard
-    const unsubscribe = onSnapshot(collection(db, 'pixels'), (snapshot) => {
-      const activePixels = snapshot.docs
-        .map(d => d.data())
-        .filter(p => p.status === 'نشط' && p.pixelId);
+    // 1. Listen for active Pixels in 'pixels' collection (TikTok & Meta)
+    const unsubPixels = onSnapshot(collection(db, 'pixels'), (snapshot) => {
+      const activePixels = snapshot.docs.map(d => d.data());
 
-      if (activePixels.length > 0) {
-        initMetaPixelScript();
-        activePixels.forEach(p => {
-          try {
-            window.fbq('init', p.pixelId);
-          } catch (e) {
-            console.error('Meta pixel init error:', e);
-          }
-        });
-        try {
-          window.fbq('track', 'PageView');
-        } catch (e) {
-          // ignore
+      const tiktokIds: string[] = [];
+      const metaIds: string[] = [];
+
+      activePixels.forEach(p => {
+        if (p.status !== 'نشط') return;
+        const pid = (p.pixelId || '').trim();
+        if (!pid) return;
+
+        // Platform detection: explicit platform or check alphanumeric characters (TikTok IDs have letters)
+        if (p.platform === 'tiktok' || (!p.platform && /[A-Za-z]/.test(pid))) {
+          tiktokIds.push(pid);
+        } else {
+          metaIds.push(pid);
         }
+      });
+
+      // Always ensure the active TikTok pixels are loaded
+      ['DALBQ9RC77UDHLL44L90', 'DALC1BBC77UDHLL44M0G'].forEach(id => {
+        if (!tiktokIds.includes(id)) {
+          tiktokIds.push(id);
+        }
+      });
+
+      if (tiktokIds.length > 0) {
+        initTikTokPixelScript(tiktokIds);
       }
+      if (metaIds.length > 0) {
+        initMetaPixelScript(metaIds);
+      }
+
+      // Fire initial PageView
+      trackPageView();
+    }, (error) => {
+      console.warn('[Pixel Tracker] Firestore pixels subscription error:', error);
     });
 
-    return () => unsubscribe();
+    // 2. Listen for global Pixel IDs from settings/general
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'general'), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.tiktokPixelId && typeof data.tiktokPixelId === 'string' && data.tiktokPixelId.trim()) {
+          initTikTokPixelScript([data.tiktokPixelId.trim()]);
+        }
+        if (data.metaPixelId && typeof data.metaPixelId === 'string' && data.metaPixelId.trim()) {
+          initMetaPixelScript([data.metaPixelId.trim()]);
+        }
+      }
+    }, (error) => {
+      console.warn('[Pixel Tracker] Firestore settings subscription error:', error);
+    });
+
+    return () => {
+      unsubPixels();
+      unsubSettings();
+    };
   }, []);
 
-  // Track PageView on route change
+  // Track PageView on route navigation
   useEffect(() => {
-    if (typeof window.fbq === 'function') {
-      try {
-        window.fbq('track', 'PageView');
-      } catch (e) {
-        // ignore
-      }
-    }
+    trackPageView(location.pathname + location.search);
   }, [location.pathname, location.search]);
 
   return null;

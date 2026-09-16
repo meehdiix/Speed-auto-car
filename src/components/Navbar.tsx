@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown, Menu, Phone, X, Star, Car } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { trackPhoneCall } from '../utils/pixelTracker';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -108,6 +109,7 @@ export default function Navbar() {
           <div className="hidden md:block relative z-10">
             <a
               href={`tel:${phoneNumber.replace(/\s+/g, '')}`}
+              onClick={() => trackPhoneCall({ buttonLabel: 'اتصل بنا الأن (الترويسة)' })}
               className="bg-red-500/20 hover:bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white px-4 py-1.5 rounded-full font-bold text-[10px] sm:text-xs flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
             >
               <Phone className="w-3 h-3" />

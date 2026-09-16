@@ -23,6 +23,8 @@ export interface CarModel {
   origin: 'korean' | 'chinese';
   year: string;
   status: string;
+  tiktokPixelId?: string;
+  pixelId?: string;
   description: string;
   availableColors: { id: string; name: string; hex: string; border: string }[];
   trims: TrimOption[];
@@ -329,6 +331,7 @@ export const carsCatalog: Record<string, CarModel> = {
     origin: 'chinese',
     year: '2025',
     status: 'متاح',
+    tiktokPixelId: 'DALC1BBC77UDHLL44M0G',
     description: 'سيدان رياضية فاست باك بأداء متميز',
     availableColors: [
       { id: 'yellow', name: 'أصفر نيون', hex: '#FFD700', border: 'border-yellow-500' },

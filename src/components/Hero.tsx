@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { trackPhoneCall } from '../utils/pixelTracker';
 
 export default function Hero() {
   const [bgMedia, setBgMedia] = useState('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000');
@@ -100,6 +101,7 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full px-4">
             <a 
               href="tel:0541399342"
+              onClick={() => trackPhoneCall({ buttonLabel: 'اتصل بنا الأن (الرئيسية)' })}
               className="px-5 py-2.5 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white rounded-full font-bold text-xs sm:text-sm transition-all shadow-[0_4px_24px_rgba(239,68,68,0.2)] flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Phone className="w-3.5 h-3.5"/>

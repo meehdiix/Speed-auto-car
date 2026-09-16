@@ -1,6 +1,7 @@
 import { Phone, MapPin, Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { WhatsappIcon } from './WhatsappIcon';
+import { trackPhoneCall, trackWhatsApp } from '../utils/pixelTracker';
 
 const TiktokIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +29,14 @@ export default function Footer() {
               <a href="https://www.tiktok.com/@wadieabid" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 hover:bg-red-600 hover:text-white transition-colors shadow-sm">
                 <TiktokIcon className="w-6 h-6" />
               </a>
-              <a href="https://wa.me/213541399342" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-green-600/20 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-600 hover:text-white transition-colors shadow-sm" title="واتساب">
+              <a 
+                href="https://wa.me/213541399342" 
+                target="_blank" 
+                rel="noreferrer" 
+                onClick={() => trackWhatsApp({ buttonLabel: 'واتساب (الفوتر)' })}
+                className="w-12 h-12 rounded-full bg-green-600/20 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-600 hover:text-white transition-colors shadow-sm" 
+                title="واتساب"
+              >
                 <WhatsappIcon className="w-6 h-6" />
               </a>
             </div>
@@ -52,7 +60,14 @@ export default function Footer() {
                 </div>
                 <div>
                    <p className="text-white/50 text-sm mb-1">الهاتف / واتساب</p>
-                   <a href="tel:0541399342" className="text-white font-bold hover:text-red-400 transition-colors inline-block tracking-wide text-lg" dir="ltr">0541 39 93 42</a>
+                   <a 
+                     href="tel:0541399342" 
+                     onClick={() => trackPhoneCall({ buttonLabel: 'اتصال (الفوتر)' })}
+                     className="text-white font-bold hover:text-red-400 transition-colors inline-block tracking-wide text-lg" 
+                     dir="ltr"
+                   >
+                     0541 39 93 42
+                   </a>
                 </div>
               </li>
               <li className="flex items-start gap-4">

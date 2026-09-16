@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Phone, MapPin, PhoneCall } from 'lucide-react';
+import { trackPhoneCall } from '../utils/pixelTracker';
 
 export default function Contact() {
   return (
@@ -36,6 +37,7 @@ export default function Contact() {
           </p>
           <a 
             href="tel:0541399342" 
+            onClick={() => trackPhoneCall({ buttonLabel: 'اتصل بنا مباشرة (صفحة تواصل معنا - البانر)' })}
             className="bg-white text-red-600 hover:bg-neutral-100 px-8 sm:px-12 py-4 sm:py-5 rounded-full font-bold text-xl sm:text-2xl transition-all shadow-xl inline-flex items-center gap-3 active:scale-95 hover:scale-105"
           >
             <Phone className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -57,7 +59,12 @@ export default function Contact() {
             </div>
             <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">رقم الهاتف المباشر</h3>
             <p className="text-white/50 text-sm mb-4">متاح للرد والاستفسار المباشر</p>
-            <a href="tel:0541399342" className="text-white hover:text-red-400 transition-colors text-2xl sm:text-3xl font-bold tracking-wider" dir="ltr">
+            <a 
+              href="tel:0541399342" 
+              onClick={() => trackPhoneCall({ buttonLabel: 'رقم الهاتف المباشر (صفحة تواصل معنا - البطاقة)' })}
+              className="text-white hover:text-red-400 transition-colors text-2xl sm:text-3xl font-bold tracking-wider" 
+              dir="ltr"
+            >
               0541 39 93 42
             </a>
           </motion.div>

@@ -16,6 +16,8 @@ import { db } from '../firebase';
 import { carsCatalog } from '../data/carsCatalog';
 import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
+import { WhatsappIcon } from '../components/WhatsappIcon';
+import { trackPhoneCall, trackWhatsApp, trackViewContent, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
 
 
 interface TrimOption {
@@ -443,6 +445,7 @@ export default function ProductTemplate() {
             thumbs: finalImages,
             hasCustomImages: customImages.length > 0, // Flag for display logic
             mainImg: finalImages[0] || defaultCoolray.mainImg,
+            tiktokPixelId: (catalogData as any).tiktokPixelId,
             price: (matchedTrimCar?.price ? String(matchedTrimCar.price).replace(/دج/g, '').trim() : catalogData.trims[0]?.price?.replace(/دج/g, '').trim()),
             specs: catalogData.trims[0]?.heroSpecs?.map(s => ({ label: s.label, value: s.value })) || []
           });
@@ -469,6 +472,8 @@ export default function ProductTemplate() {
             images: thumbsList,
             thumbs: thumbsList,
             hasCustomImages: data.images && data.images.length > 0,
+            tiktokPixelId: data.tiktokPixelId,
+            pixelId: data.pixelId,
           });
           setActiveImg(mainImgUrl);
         } else {
@@ -487,6 +492,16 @@ export default function ProductTemplate() {
     fetchProduct();
   }, [id]);
 
+  // 🎯 Initialize car-specific pixels if defined
+  useEffect(() => {
+    if (product?.tiktokPixelId) {
+      initTikTokPixelScript([product.tiktokPixelId]);
+    }
+    if (product?.pixelId) {
+      initMetaPixelScript([product.pixelId]);
+    }
+  }, [product?.tiktokPixelId, product?.pixelId]);
+
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -501,6 +516,18 @@ export default function ProductTemplate() {
     };
     fetchSettings();
   }, []);
+
+  // 🎯 Auto-track ViewContent event for TikTok & Meta Pixels
+  useEffect(() => {
+    if (product?.title) {
+      trackViewContent({
+        id: product.id,
+        title: product.title,
+        price: activeTrim?.price,
+        trimName: activeTrim?.name
+      });
+    }
+  }, [product?.id, product?.title, activeTrim?.name, activeTrim?.price]);
 
   const steps = [
     {
@@ -859,6 +886,13 @@ export default function ProductTemplate() {
         phone: bookingForm.phone,
         status: 'جديد',
         createdAt: serverTimestamp()
+      });
+      // Track Lead submission event in TikTok & Meta Pixels
+      trackLeadSubmission({
+        formName: 'حجز سيارة وتوقيع العقد',
+        carTitle: `${product.title} - ${activeTrim.name}`,
+        name: bookingForm.name,
+        phone: bookingForm.phone
       });
       setBookingStatus('success');
       setTimeout(() => {
@@ -1224,14 +1258,38 @@ export default function ProductTemplate() {
               </div>
             </div>
 
-            {/* 🎯 CTA Buttons */}
-            <div className="pt-1 flex flex-col gap-3">
+            {/* 🎯 CTA Buttons (Direct Phone Call + WhatsApp) */}
+            <div className="pt-1 flex flex-col sm:flex-row gap-3">
               <a
+                id="btn-call-direct"
                 href={`tel:${phoneNumber}`}
-                className="w-full py-3 bg-red-600 hover:bg-red-500 active:scale-[0.99] border border-red-500/50 text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-[0_4px_24px_rgba(239,68,68,0.3)]"
+                onClick={() => trackPhoneCall({
+                  carTitle: product?.title,
+                  trimName: activeTrim?.name,
+                  price: activeTrim?.price,
+                  buttonLabel: 'إتصل بنا مباشرة'
+                })}
+                className="flex-1 py-3.5 bg-red-600 hover:bg-red-500 active:scale-[0.99] border border-red-500/50 text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all shadow-[0_4px_24px_rgba(239,68,68,0.3)] hover:shadow-[0_4px_30px_rgba(239,68,68,0.5)] cursor-pointer"
               >
                 <Phone className="w-5 h-5" />
                 <span>إتصل بنا مباشرة</span>
+              </a>
+
+              <a
+                id="btn-whatsapp-direct"
+                href={`https://wa.me/213${phoneNumber.replace(/^0|\D/g, '')}?text=${encodeURIComponent(`السلام عليكم، أريد الاستفسار عن سيارة ${product?.title || ''} (${activeTrim?.name || ''}) معروضة بسعر ${activeTrim?.price || ''}`)}`}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackWhatsApp({
+                  carTitle: product?.title,
+                  trimName: activeTrim?.name,
+                  price: activeTrim?.price,
+                  buttonLabel: 'تواصل عبر واتساب'
+                })}
+                className="flex-1 py-3.5 bg-emerald-600/95 hover:bg-emerald-500 active:scale-[0.99] border border-emerald-500/50 text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all shadow-[0_4px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_26px_rgba(16,185,129,0.45)] cursor-pointer"
+              >
+                <WhatsappIcon className="w-5 h-5" />
+                <span>تواصل عبر واتساب</span>
               </a>
             </div>
 
@@ -1488,13 +1546,36 @@ export default function ProductTemplate() {
                 اتصل بنا مباشرة لتأكيد موعد حضورك بالمكتب وإيداع التمويل للشروع في شحن سيارتك.
               </p>
 
-              <div className="relative inline-block z-10">
+              <div className="relative inline-flex flex-wrap items-center justify-center gap-4 z-10">
                 <a
+                  id="btn-call-contract"
                   href={`tel:${phoneNumber}`}
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-red-600/30 hover:bg-red-600/40 active:scale-95 border border-red-400/40 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_40px_rgba(239,68,68,0.45)]"
+                  onClick={() => trackPhoneCall({
+                    carTitle: product?.title,
+                    trimName: activeTrim?.name,
+                    price: activeTrim?.price,
+                    buttonLabel: 'إتصل بنا الآن (توقيع العقد)'
+                  })}
+                  className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/40 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_40px_rgba(239,68,68,0.45)] cursor-pointer"
                 >
-                  <Phone className="w-4 h-4 text-red-300" />
+                  <Phone className="w-4 h-4 text-white" />
                   <span>إتصل بنا الآن</span>
+                </a>
+                <a
+                  id="btn-whatsapp-contract"
+                  href={`https://wa.me/213${phoneNumber.replace(/^0|\D/g, '')}?text=${encodeURIComponent(`السلام عليكم، أريد تأكيد موعد توقيع العقد بخصوص سيارة ${product?.title || ''} (${activeTrim?.name || ''})`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackWhatsApp({
+                    carTitle: product?.title,
+                    trimName: activeTrim?.name,
+                    price: activeTrim?.price,
+                    buttonLabel: 'تأكيد عبر واتساب (توقيع العقد)'
+                  })}
+                  className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-emerald-600/30 hover:bg-emerald-600/40 active:scale-95 border border-emerald-400/40 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.35)] cursor-pointer"
+                >
+                  <WhatsappIcon className="w-4 h-4 text-emerald-300" />
+                  <span>تأكيد عبر واتساب</span>
                 </a>
               </div>
             </div>
@@ -1513,11 +1594,34 @@ export default function ProductTemplate() {
 
           <div className="flex items-center gap-2 w-full min-[380px]:w-auto justify-end">
             <a
+              id="btn-sticky-call"
               href={`tel:${phoneNumber}`}
-              className="w-full min-[380px]:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+              onClick={() => trackPhoneCall({
+                carTitle: product?.title,
+                trimName: activeTrim?.name,
+                price: activeTrim?.price,
+                buttonLabel: 'إتصل بنا الآن مباشرة (شريط التثبيت)'
+              })}
+              className="flex-1 min-[380px]:flex-none px-4 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)] cursor-pointer"
             >
               <Phone className="w-4 h-4" />
-              <span>إتصل بنا الآن مباشرة</span>
+              <span>إتصل بنا مباشرة</span>
+            </a>
+            <a
+              id="btn-sticky-whatsapp"
+              href={`https://wa.me/213${phoneNumber.replace(/^0|\D/g, '')}?text=${encodeURIComponent(`السلام عليكم، أريد الاستفسار عن سيارة ${product?.title || ''} (${activeTrim?.name || ''})`)}`}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackWhatsApp({
+                carTitle: product?.title,
+                trimName: activeTrim?.name,
+                price: activeTrim?.price,
+                buttonLabel: 'تواصل عبر واتساب (شريط التثبيت)'
+              })}
+              className="w-10 h-10 shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full flex items-center justify-center border border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-pointer"
+              title="واتساب"
+            >
+              <WhatsappIcon className="w-4 h-4" />
             </a>
           </div>
         </div>
