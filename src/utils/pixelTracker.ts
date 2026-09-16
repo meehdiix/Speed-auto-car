@@ -84,12 +84,16 @@ export function initTikTokPixelScript(pixelIds: string[]) {
     isTikTokScriptLoaded = true;
   }
 
-  // 2. Initialize each unique Pixel ID
+  // 2. Initialize each unique Pixel ID (preventing duplicate loads)
   validIds.forEach(id => {
     if (!loadedTikTokPixelIds.has(id)) {
+      loadedTikTokPixelIds.add(id);
+      // If already loaded by index.html, do not re-call load to prevent duplicate warnings
+      if (window.ttq && window.ttq._i && window.ttq._i[id]) {
+        return;
+      }
       try {
         window.ttq.load(id);
-        loadedTikTokPixelIds.add(id);
         console.log(`[TikTok Pixel] Initialized ID: ${id}`);
       } catch (err) {
         console.warn('[TikTok Pixel] Init warning:', err);

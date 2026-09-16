@@ -28,12 +28,10 @@ export default function MetaPixelTracker() {
         }
       });
 
-      // Always ensure the active TikTok pixels are loaded
-      ['DALBQ9RC77UDHLL44L90', 'DALC1BBC77UDHLL44M0G'].forEach(id => {
-        if (!tiktokIds.includes(id)) {
-          tiktokIds.push(id);
-        }
-      });
+      // Always ensure the active MG 5 TikTok pixel is loaded
+      if (!tiktokIds.includes('DALC1BBC77UDHLL44M0G')) {
+        tiktokIds.push('DALC1BBC77UDHLL44M0G');
+      }
 
       if (tiktokIds.length > 0) {
         initTikTokPixelScript(tiktokIds);
