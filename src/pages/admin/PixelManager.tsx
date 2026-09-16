@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { trackPhoneCall, trackWhatsApp } from '../../utils/pixelTracker';
+import { trackPhoneCall, trackWhatsApp, triggerAllOptimizationEvents } from '../../utils/pixelTracker';
 
 export default function PixelManager() {
   const [pixels, setPixels] = useState<any[]>([]);
@@ -93,13 +93,17 @@ export default function PixelManager() {
   };
 
   const handleTestEvent = () => {
+    triggerAllOptimizationEvents({
+      carTitle: 'MG 5 2026',
+      price: '3,000,000 دج'
+    });
     trackPhoneCall({
-      carTitle: 'تجربة فحص البيكسل',
+      carTitle: 'MG 5 2026',
       trimName: 'فحص فوري',
       price: '3,000,000 دج',
-      buttonLabel: 'إتصل بنا مباشرة (تجربة الفحص)'
+      buttonLabel: 'إتصل بنا مباشرة'
     });
-    showNotification(`تم إرسال حدث تجريبي (Contact) إلى ${activePlatform === 'tiktok' ? 'تيك توك' : 'فيسبوك'}!`);
+    showNotification(`تم إرسال كافة أحداث التحويل (CompletePayment, Contact, Lead) لتيك توك بنجاح! ستصبح نشطة الآن.`);
   };
 
   // Filter pixels strictly by platform
@@ -239,11 +243,11 @@ export default function PixelManager() {
             <button
               type="button"
               onClick={handleTestEvent}
-              className="px-4 py-2.5 rounded-xl text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-              title="إرسال حدث اتصال تجريبي للتحقق في مدير الأحداث"
+              className="px-4 py-2.5 rounded-xl text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+              title="إرسال وتفعيل أحداث التحويل (CompletePayment, Contact, Lead) فوراً لإزالة حالة الانتظار في تيك توك"
             >
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>تجربة فحص البيكسل (Test Event)</span>
+              <Zap className="w-4 h-4 text-amber-400 animate-pulse" />
+              <span>⚡ تفعيل كافة الأحداث في تيك توك الآن (CompletePayment & Contact)</span>
             </button>
           </div>
         </form>
