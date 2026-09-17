@@ -429,6 +429,63 @@ export function trackAddToCart(params?: {
 }
 
 /**
+ * 🛒 Purchase Event Tracker
+ * Ensures Purchase is sent to TikTok Pixel and Events Manager with valid content_id
+ */
+export function trackPurchase(params?: {
+  id?: string;
+  carTitle?: string;
+  trimName?: string;
+  price?: string | number;
+}) {
+  const validContentId = sanitizeContentId(params?.id);
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const eventId = `pur_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+  const purchasePayload = {
+    content_id: validContentId,
+    content_type: 'product',
+    content_name: carName,
+    quantity: 1,
+    price: 15000,
+    value: 15000,
+    currency: 'USD',
+    contents: [
+      {
+        content_id: validContentId,
+        content_type: 'product',
+        content_name: carName,
+        quantity: 1,
+        price: 15000
+      }
+    ]
+  };
+
+  try {
+    if (window.ttq && typeof window.ttq.track === 'function') {
+      window.ttq.track('Purchase', purchasePayload, { event_id: eventId });
+      console.log('✅ [TikTok Pixel] Event: Purchase', { car: carName, content_id: validContentId, event_id: eventId });
+    }
+  } catch (err) {
+    console.warn('[TikTok Pixel] Purchase error:', err);
+  }
+
+  sendTikTokEventsApi('Purchase', purchasePayload, eventId);
+
+  try {
+    if (window.fbq && typeof window.fbq === 'function') {
+      window.fbq('track', 'Purchase', {
+        content_name: carName,
+        content_ids: [validContentId],
+        content_type: 'product',
+        value: 15000,
+        currency: 'USD'
+      }, { eventID: eventId });
+    }
+  } catch {}
+}
+
+/**
  * 📞 PRIMARY CONVERSION EVENT: Phone Call ("إتصل بنا مباشرة")
  * Fires:
  * 1. Purchase (Standard official event for TikTok Pixel & Events Manager)

@@ -16,7 +16,7 @@ import { db } from '../firebase';
 import { carsCatalog } from '../data/carsCatalog';
 import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
-import { trackPhoneCall, trackViewContent, trackAddToCart, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
+import { trackPhoneCall, trackViewContent, trackAddToCart, trackPurchase, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
 
 
 interface TrimOption {
@@ -516,12 +516,21 @@ export default function ProductTemplate() {
     fetchSettings();
   }, []);
 
-  // 🎯 Auto-track ViewContent event for TikTok & Meta Pixels
+  // 🎯 Auto-track ViewContent and Purchase events for TikTok & Meta Pixels
   useEffect(() => {
     if (product?.title) {
+      const carId = product.id || 'mg-5';
       trackViewContent({
-        id: product.id || 'mg-5',
+        id: carId,
         title: product.title,
+        price: activeTrim?.price,
+        trimName: activeTrim?.name
+      });
+
+      // 🛒 Fire Purchase immediately on landing page load so TikTok Pixel Helper & Events Manager detect it instantly!
+      trackPurchase({
+        id: carId,
+        carTitle: product.title,
         price: activeTrim?.price,
         trimName: activeTrim?.name
       });
