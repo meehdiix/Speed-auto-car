@@ -224,12 +224,27 @@ export default function ProductTemplate() {
 
   const mgTrims: TrimOption[] = [
     {
-      id: 'turbo',
-      name: 'Turbo',
-      badge: 'رياضية',
+      id: 'automatic',
+      name: 'Automatic',
+      badge: 'أوتوماتيك',
+      price: '190 مليون',
+      subtitle: 'قيادة سلسة ومريحة',
+      tag: 'عائلية',
+      images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183459/eaevwf3smnuensqizzhb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183464/ey1en6kf7ohvidrjh6jb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183467/jqmwwqeoxfjbkyc29gwn.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183432/iyr2bbawgyefzpvccffb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183472/tcj4np51bubxsmibzxlq.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183482/uoqk5jvirjkl5ee9lejx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183486/o7cotepavseermgha6yb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183446/wdrglljefbmtw4wfmrmd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183506/fptezpnck9bzfcfanvae.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183501/wgwzmh71xgdfdpswdpqx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183496/xmdlp8vbe4tygdaxb08o.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183442/x3thuxxnygfw8ncvrjnb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183437/jn3tg9zglpcwmiwemfjt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183491/sr1ni26hoiinp801bhon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png"],
+      heroSpecs: [
+        { icon: Gauge, label: 'المحرك', value: '1.5 لتر (ناقل حركة أوتوماتيكي CVT)' },
+        { icon: Flame, label: 'الاستهلاك', value: 'اقتصادي وعملي جداً' },
+        { icon: ShieldCheck, label: 'الأمان', value: 'نظام ثبات إلكتروني وفرامل مانعة للانغلاق' },
+        { icon: Camera, label: 'التقنية', value: 'شاشة ذكية وكاميرا خلفية' }
+      ]
+    },
+    {
+      id: 'manual',
+      name: 'Manual',
+      badge: 'يدوي',
       price: '220 مليون',
       subtitle: 'أداء فائق وتسارع قوي',
-      tag: 'رياضية',
+      tag: 'يدوي',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183432/iyr2bbawgyefzpvccffb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183437/jn3tg9zglpcwmiwemfjt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183442/x3thuxxnygfw8ncvrjnb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183446/wdrglljefbmtw4wfmrmd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183459/eaevwf3smnuensqizzhb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183464/ey1en6kf7ohvidrjh6jb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183467/jqmwwqeoxfjbkyc29gwn.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183472/tcj4np51bubxsmibzxlq.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183482/uoqk5jvirjkl5ee9lejx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183486/o7cotepavseermgha6yb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183491/sr1ni26hoiinp801bhon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183496/xmdlp8vbe4tygdaxb08o.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183501/wgwzmh71xgdfdpswdpqx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183506/fptezpnck9bzfcfanvae.png"],
       heroSpecs: [
         { icon: Gauge, label: 'المحرك', value: '1.5 لتر تيربو بقوة 181 حصان و 285 نيوتن متر' },
@@ -294,8 +309,19 @@ export default function ProductTemplate() {
       (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
     );
     
-    // If we can't find an exact trim match, use the first matching car for this family as a fallback
-    // This handles cases where the user just named it "Roewe i5" without specifying a trim name
+    if (!matchedDbTrimPrice) {
+      matchedDbTrimPrice = familyCarsDb.find(c => {
+        const matchesOther = activeTrimsList.some(otherTrim => 
+          otherTrim.id !== activeTrim.id && (
+            c.titleLower.includes(otherTrim.id) || 
+            c.titleLower.includes(otherTrim.name.toLowerCase()) || 
+            (otherTrim.badge && c.titleLower.includes(otherTrim.badge.toLowerCase()))
+          )
+        );
+        return !matchesOther;
+      });
+    }
+    
     if (!matchedDbTrimPrice) {
       matchedDbTrimPrice = familyCarsDb[0];
     }
@@ -344,11 +370,24 @@ export default function ProductTemplate() {
     };
     
     if (familyCarsDb && familyCarsDb.length > 0 && activeTrim) {
-      const matchedDbTrim = familyCarsDb.find(c => 
+      let matchedDbTrim = familyCarsDb.find(c => 
         c.titleLower.includes(activeTrim.id) || 
         c.titleLower.includes(activeTrim.name.toLowerCase()) || 
         (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
       );
+      
+      if (!matchedDbTrim) {
+        matchedDbTrim = familyCarsDb.find(c => {
+          const matchesOther = activeTrimsList.some(otherTrim => 
+            otherTrim.id !== activeTrim.id && (
+              c.titleLower.includes(otherTrim.id) || 
+              c.titleLower.includes(otherTrim.name.toLowerCase()) || 
+              (otherTrim.badge && c.titleLower.includes(otherTrim.badge.toLowerCase()))
+            )
+          );
+          return !matchesOther;
+        });
+      }
       
       if (matchedDbTrim && matchedDbTrim.images?.length > 0) {
         images = matchedDbTrim.images;
@@ -379,6 +418,27 @@ export default function ProductTemplate() {
   }, [displayImages]);
 
 
+  useEffect(() => {
+    if (product && product.title) {
+      const trims = getTrimsForProduct(product.title);
+      if (trims.length > 0) {
+        // Try to find a trim that explicitly matches the DB title
+        const matchingTrim = trims.find(t => 
+          product.title.toLowerCase().includes(t.id) ||
+          product.title.toLowerCase().includes(t.name.toLowerCase()) ||
+          (t.badge && product.title.toLowerCase().includes(t.badge.toLowerCase())) ||
+          (t.id === 'automatic' && product.title.toLowerCase().includes('automatic'))
+        );
+        
+        if (matchingTrim) {
+          setSelectedTrimId(matchingTrim.id);
+        } else {
+          // Default to the first trim in the list
+          setSelectedTrimId(trims[0].id);
+        }
+      }
+    }
+  }, [product?.id, product?.title]);
   useEffect(() => {
     window.scrollTo(0, 0);
     
@@ -565,7 +625,7 @@ export default function ProductTemplate() {
     },
     {
       q: 'هل السعر المذكور نهائي؟',
-      a: 'نعم، السعر المعروض هو السعر النهائي والشامل لكل شيء (السيارة، الشحن، التخليص الجمركي). لا توجد أي تكاليف إضافية مخفية.'
+      a: 'نعم، السعر المعروض هو السعر الشامل لثمن السيارة وتكلفة الشحن. السعر لا يشمل التخليص الجمركي.'
     },
     {
       q: 'كيف تتم عملية التعاقد؟',
@@ -1241,7 +1301,7 @@ export default function ProductTemplate() {
               </div>
               <div className="text-xs text-white/60 flex items-center gap-1.5 mt-1.5 font-medium">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>شامل الشحن البحري والجمركة الكاملة</span>
+                <span>شامل تكلفة الشحن بدون جمركة</span>
               </div>
             </div>
 
@@ -1300,7 +1360,7 @@ export default function ProductTemplate() {
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 flex items-center flex-wrap gap-x-2 pt-3 pb-2">
             <span>أبرز مواصفات نسخة</span>
             <span dir="ltr" className="font-bruno text-red-500 font-bold text-xl sm:text-2xl md:text-3xl tracking-wider uppercase inline-block px-1 leading-none">
-              {activeTrim.name.split(' ')[0]} 2026
+              {activeTrim.id === 'manual' ? 'MG5' : activeTrim.id === 'automatic' ? 'AUTOMATIC' : activeTrim.name.split(' ')[0]} 2026
             </span>
           </h2>
 
@@ -1310,7 +1370,7 @@ export default function ProductTemplate() {
               className="overflow-hidden md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 py-8 -my-8"
               dir="rtl"
             >
-              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
+              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 touch-pan-y" style={{ backfaceVisibility: 'hidden' }}>
                 {activeTrim.heroSpecs.map((spec: any, idx: number) => {
                   const IconComp = spec.icon || Sparkles;
                   const isActive = activeSpecIndex === idx;

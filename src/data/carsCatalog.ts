@@ -1,4 +1,4 @@
-import { Fuel, Gauge, Layers, ShieldCheck, Camera, Flame, Sparkles, Car, Phone } from 'lucide-react';
+import { Fuel, Gauge, Layers, ShieldCheck, Camera, Flame, Sparkles, Car, Phone, FileCheck, Star } from 'lucide-react';
 
 export interface TrimSpec {
   icon: any;
@@ -342,12 +342,52 @@ export const carsCatalog: Record<string, CarModel> = {
     ],
     trims: [
       {
-        id: 'turbo',
-        name: 'Turbo',
-        badge: 'رياضية',
+        id: 'automatic',
+        name: 'Automatic',
+        badge: 'أوتوماتيك',
+        price: '190 مليون',
+        subtitle: 'قيادة سلسة ومريحة',
+        tag: 'عائلية',
+        images: [
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613217/oy4rgutdpjynh4yjqqkj.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613218/vftlrhgorttpmbgsehf7.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613219/ovchltjlj6gk7iltv5ed.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613221/xhxi5xna5ngkxt8gxqbr.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613222/lnfthxcq55tcmoyunxzy.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613224/q29a79aummggajwrgbes.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613225/q3uweydwpwtnxguqjlpv.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613226/cnmp41g7atvftjihq6no.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613227/e6jkwun0hwasbqkpzah7.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613229/adaawg3dlhdm8oguamly.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613230/nghimiyl9cpuagy8ky9u.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613231/e9xpx46p2j0ubzxlhmbb.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613233/aqbfew6efghoxjqzkepx.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613234/xledom3dkkrsitm3iqhr.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613236/rmo2set5dmtrno3gtqty.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613238/wpbcow2gjptmfxfyd2u0.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613240/tgjymcqjpkwqfcm2ucbn.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613242/kswaakgbywhg9y1ky5bt.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613244/hrapm3hmuyz4j2pg6wnb.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613246/x6p01lovnfsuv3llb1gy.png",
+  "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613248/xz1um0xc14i2ystvtw3v.png"
+        ],
+        heroSpecs: [
+          { icon: Car, label: 'الأبعاد والمساحة', value: 'طول 4715 مم، عرض 1842 مم، وارتفاع 1473 مم، وقاعدة عجلات 2680 مم توفر مساحة رحبة' },
+          { icon: Layers, label: 'الخلوص والتخزين', value: 'خلوص أرضي 127 مم بتصميم رياضي فاست باك، وصندوق أمتعة بسعة 401 لتر' },
+          { icon: Sparkles, label: 'التصميم الخارجي', value: 'عجلات ألمنيوم 16 بوصة، مصابيح LED أوتوماتيكية (عالي/منخفض)، وفتحة سقف إلكترونية' },
+          { icon: Camera, label: 'المقصورة والتقنية', value: 'شاشتين 12.3 بوصة (Dual LCD) للعدادات والنظام الترفيهي المركزي' },
+          { icon: Star, label: 'المقاعد', value: '5 مقاعد من الجلد مع تحكم كهربائي متعدد الاتجاهات للسائق ومساند أمامية/خلفية' },
+          { icon: ShieldCheck, label: 'أنظمة المساعدة', value: 'فرامل يد إلكترونية، مثبت سرعة، AutoHold، مساعد المرتفعات (HAC)، ومراقبة الإطارات (TPMS)' },
+          { icon: FileCheck, label: 'المطابقة والاستيراد', value: 'محرك 1498 سي سي، مطابق تماماً لدفتر شروط استيراد السيارات بالجزائر CCR' }
+        ]
+      },
+      {
+        id: 'manual',
+        name: 'Manual',
+        badge: 'يدوي',
         price: '220 مليون',
         subtitle: 'أداء فائق وتسارع قوي',
-        tag: 'رياضية',
+        tag: 'يدوي',
         images: [
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png",
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png",
@@ -368,10 +408,15 @@ export const carsCatalog: Record<string, CarModel> = {
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png"
       ],
         heroSpecs: [
-          { icon: Gauge, label: 'المحرك', value: '1.5 لتر تيربو (15C4E) بقوة 181 حصان و 285 نيوتن متر' },
+          { icon: Gauge, label: 'المحرك (تيربو)', value: '1.5 لتر تيربو بقوة 181 حصان و 285 نيوتن متر' },
           { icon: Flame, label: 'التسارع', value: 'من 0 إلى 100 كم/س في 8.1 ثانية فقط' },
-          { icon: ShieldCheck, label: 'التحكم', value: 'نظام XDS لقفل التفاضل الإلكتروني في المنعطفات' },
-          { icon: Camera, label: 'المكابح', value: 'مكابح كونتيننتال الألمانية (100-0 كم/س في 35 متر)' }
+          { icon: FileCheck, label: 'المطابقة والاستيراد', value: 'محرك 1498 سي سي، مطابق تماماً لدفتر شروط استيراد السيارات' },
+          { icon: Sparkles, label: 'التصميم الخارجي', value: 'عجلات 16 بوصة، مصابيح LED أوتوماتيكية، وفتحة سقف إلكترونية' },
+          { icon: Car, label: 'الأبعاد والمساحة', value: 'طول 4715 مم، عرض 1842 مم، وقاعدة عجلات 2680 مم' },
+          { icon: Camera, label: 'المقصورة والتقنية', value: 'شاشتين 12.3 بوصة للعدادات والنظام الترفيهي (Dual LCD)' },
+          { icon: Star, label: 'المقاعد', value: '5 مقاعد من الجلد مع تحكم كهربائي لمقعد السائق' },
+          { icon: ShieldCheck, label: 'الأمان والتحكم', value: 'مكابح كونتيننتال الألمانية ونظام قفل التفاضل الإلكتروني (XDS)' },
+          { icon: Layers, label: 'التخزين والخلوص', value: 'خلوص أرضي 127 مم، وصندوق أمتعة بسعة 401 لتر' }
         ]
       }
     ]

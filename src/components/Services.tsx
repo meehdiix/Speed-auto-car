@@ -52,13 +52,22 @@ export default function Services() {
             groupedCatalogIds.add(matchedCatalogId);
             const catalogData = carsCatalog[matchedCatalogId];
             if (catalogData) {
+              let imagesToUse = car.images || [];
+              if (catalogData.id === 'mg-5') {
+                const autoTrim = catalogData.trims.find(t => t.id === 'automatic');
+                if (autoTrim && autoTrim.images && autoTrim.images.length > 0) {
+                  imagesToUse = autoTrim.images;
+                }
+              } else if (catalogData.trims[0]?.images?.length > 0) {
+                imagesToUse = catalogData.trims[0].images;
+              }
+              
               displayCars.push({
                 id: catalogData.id, // e.g. 'geely-coolray'
                 title: catalogData.title,
                 origin: catalogData.origin,
                 year: catalogData.year,
-                // Use the first trim's first image or a default
-                images: (catalogData.trims[0]?.images?.length > 0 ? catalogData.trims[0].images : car.images) || [],
+                images: imagesToUse,
                 status: 'متاح',
                 isCatalogDriven: true
               });
