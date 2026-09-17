@@ -17,6 +17,7 @@ import { carsCatalog } from '../data/carsCatalog';
 import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
 import { trackPhoneCall, trackViewContent, trackAddToCart, trackPurchase, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
+import { getGeneralSettings } from '../utils/settings';
 
 
 interface TrimOption {
@@ -227,7 +228,7 @@ export default function ProductTemplate() {
       id: 'automatic',
       name: 'Automatic',
       badge: 'أوتوماتيك',
-      price: '190 مليون',
+      price: '275 مليون',
       subtitle: 'قيادة سلسة ومريحة',
       tag: 'عائلية',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183459/eaevwf3smnuensqizzhb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183464/ey1en6kf7ohvidrjh6jb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183467/jqmwwqeoxfjbkyc29gwn.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183432/iyr2bbawgyefzpvccffb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183472/tcj4np51bubxsmibzxlq.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183482/uoqk5jvirjkl5ee9lejx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183486/o7cotepavseermgha6yb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183446/wdrglljefbmtw4wfmrmd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183506/fptezpnck9bzfcfanvae.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183501/wgwzmh71xgdfdpswdpqx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183496/xmdlp8vbe4tygdaxb08o.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183442/x3thuxxnygfw8ncvrjnb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183437/jn3tg9zglpcwmiwemfjt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183491/sr1ni26hoiinp801bhon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png"],
@@ -478,8 +479,8 @@ export default function ProductTemplate() {
                 // keep looping to gather all family members
               }
             }
-          } catch (e) {
-            console.error("Error fetching custom images:", e);
+          } catch (e: any) {
+            console.warn("Using catalog images (Firestore unavailable):", e?.message || e);
           }
           
           setFamilyCarsDb(familyDbMatches);
@@ -562,18 +563,17 @@ export default function ProductTemplate() {
   }, [product?.tiktokPixelId, product?.pixelId]);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const docRef = doc(db, 'settings', 'general');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().phone) {
-          setPhoneNumber(docSnap.data().phone);
-        }
-      } catch (err) {
-        console.error("Error fetching settings:", err);
+    let isMounted = true;
+    getGeneralSettings().then(settings => {
+      if (isMounted && settings.phone) {
+        setPhoneNumber(settings.phone);
       }
+    }).catch(() => {
+      // fallback phone already set in initial state
+    });
+    return () => {
+      isMounted = false;
     };
-    fetchSettings();
   }, []);
 
   // 🎯 Auto-track ViewContent and Purchase events for TikTok & Meta Pixels

@@ -1,28 +1,13 @@
 import { motion } from 'motion/react';
 import { CarFront, ArrowLeft, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { trackPhoneCall } from '../utils/pixelTracker';
+import { useGeneralSettings } from '../utils/settings';
 
 export default function Hero() {
-  const [bgMedia, setBgMedia] = useState('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000');
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const docRef = doc(db, 'settings', 'general');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().heroBackgroundImage) {
-          setBgMedia(docSnap.data().heroBackgroundImage);
-        }
-      } catch (e) {
-        console.error('Error fetching settings', e);
-      }
-    };
-    fetchSettings();
-  }, []);
+  const settings = useGeneralSettings();
+  const bgMedia = settings.heroBackgroundImage || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000';
+  const phoneNumber = settings.phone || '0541399342';
 
   const isVideo = bgMedia.match(/\.(mp4|webm|ogg)$/i) || bgMedia.includes('/video/upload');
 

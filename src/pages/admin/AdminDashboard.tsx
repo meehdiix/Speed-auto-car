@@ -10,6 +10,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'cars'), (snapshot) => {
       setCarCount(snapshot.size);
+    }, (error) => {
+      console.warn('[AdminDashboard] Cars snapshot error:', error?.message || error);
     });
     return unsubscribe;
   }, []);

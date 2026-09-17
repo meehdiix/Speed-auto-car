@@ -34,6 +34,8 @@ export default function PixelManager() {
         ...d.data()
       }));
       setPixels(data);
+    }, (error) => {
+      console.warn('[PixelManager] Pixels snapshot error:', error?.message || error);
     });
     return unsubscribe;
   }, []);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, Phone, MapPin, Mail, Instagram, Facebook } from 'lucide-react';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { getGeneralSettings } from '../../utils/settings';
 
 export default function SettingsManager() {
   const [loading, setLoading] = useState(true);
@@ -23,13 +24,10 @@ export default function SettingsManager() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const docRef = doc(db, 'settings', 'general');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setSettings(docSnap.data() as any);
-        }
-      } catch (err) {
-        console.error("Error fetching settings:", err);
+        const s = await getGeneralSettings();
+        setSettings(prev => ({ ...prev, ...s }));
+      } catch (err: any) {
+        console.warn("Could not load settings:", err?.message || err);
       } finally {
         setLoading(false);
       }

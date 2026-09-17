@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Copy, CheckCircle, Image as ImageIcon, Video, Trash2 } from 'lucide-react';
 import { db } from '../../firebase';
-import { doc, getDoc, collection, addDoc, getDocs, deleteDoc, orderBy, query } from 'firebase/firestore';
+import { doc, collection, addDoc, getDocs, deleteDoc, orderBy, query } from 'firebase/firestore';
+import { getGeneralSettings } from '../../utils/settings';
 
 export default function MediaManager() {
   const [file, setFile] = useState<File | null>(null);
@@ -17,21 +18,26 @@ export default function MediaManager() {
   }, []);
 
   const fetchSettings = async () => {
-    const docRef = doc(db, 'settings', 'general');
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      setSettings(docSnap.data());
+    try {
+      const s = await getGeneralSettings();
+      setSettings(s);
+    } catch (e: any) {
+      console.warn('[MediaManager] Could not load settings:', e?.message || e);
     }
   };
 
   const fetchMedia = async () => {
-    const q = query(collection(db, 'media'), orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    const m: any[] = [];
-    snapshot.forEach(doc => {
-      m.push({ id: doc.id, ...doc.data() });
-    });
-    setMediaList(m);
+    try {
+      const q = query(collection(db, 'media'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const m: any[] = [];
+      snapshot.forEach(doc => {
+        m.push({ id: doc.id, ...doc.data() });
+      });
+      setMediaList(m);
+    } catch (e: any) {
+      console.warn('[MediaManager] Could not load media list:', e?.message || e);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

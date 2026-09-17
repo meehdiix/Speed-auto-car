@@ -345,7 +345,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'automatic',
         name: 'Automatic',
         badge: 'أوتوماتيك',
-        price: '190 مليون',
+        price: '275 مليون',
         subtitle: 'قيادة سلسة ومريحة',
         tag: 'عائلية',
         images: [

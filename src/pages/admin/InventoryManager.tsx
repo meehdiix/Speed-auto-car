@@ -33,6 +33,9 @@ export default function InventoryManager() {
       }));
       setCars(carsData);
       setLoading(false);
+    }, (error) => {
+      console.warn('[InventoryManager] Cars snapshot error:', error?.message || error);
+      setLoading(false);
     });
     return unsubscribe;
   }, []);

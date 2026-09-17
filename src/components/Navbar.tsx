@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, Menu, Phone, X, Star, Car } from 'lucide-react';
-import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { trackPhoneCall } from '../utils/pixelTracker';
+import { useGeneralSettings } from '../utils/settings';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const settings = useGeneralSettings();
+  const phoneNumber = settings.phone || '0541399342';
 
 
   useEffect(() => {
@@ -31,23 +31,6 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
-
-  const [phoneNumber, setPhoneNumber] = useState('0541399342');
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const docRef = doc(db, 'settings', 'general');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().phone) {
-          setPhoneNumber(docSnap.data().phone);
-        }
-      } catch (err) {
-        console.error("Error fetching settings:", err);
-      }
-    };
-    fetchSettings();
-  }, []);
 
   return (
     <nav

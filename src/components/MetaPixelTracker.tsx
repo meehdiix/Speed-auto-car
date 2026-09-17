@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { collection, onSnapshot, doc } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { initTikTokPixelScript, initMetaPixelScript, trackPageView } from '../utils/pixelTracker';
+import { getGeneralSettings } from '../utils/settings';
 
 export default function MetaPixelTracker() {
   const location = useLocation();
@@ -43,27 +44,25 @@ export default function MetaPixelTracker() {
       // Fire initial PageView
       trackPageView();
     }, (error) => {
-      console.warn('[Pixel Tracker] Firestore pixels subscription error:', error);
+      console.warn('[Pixel Tracker] Firestore pixels subscription error, using fallback pixel:', error?.message || error);
+      initTikTokPixelScript(['DALDKHBC77U05QM9RMN0']);
+      trackPageView();
     });
 
-    // 2. Listen for global Pixel IDs from settings/general
-    const unsubSettings = onSnapshot(doc(db, 'settings', 'general'), (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.tiktokPixelId && typeof data.tiktokPixelId === 'string' && data.tiktokPixelId.trim()) {
-          initTikTokPixelScript([data.tiktokPixelId.trim()]);
-        }
-        if (data.metaPixelId && typeof data.metaPixelId === 'string' && data.metaPixelId.trim()) {
-          initMetaPixelScript([data.metaPixelId.trim()]);
-        }
+    // 2. Fetch global Pixel IDs from settings cache
+    getGeneralSettings().then((data) => {
+      if (data.tiktokPixelId && typeof data.tiktokPixelId === 'string' && data.tiktokPixelId.trim()) {
+        initTikTokPixelScript([data.tiktokPixelId.trim()]);
       }
-    }, (error) => {
-      console.warn('[Pixel Tracker] Firestore settings subscription error:', error);
+      if (data.metaPixelId && typeof data.metaPixelId === 'string' && data.metaPixelId.trim()) {
+        initMetaPixelScript([data.metaPixelId.trim()]);
+      }
+    }).catch(() => {
+      // Fallback already handled
     });
 
     return () => {
       unsubPixels();
-      unsubSettings();
     };
   }, []);
 

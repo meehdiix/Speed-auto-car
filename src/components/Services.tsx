@@ -12,6 +12,30 @@ export default function Services() {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const getDefaultCatalogCars = () => {
+    return Object.values(carsCatalog).map(catalogData => {
+      let imagesToUse: string[] = [];
+      if (catalogData.id === 'mg-5') {
+        const autoTrim = catalogData.trims.find(t => t.id === 'automatic');
+        if (autoTrim && autoTrim.images && autoTrim.images.length > 0) {
+          imagesToUse = autoTrim.images;
+        }
+      } else if (catalogData.trims[0]?.images?.length > 0) {
+        imagesToUse = catalogData.trims[0].images;
+      }
+
+      return {
+        id: catalogData.id,
+        title: catalogData.title,
+        origin: catalogData.origin,
+        year: catalogData.year,
+        images: imagesToUse,
+        status: 'متاح',
+        isCatalogDriven: true
+      };
+    });
+  };
+
   useEffect(() => {
     const q = query(
       collection(db, 'cars'),
@@ -82,11 +106,15 @@ export default function Services() {
         }
       });
 
-      // If the DB is completely empty for some reason, we could push the catalog items directly as a fallback,
-      // but if the user deleted them from inventory, they probably don't want them on the site.
-      // We will respect the inventory's existence.
-
-      setServices(displayCars);
+      if (displayCars.length === 0) {
+        setServices(getDefaultCatalogCars());
+      } else {
+        setServices(displayCars);
+      }
+      setLoading(false);
+    }, (error) => {
+      console.warn('[Services] Firestore onSnapshot error, falling back to static catalog:', error?.message || error);
+      setServices(getDefaultCatalogCars());
       setLoading(false);
     });
 
