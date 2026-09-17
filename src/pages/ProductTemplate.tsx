@@ -70,8 +70,14 @@ export default function ProductTemplate() {
   ];
   const [selectedColor, setSelectedColor] = useState('white');
   
-  // Trim selector state
-  const [selectedTrimId, setSelectedTrimId] = useState('battle');
+  // Trim selector state - initialized to match the current product if available
+  const [selectedTrimId, setSelectedTrimId] = useState(() => {
+    if (initialCar?.title) {
+      const trims = carsCatalog[(!id || id === 'coolray-2026-battle' || id === 'geely-coolray-2026') ? 'geely-coolray' : id]?.trims;
+      if (trims && trims.length > 0) return trims[0].id;
+    }
+    return 'battle';
+  });
   const [isTrimDropdownOpen, setIsTrimDropdownOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingForm, setBookingForm] = useState({ name: '', phone: '' });
@@ -231,12 +237,34 @@ export default function ProductTemplate() {
       price: '275 مليون',
       subtitle: 'قيادة سلسة ومريحة',
       tag: 'عائلية',
-      images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183459/eaevwf3smnuensqizzhb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183464/ey1en6kf7ohvidrjh6jb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183467/jqmwwqeoxfjbkyc29gwn.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183432/iyr2bbawgyefzpvccffb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183472/tcj4np51bubxsmibzxlq.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183482/uoqk5jvirjkl5ee9lejx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183486/o7cotepavseermgha6yb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183446/wdrglljefbmtw4wfmrmd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183506/fptezpnck9bzfcfanvae.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183501/wgwzmh71xgdfdpswdpqx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183496/xmdlp8vbe4tygdaxb08o.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183442/x3thuxxnygfw8ncvrjnb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183437/jn3tg9zglpcwmiwemfjt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183491/sr1ni26hoiinp801bhon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png"],
+      images: [
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613217/oy4rgutdpjynh4yjqqkj.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613218/vftlrhgorttpmbgsehf7.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613219/ovchltjlj6gk7iltv5ed.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613221/xhxi5xna5ngkxt8gxqbr.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613222/lnfthxcq55tcmoyunxzy.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613224/q29a79aummggajwrgbes.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613225/q3uweydwpwtnxguqjlpv.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613226/cnmp41g7atvftjihq6no.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613227/e6jkwun0hwasbqkpzah7.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613229/adaawg3dlhdm8oguamly.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613230/nghimiyl9cpuagy8ky9u.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613231/e9xpx46p2j0ubzxlhmbb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613233/aqbfew6efghoxjqzkepx.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613234/xledom3dkkrsitm3iqhr.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613236/rmo2set5dmtrno3gtqty.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613238/wpbcow2gjptmfxfyd2u0.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613240/tgjymcqjpkwqfcm2ucbn.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613242/kswaakgbywhg9y1ky5bt.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613244/hrapm3hmuyz4j2pg6wnb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613246/x6p01lovnfsuv3llb1gy.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613248/xz1um0xc14i2ystvtw3v.png"
+      ],
       heroSpecs: [
         { icon: Gauge, label: 'المحرك', value: '1.5 لتر (ناقل حركة أوتوماتيكي CVT)' },
         { icon: Flame, label: 'الاستهلاك', value: 'اقتصادي وعملي جداً' },
         { icon: ShieldCheck, label: 'الأمان', value: 'نظام ثبات إلكتروني وفرامل مانعة للانغلاق' },
-        { icon: Camera, label: 'التقنية', value: 'شاشة ذكية وكاميرا خلفية' }
+        { icon: Camera, label: 'التقنية', value: 'شاشتين 12.3 بوصة وكاميرا خلفية' }
       ]
     },
     {
@@ -246,7 +274,25 @@ export default function ProductTemplate() {
       price: '220 مليون',
       subtitle: 'أداء فائق وتسارع قوي',
       tag: 'يدوي',
-      images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183432/iyr2bbawgyefzpvccffb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183437/jn3tg9zglpcwmiwemfjt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183442/x3thuxxnygfw8ncvrjnb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183446/wdrglljefbmtw4wfmrmd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183459/eaevwf3smnuensqizzhb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183464/ey1en6kf7ohvidrjh6jb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183467/jqmwwqeoxfjbkyc29gwn.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183472/tcj4np51bubxsmibzxlq.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183482/uoqk5jvirjkl5ee9lejx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183486/o7cotepavseermgha6yb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183491/sr1ni26hoiinp801bhon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183496/xmdlp8vbe4tygdaxb08o.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183501/wgwzmh71xgdfdpswdpqx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183506/fptezpnck9bzfcfanvae.png"],
+      images: [
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183459/eaevwf3smnuensqizzhb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183464/ey1en6kf7ohvidrjh6jb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183467/jqmwwqeoxfjbkyc29gwn.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183432/iyr2bbawgyefzpvccffb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183472/tcj4np51bubxsmibzxlq.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183482/uoqk5jvirjkl5ee9lejx.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183486/o7cotepavseermgha6yb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183446/wdrglljefbmtw4wfmrmd.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183506/fptezpnck9bzfcfanvae.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183501/wgwzmh71xgdfdpswdpqx.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183496/xmdlp8vbe4tygdaxb08o.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183442/x3thuxxnygfw8ncvrjnb.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183437/jn3tg9zglpcwmiwemfjt.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183491/sr1ni26hoiinp801bhon.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183477/fgqwhi839qutimluvjx4.png"
+      ],
       heroSpecs: [
         { icon: Gauge, label: 'المحرك', value: '1.5 لتر تيربو بقوة 181 حصان و 285 نيوتن متر' },
         { icon: Flame, label: 'التسارع', value: 'من 0 إلى 100 كم/س في 8.1 ثانية فقط' },
@@ -342,7 +388,23 @@ export default function ProductTemplate() {
   });
 
   const displayImages = useMemo(() => {
-    let images = activeTrim?.images?.length > 0 ? activeTrim.images : (product?.images || defaultCoolray.thumbs);
+    // If activeTrim specifically defines images (such as distinct MG 5 trims or Coolray trims), prioritize them directly
+    if (activeTrim?.images && activeTrim.images.length > 0) {
+      // Check if this specific trim has custom images in Firestore
+      if (familyCarsDb && familyCarsDb.length > 0) {
+        const matchedDbTrim = familyCarsDb.find(c => 
+          c.titleLower.includes(activeTrim.id) || 
+          c.titleLower.includes(activeTrim.name.toLowerCase()) || 
+          (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
+        );
+        if (matchedDbTrim && matchedDbTrim.images?.length > 0) {
+          return matchedDbTrim.images;
+        }
+      }
+      return activeTrim.images;
+    }
+
+    let images = (product?.images || defaultCoolray.thumbs);
     
     const applyPermutation = (customImages: string[]) => {
       const defaultTrimImages = activeTrimsList[0]?.images || [];
@@ -1002,10 +1064,10 @@ export default function ProductTemplate() {
                 ref={galleryEmblaRef}
                 className="w-full rounded-[2rem] overflow-hidden border border-white/10 bg-[#181818] shadow-2xl touch-pan-y select-none"
               >
-                <div className="flex touch-pan-y">
+                <div key={activeTrim.id} className="flex touch-pan-y">
                   {displayImages.map((img: string, idx: number) => (
                     <div 
-                      key={idx}
+                      key={`${activeTrim.id}-${idx}-${img}`}
                       className="flex-[0_0_100%] min-w-0 relative flex items-center justify-center cursor-pointer"
                       onClick={() => {
                         setActiveImg(img);
@@ -1131,7 +1193,7 @@ export default function ProductTemplate() {
                 >
                   {displayImages.map((img: string, idx: number) => (
                     <button
-                      key={idx}
+                      key={`${activeTrim.id}-${idx}-${img}`}
                       type="button"
                       onClick={() => selectImageIndex(idx)}
                       className={`relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl overflow-hidden border transition-all duration-200 ${
@@ -1225,6 +1287,14 @@ export default function ProductTemplate() {
                             onClick={() => {
                               setSelectedTrimId(trim.id);
                               setIsTrimDropdownOpen(false);
+                              setSelectedGalleryIndex(0);
+                              if (trim.images && trim.images.length > 0) {
+                                setActiveImg(trim.images[0]);
+                              }
+                              if (galleryEmblaApi) {
+                                galleryEmblaApi.reInit();
+                                galleryEmblaApi.scrollTo(0, true);
+                              }
                               trackAddToCart({
                                 id: product?.id || 'mg-5',
                                 carTitle: product?.title,
