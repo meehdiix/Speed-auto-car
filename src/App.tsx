@@ -56,24 +56,18 @@ function PublicLayout() {
 }
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
+  // 🌟 Butter-Smooth Inertial Scroll across the entire website (optimized for high pressure & mobile touch)
   useEffect(() => {
-    document.fonts.ready.then(() => {
-      setFontsLoaded(true);
-    });
-  }, []);
+    const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || (navigator && navigator.maxTouchPoints > 0));
 
-  // 🌟 Butter-Smooth Inertial Scroll across the entire website
-  useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.2,
+      syncTouch: false,
+      touchMultiplier: isTouchDevice ? 0 : 1,
     });
 
     (window as any).lenis = lenis;
@@ -92,10 +86,6 @@ export default function App() {
       delete (window as any).lenis;
     };
   }, []);
-
-  if (!fontsLoaded) {
-    return <div className="min-h-screen bg-black flex items-center justify-center"></div>;
-  }
 
   return (
     <BrowserRouter>

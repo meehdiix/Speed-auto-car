@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Filter, SlidersHorizontal, ArrowRight, Car, MapPin, Calendar, Activity, Info, AlertCircle, ChevronDown, Check, Layers, ArrowLeft } from 'lucide-react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
 import { carsCatalog } from '../data/carsCatalog';
 import { optimizeImage } from '../utils/imageOptimization';
+import { getCarsList, getDefaultCatalogCars, matchCarModelId, DisplayCarItem } from '../utils/carsCache';
 
 interface CarItem {
   id: string;
@@ -16,12 +15,19 @@ interface CarItem {
   status?: string;
   images: string[];
   baseCarId: string;
+  [key: string]: any;
 }
 
 export default function Catalog() {
   const navigate = useNavigate();
-  const [cars, setCars] = useState<CarItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize immediately with static catalog cars to guarantee instant 0ms render
+  const [cars, setCars] = useState<CarItem[]>(() => {
+    return (getDefaultCatalogCars() as any[]).map(c => ({
+      ...c,
+      baseCarId: c.baseCarId || c.id
+    }));
+  });
+  const [loading, setLoading] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [brandFilter, setBrandFilter] = useState('all');
@@ -29,59 +35,28 @@ export default function Catalog() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
-    const fetchCars = async () => {
-      try {
-        setLoading(true);
-        const q = query(collection(db, 'cars'), where('status', '==', 'متاح'));
-        const snapshot = await getDocs(q);
-        
-        const fetchedCars: CarItem[] = snapshot.docs.map(doc => {
-          const data = doc.data();
-          const titleLower = (data.title || '').toLowerCase();
-          
-          let baseCarId = 'geely-coolray'; // fallback
-          if (titleLower.includes('coolray') || titleLower.includes('كولراي')) {
-            baseCarId = 'geely-coolray';
-          } else if (titleLower.includes('livan') || titleLower.includes('ليفان') || titleLower.includes('x3')) {
-            baseCarId = 'livan-x3-pro';
-          } else if (titleLower.includes('roewe') || titleLower.includes('رويوي') || titleLower.includes('i5')) {
-            baseCarId = 'roewe-i5';
-          } else if (titleLower.includes('mg') || titleLower.includes('ام جي')) {
-            baseCarId = 'mg-5';
-          }
-
-          return {
-            id: doc.id,
-            title: data.title || 'سيارة غير مسماة',
-            price: data.price || '0',
-            year: data.year || '2024',
-            mileage: data.mileage,
-            status: data.status,
-            images: data.images || [],
-            baseCarId
-          };
-        });
-
-        if (fetchedCars.length === 0) {
-          fetchedCars.push({
-            id: 'coolray-2026-battle',
-            title: 'جيلي كولراي 2026 باتل',
-            price: '345 مليون',
-            year: '2026',
-            status: 'متاح',
-            images: [],
-            baseCarId: 'geely-coolray'
-          });
-        }
-
-        setCars(fetchedCars);
-      } catch (err) {
-        console.error("Error fetching cars catalog:", err);
-      } finally {
-        setLoading(false);
+    let isMounted = true;
+    getCarsList().then(fetched => {
+      if (isMounted && fetched && fetched.length > 0) {
+        setCars(fetched.map(c => ({
+          id: c.id,
+          title: c.title,
+          price: c.price || '0',
+          year: c.year || '2026',
+          mileage: c.mileage || '0 كم',
+          status: c.status || 'متاح',
+          images: c.images || [],
+          baseCarId: c.baseCarId || c.id,
+          ...c
+        })));
       }
+    }).catch(() => {
+      // Fallback already pre-rendered
+    });
+
+    return () => {
+      isMounted = false;
     };
-    fetchCars();
   }, []);
 
   const brands = [
@@ -93,9 +68,10 @@ export default function Catalog() {
   ];
 
   const groupedCars = Object.values(cars.reduce((acc, car) => {
-    if (!acc[car.baseCarId]) {
-      acc[car.baseCarId] = {
-        baseCarId: car.baseCarId,
+    const key = (car.baseCarId && carsCatalog[car.baseCarId]) ? car.baseCarId : (matchCarModelId(car.title) || car.baseCarId || car.id);
+    if (!acc[key]) {
+      acc[key] = {
+        baseCarId: key,
         titles: new Set([car.title]),
         prices: [],
         year: car.year,
@@ -107,17 +83,27 @@ export default function Catalog() {
     // Extract numerical value from price (e.g., "300 مليون" -> 300)
     const numMatch = String(car.price).match(/\d+(\.\d+)?/);
     if (numMatch) {
-      acc[car.baseCarId].prices.push(parseFloat(numMatch[0]));
+      acc[key].prices.push(parseFloat(numMatch[0]));
     }
     
-    acc[car.baseCarId].titles.add(car.title);
-    acc[car.baseCarId].count += 1;
+    acc[key].titles.add(car.title);
+    acc[key].count += 1;
     
     return acc;
   }, {} as Record<string, any>)).map((group: any) => {
-    const minPrice = group.prices.length > 0 ? Math.min(...group.prices) : 0;
-    
     const catalogItem = carsCatalog[group.baseCarId];
+    
+    // If no prices found in group, check catalogItem trims
+    if (group.prices.length === 0 && catalogItem?.trims) {
+      catalogItem.trims.forEach(t => {
+        const numMatch = String(t.price).match(/\d+(\.\d+)?/);
+        if (numMatch) {
+          group.prices.push(parseFloat(numMatch[0]));
+        }
+      });
+    }
+
+    const minPrice = group.prices.length > 0 ? Math.min(...group.prices) : 0;
     
     return {
       id: group.baseCarId,
@@ -127,7 +113,7 @@ export default function Catalog() {
       minPriceNum: minPrice,
       year: group.year,
       images: group.images,
-      hasMultipleTrims: group.count > 1,
+      hasMultipleTrims: group.count > 1 || (catalogItem?.trims?.length > 1),
       mainImg: catalogItem ? ((catalogItem as any).mainImg || catalogItem.trims?.[0]?.images?.[0] || '') : ''
     };
   });
@@ -137,7 +123,7 @@ export default function Catalog() {
     
     let matchesBrand = true;
     if (brandFilter !== 'all') {
-      const carBrand = car.baseCarId.split('-')[0]; // geely, roewe, mg, livan
+      const carBrand = (car.baseCarId || car.id || '').split('-')[0]; // geely, roewe, mg, livan
       matchesBrand = carBrand === brandFilter;
     }
     

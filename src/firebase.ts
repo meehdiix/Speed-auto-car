@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
@@ -13,6 +13,19 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, "ai-studio-0d4d0a50-18fc-483c-a019-c84f88da188f");
+
+let firestoreInstance;
+try {
+  firestoreInstance = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  }, "ai-studio-0d4d0a50-18fc-483c-a019-c84f88da188f");
+} catch {
+  firestoreInstance = getFirestore(app, "ai-studio-0d4d0a50-18fc-483c-a019-c84f88da188f");
+}
+
+export const db = firestoreInstance;
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+

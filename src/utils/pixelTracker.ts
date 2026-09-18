@@ -164,24 +164,45 @@ function parseNumericPrice(val?: string | number): number | undefined {
   return isNaN(num) ? undefined : num;
 }
 
+// In-memory cache of active pixel document IDs to avoid querying the collection on every single click
+let cachedActivePixelDocs: { id: string; platform?: string }[] | null = null;
+let lastPixelDocsFetch = 0;
+let lastRecordedTimestamp = 0;
+const PIXEL_DOCS_TTL = 15 * 60 * 1000; // 15 minutes TTL
+
 /**
- * Increments event count in Firestore pixels collection for visual reporting in Admin
+ * Increments event count in Firestore pixels collection for visual reporting in Admin.
+ * Throttled to prevent doc contention and Firestore quota exhaustion under ad traffic.
  */
 async function recordEventInFirestore(eventName: string, platform?: 'tiktok' | 'meta') {
+  const now = Date.now();
+  // Throttle writes: at most 1 write every 4 seconds to prevent document contention
+  if (now - lastRecordedTimestamp < 4000) {
+    return;
+  }
+  lastRecordedTimestamp = now;
+
   try {
-    const snap = await getDocs(collection(db, 'pixels'));
-    snap.docs.forEach(async (docItem) => {
-      const data = docItem.data();
-      if (data.status === 'نشط') {
-        if (!platform || !data.platform || data.platform === platform) {
-          await updateDoc(doc(db, 'pixels', docItem.id), {
-            events: increment(1)
-          }).catch(() => {});
-        }
+    if (!cachedActivePixelDocs || now - lastPixelDocsFetch > PIXEL_DOCS_TTL) {
+      const snap = await getDocs(collection(db, 'pixels'));
+      cachedActivePixelDocs = snap.docs
+        .filter(d => d.data().status === 'نشط')
+        .map(d => ({ id: d.id, platform: d.data().platform }));
+      lastPixelDocsFetch = now;
+    }
+
+    if (!cachedActivePixelDocs || cachedActivePixelDocs.length === 0) return;
+
+    // Run updates without blocking
+    cachedActivePixelDocs.forEach(p => {
+      if (!platform || !p.platform || p.platform === platform) {
+        updateDoc(doc(db, 'pixels', p.id), {
+          events: increment(1)
+        }).catch(() => {});
       }
     });
   } catch {
-    // Non-blocking firestore analytics increment
+    // Non-blocking firestore analytics increment failure is safely ignored
   }
 }
 

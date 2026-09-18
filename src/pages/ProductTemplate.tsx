@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { 
@@ -18,6 +18,7 @@ import Stats from '../components/Stats';
 import { optimizeImage } from '../utils/imageOptimization';
 import { trackPhoneCall, trackViewContent, trackAddToCart, trackPurchase, trackLeadSubmission, initTikTokPixelScript, initMetaPixelScript } from '../utils/pixelTracker';
 import { getGeneralSettings } from '../utils/settings';
+import { getCarsList, getDbCarsForModel, matchCarModelId } from '../utils/carsCache';
 
 
 interface TrimOption {
@@ -54,6 +55,7 @@ function getInitialCar(id: string | undefined) {
 
 export default function ProductTemplate() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const initialCar = getInitialCar(id);
   const [product, setProduct] = useState<any>(initialCar);
   const [loading, setLoading] = useState(!initialCar);
@@ -103,7 +105,7 @@ export default function ProductTemplate() {
       ]
     },
     {
-      id: 'super-power',
+      id: 'superpower',
       name: 'Superpower',
       badge: 'النسخة القياسية',
       price: '300 مليون',
@@ -120,7 +122,7 @@ export default function ProductTemplate() {
       ]
     },
     {
-      id: 'super-max',
+      id: 'supermax',
       name: 'Supermax',
       badge: 'الاقتصادية',
       price: '280 مليون',
@@ -322,62 +324,96 @@ export default function ProductTemplate() {
 
   const getTrimsForProduct = (title: string | undefined): TrimOption[] => {
     if (!title) return coolrayTrims;
+    const modelKey = matchCarModelId(title);
+    if (modelKey === 'geely-coolray') return coolrayTrims;
+    if (modelKey === 'livan-x3-pro') return livanTrims;
+    if (modelKey === 'roewe-i5') return roeweTrims;
+    if (modelKey === 'mg-5') return mgTrims;
+
     const t = title.toLowerCase();
-    if (t.includes('coolray') || t.includes('كولراي')) return coolrayTrims;
-    if (t.includes('livan') || t.includes('x3')) return livanTrims;
-    if (t.includes('roewe') || t.includes('i5')) return roeweTrims;
-    if (t.includes('mg 5') || t.includes('mg5') || t.includes('ام جي')) return mgTrims;
+    if (t.includes('coolray') || t.includes('كولراي') || t.includes('geely') || t.includes('جيلي')) return coolrayTrims;
+    if (t.includes('livan') || t.includes('x3') || t.includes('ليفان')) return livanTrims;
+    if (t.includes('roewe') || t.includes('i5') || t.includes('روي') || t.includes('رويفي')) return roeweTrims;
+    if (t.includes('mg') || t.includes('ام جي') || t.includes('إم جي') || t.includes('امجي')) return mgTrims;
     return []; // No trims for arbitrary custom cars
   };
 
-  let activeTrimsList = getTrimsForProduct(product?.title);
-  
-  if (activeTrimsList.length === 0) {
-    activeTrimsList = [{
-      id: 'standard',
-      name: 'Standard',
-      badge: 'نسخة قياسية',
-      price: product?.price || 'تواصل معنا',
-      subtitle: product?.description || '',
-      tag: 'قياسية',
-      heroSpecs: product?.specs?.length > 0 ? product.specs : [{ icon: null, label: 'الضمان', value: 'عام كامل' }],
-      images: product?.images || []
-    }];
-  }
+  // Helper function to match a DB car entry to a trim with strict priority scoring
+  const matchDbCarToTrim = (trim: TrimOption, dbCars: any[]): any | null => {
+    if (!dbCars || dbCars.length === 0) return null;
+    if (dbCars.length === 1) return dbCars[0];
+
+    const trimIdLower = trim.id.toLowerCase();
+    const trimNameLower = trim.name.toLowerCase();
+    const trimBadgeLower = (trim.badge || '').toLowerCase();
+    const trimTagLower = (trim.tag || '').toLowerCase();
+
+    // 1. Direct trim ID match (e.g. 'flagship', 'battle', 'starlight', 'superpower', 'supermax', 'auto', 'manual')
+    let matched = dbCars.find(c => c.titleLower && c.titleLower.includes(trimIdLower));
+    if (matched) return matched;
+
+    // 2. Direct trim name match
+    matched = dbCars.find(c => c.titleLower && c.titleLower.includes(trimNameLower));
+    if (matched) return matched;
+
+    // 3. Keyword / Transmission specific matching
+    if (trimIdLower === 'manual' || trimBadgeLower.includes('يدوي') || trimTagLower.includes('يدوي')) {
+      matched = dbCars.find(c => c.titleLower && (c.titleLower.includes('manual') || c.titleLower.includes('يدوي') || c.titleLower.includes('manuelle')));
+      if (matched) return matched;
+      // If no explicit manual, find the one that is NOT automatic
+      matched = dbCars.find(c => c.titleLower && !c.titleLower.includes('auto') && !c.titleLower.includes('cvt') && !c.titleLower.includes('أوتوماتيك') && !c.titleLower.includes('اوتوماتيك'));
+      if (matched) return matched;
+    }
+    if (trimIdLower === 'auto' || trimIdLower === 'automatic' || trimBadgeLower.includes('أوتوماتيك') || trimBadgeLower.includes('اوتوماتيك')) {
+      matched = dbCars.find(c => c.titleLower && (c.titleLower.includes('auto') || c.titleLower.includes('cvt') || c.titleLower.includes('أوتوماتيك') || c.titleLower.includes('اوتوماتيك')));
+      if (matched) return matched;
+    }
+
+    // 4. Badge or tag match
+    if (trimBadgeLower) {
+      matched = dbCars.find(c => c.titleLower && c.titleLower.includes(trimBadgeLower));
+      if (matched) return matched;
+    }
+
+    return null;
+  };
+
+  // Build reactive trims list where each trim receives its genuine price
+  const activeTrimsList: TrimOption[] = useMemo(() => {
+    const baseList = getTrimsForProduct(product?.title);
+    if (baseList.length === 0) {
+      return [{
+        id: 'standard',
+        name: 'Standard',
+        badge: 'نسخة قياسية',
+        price: product?.price || 'تواصل معنا',
+        subtitle: product?.description || '',
+        tag: 'قياسية',
+        heroSpecs: product?.specs?.length > 0 ? product.specs : [{ icon: null, label: 'الضمان', value: 'عام كامل' }],
+        images: product?.images || []
+      }];
+    }
+
+    // Map each trim to its dynamic DB price if available, otherwise keep catalog price
+    return baseList.map(trim => {
+      let resolvedPrice = trim.price;
+      if (familyCarsDb && familyCarsDb.length > 0) {
+        const matchedCar = matchDbCarToTrim(trim, familyCarsDb);
+        if (matchedCar && matchedCar.price) {
+          resolvedPrice = String(matchedCar.price).replace(/دج/g, '').trim();
+        }
+      }
+      return {
+        ...trim,
+        price: resolvedPrice
+      };
+    });
+  }, [product?.title, product?.price, product?.description, product?.specs, product?.images, familyCarsDb]);
 
   // Make sure selectedTrimId is valid for the current car's trims
-  const activeTrim = activeTrimsList.find(t => t.id === selectedTrimId) || activeTrimsList[0];
-
-  // Map DB Price to Active Trim if available
-  if (familyCarsDb && familyCarsDb.length > 0 && activeTrim) {
-    let matchedDbTrimPrice = familyCarsDb.find(c => 
-      c.titleLower.includes(activeTrim.id) || 
-      c.titleLower.includes(activeTrim.name.toLowerCase()) || 
-      (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
-    );
-    
-    if (!matchedDbTrimPrice) {
-      matchedDbTrimPrice = familyCarsDb.find(c => {
-        const matchesOther = activeTrimsList.some(otherTrim => 
-          otherTrim.id !== activeTrim.id && (
-            c.titleLower.includes(otherTrim.id) || 
-            c.titleLower.includes(otherTrim.name.toLowerCase()) || 
-            (otherTrim.badge && c.titleLower.includes(otherTrim.badge.toLowerCase()))
-          )
-        );
-        return !matchesOther;
-      });
-    }
-    
-    if (!matchedDbTrimPrice) {
-      matchedDbTrimPrice = familyCarsDb[0];
-    }
-    
-    if (matchedDbTrimPrice && matchedDbTrimPrice.price) {
-      const priceStr = String(matchedDbTrimPrice.price);
-      activeTrim.price = priceStr.replace(/دج/g, '').trim();
-    }
-  }
+  const activeTrim = useMemo(() => {
+    return activeTrimsList.find(t => t.id === selectedTrimId) || activeTrimsList[0];
+  }, [activeTrimsList, selectedTrimId]);
 
   // Stringify dependencies to avoid infinite re-renders from inline objects/arrays
   const depsString = JSON.stringify({
@@ -507,54 +543,30 @@ export default function ProductTemplate() {
     
     const fetchProduct = async () => {
       try {
+        // Normalize alias routes to canonical car model URL
         if (!id || id === 'coolray-2026-battle' || id === 'geely-coolray-2026') {
-          setProduct(defaultCoolray);
-          setActiveImg(defaultCoolray.mainImg);
-          setLoading(false);
+          navigate('/product/geely-coolray', { replace: true });
           return;
         }
 
-        // Check if it's a catalog grouping ID
+        // Check if it's a catalog grouping ID (geely-coolray, livan-x3-pro, roewe-i5, mg-5)
         if (carsCatalog[id]) {
           const catalogData = carsCatalog[id];
           
-          // Query the DB to see if the admin uploaded custom images for this car!
-          let customImages = [];
+          // Query cached Firestore trim documents for this car model
+          let customImages: string[] = [];
           let familyDbMatches: any[] = [];
           try {
-            const carsSnap = await getDocs(collection(db, 'cars'));
-            for (const carDoc of carsSnap.docs) {
-              const car = carDoc.data();
-              const titleLower = (car.title || '').toLowerCase();
-              let matchedId = null;
-              if (titleLower.includes('coolray') || titleLower.includes('كولراي')) matchedId = 'geely-coolray';
-              else if (titleLower.includes('livan') || titleLower.includes('x3')) matchedId = 'livan-x3-pro';
-              else if (titleLower.includes('roewe') || titleLower.includes('i5')) matchedId = 'roewe-i5';
-              else if (titleLower.includes('mg 5') || titleLower.includes('mg5') || titleLower.includes('ام جي')) matchedId = 'mg-5';
-              
-              if (matchedId === id) {
-                familyDbMatches.push({ id: carDoc.id, ...car, titleLower });
-              }
-              
-              if (matchedId === id && car.images && car.images.length > 0) {
-                customImages = car.images;
-                // keep looping to gather all family members
-              }
+            familyDbMatches = await getDbCarsForModel(id);
+            const carWithImages = familyDbMatches.find(c => c.images && c.images.length > 0);
+            if (carWithImages) {
+              customImages = carWithImages.images;
             }
           } catch (e: any) {
-            console.warn("Using catalog images (Firestore unavailable):", e?.message || e);
+            console.warn("Using catalog data (Firestore unavailable):", e?.message || e);
           }
           
           setFamilyCarsDb(familyDbMatches);
-
-          let matchedTrimCar = null;
-          if (familyDbMatches.length > 0 && catalogData.trims[0]) {
-            matchedTrimCar = familyDbMatches.find(c => 
-              c.titleLower.includes(catalogData.trims[0].id) || 
-              c.titleLower.includes(catalogData.trims[0].name.toLowerCase())
-            );
-            if (!matchedTrimCar) matchedTrimCar = familyDbMatches[0];
-          }
 
           const finalImages = customImages.length > 0 ? customImages : (catalogData.trims[0]?.images || []);
 
@@ -565,10 +577,10 @@ export default function ProductTemplate() {
             mileage: '0 كم جديدة من المصنع',
             images: finalImages,
             thumbs: finalImages,
-            hasCustomImages: customImages.length > 0, // Flag for display logic
+            hasCustomImages: customImages.length > 0,
             mainImg: finalImages[0] || defaultCoolray.mainImg,
             tiktokPixelId: (catalogData as any).tiktokPixelId,
-            price: (matchedTrimCar?.price ? String(matchedTrimCar.price).replace(/دج/g, '').trim() : catalogData.trims[0]?.price?.replace(/دج/g, '').trim()),
+            price: catalogData.trims[0]?.price?.replace(/دج/g, '').trim() || '',
             specs: catalogData.trims[0]?.heroSpecs?.map(s => ({ label: s.label, value: s.value })) || []
           });
           setActiveImg(finalImages[0] || defaultCoolray.mainImg);
@@ -576,18 +588,35 @@ export default function ProductTemplate() {
           return;
         }
 
-
+        // If ID is not in carsCatalog, it may be a Firestore doc ID.
+        // Fetch doc with a 2.5s timeout guard.
         const docRef = doc(db, 'cars', id);
-        const docSnap = await getDoc(docRef);
+        const timeoutPromise = new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Car fetch timeout')), 2500)
+        );
+        const docSnap = await Promise.race([getDoc(docRef), timeoutPromise]);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
+          const titleLower = (data.title || '').toLowerCase();
+
+          // Check if this DB car belongs to one of our catalog car models!
+          // If so, redirect to the one canonical URL for this car so all trims are together on 1 page.
+          const matchedCatalogId = matchCarModelId(data.title);
+          if (matchedCatalogId && carsCatalog[matchedCatalogId]) {
+            navigate(`/product/${matchedCatalogId}`, { replace: true });
+            return;
+          }
+
+          // Genuine custom standalone car
           const thumbsList = data.images && data.images.length > 0 ? data.images : defaultCoolray.thumbs;
           const mainImgUrl = thumbsList[0];
 
           setProduct({
             id: docSnap.id,
             title: data.title || 'سيارة',
+            price: data.price ? String(data.price).replace(/دج/g, '').trim() : '',
+            description: data.description || '',
             year: data.year || '2026',
             mileage: data.mileage ? `${data.mileage} كم` : '0 كم (جديدة على الزيرو)',
             mainImg: mainImgUrl,
@@ -596,14 +625,15 @@ export default function ProductTemplate() {
             hasCustomImages: data.images && data.images.length > 0,
             tiktokPixelId: data.tiktokPixelId,
             pixelId: data.pixelId,
+            specs: Array.isArray(data.specs) ? data.specs : []
           });
           setActiveImg(mainImgUrl);
         } else {
-          setProduct(defaultCoolray);
-          setActiveImg(defaultCoolray.mainImg);
+          // Document not found - fallback to main car page
+          navigate('/product/geely-coolray', { replace: true });
         }
       } catch (err) {
-        console.error("Error fetching product:", err);
+        console.warn("Error fetching product, applying fallback:", err);
         setProduct(defaultCoolray);
         setActiveImg(defaultCoolray.mainImg);
       } finally {
@@ -612,7 +642,7 @@ export default function ProductTemplate() {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, navigate]);
 
   // 🎯 Initialize car-specific pixels if defined
   useEffect(() => {
@@ -1006,34 +1036,48 @@ export default function ProductTemplate() {
     if (!bookingForm.name || !bookingForm.phone) return;
     
     setBookingStatus('submitting');
+
+    const leadPayload = {
+      carId: product.id,
+      carTitle: product.title,
+      trim: activeTrim.name,
+      color: availableColors.find(c => c.id === selectedColor)?.name || 'أبيض',
+      name: bookingForm.name,
+      phone: bookingForm.phone,
+      status: 'جديد',
+      timestamp: Date.now()
+    };
+
+    // Always fire ad pixel lead tracking immediately
+    trackLeadSubmission({
+      formName: 'حجز سيارة وتوقيع العقد',
+      carTitle: `${product.title} - ${activeTrim.name}`,
+      name: bookingForm.name,
+      phone: bookingForm.phone
+    });
+
     try {
-      await addDoc(collection(db, 'appointments'), {
-        carId: product.id,
-        carTitle: product.title,
-        trim: activeTrim.name,
-        color: availableColors.find(c => c.id === selectedColor)?.name,
-        name: bookingForm.name,
-        phone: bookingForm.phone,
-        status: 'جديد',
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Submit timeout')), 2500)
+      );
+      const addDocPromise = addDoc(collection(db, 'appointments'), {
+        ...leadPayload,
         createdAt: serverTimestamp()
       });
-      // Track Lead submission event in TikTok & Meta Pixels
-      trackLeadSubmission({
-        formName: 'حجز سيارة وتوقيع العقد',
-        carTitle: `${product.title} - ${activeTrim.name}`,
-        name: bookingForm.name,
-        phone: bookingForm.phone
-      });
-      setBookingStatus('success');
-      setTimeout(() => {
-        setIsBookingModalOpen(false);
-        setBookingStatus('');
-        setBookingForm({ name: '', phone: '' });
-      }, 3000);
+
+      await Promise.race([addDocPromise, timeoutPromise]);
     } catch (err) {
-      console.error('Error submitting booking:', err);
-      setBookingStatus('error');
+      console.warn('Firestore appointment submission timed out or failed, saving offline fallback:', err);
+      try {
+        const stored = JSON.parse(localStorage.getItem('speedauto_offline_leads') || '[]');
+        stored.push(leadPayload);
+        localStorage.setItem('speedauto_offline_leads', JSON.stringify(stored));
+      } catch {
+        // silent
+      }
     }
+
+    setBookingStatus('success');
   };
 
   if (loading) {
@@ -1239,93 +1283,81 @@ export default function ProductTemplate() {
               )}
             </div>
 
-            {/* 🌟 SLEEK STANDOUT TRIM DROPDOWN PILL */}
+            {/* 🌟 STANDOUT INTERACTIVE TRIMS SELECTOR */}
             {activeTrimsList.length > 1 && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsTrimDropdownOpen(!isTrimDropdownOpen)}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 bg-black/40 hover:bg-black/60 active:scale-[0.99] border border-red-500/30 hover:border-red-400/50 rounded-2xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.12)] group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 border border-red-400/20">
-                    <SlidersHorizontal className="w-3.5 h-3.5" />
+              <div className="space-y-2.5 bg-black/40 border border-red-500/20 rounded-2xl p-3.5 sm:p-4">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 font-bold text-white">
+                    <SlidersHorizontal className="w-4 h-4 text-red-400" />
+                    <span>فئات السيارة المتوفرة:</span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-white/50 block font-medium leading-tight">فئة السيارة</span>
-                    <span className="text-xs sm:text-sm font-bold text-white group-hover:text-red-300 transition-colors">
-                      {activeTrim.name}
-                    </span>
-                  </div>
+                  <span className="text-[11px] text-red-400 font-bold bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">
+                    {activeTrimsList.length} فئات
+                  </span>
                 </div>
-                
-                <ChevronDown className={`w-4 h-4 text-white/60 transition-transform duration-200 ${isTrimDropdownOpen ? 'rotate-180 text-red-400' : ''}`} />
-              </button>
 
-              {/* Floating Dropdown Menu */}
-              <AnimatePresence>
-                {isTrimDropdownOpen && (
-                  <>
-                    {/* Backdrop to close */}
-                    <div 
-                      className="fixed inset-0 z-20" 
-                      onClick={() => setIsTrimDropdownOpen(false)}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full right-0 left-0 mt-2 z-30 bg-[#16181f]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden p-1.5 space-y-1"
-                    >
-                      {activeTrimsList.map((trim) => {
-                        const isSelected = selectedTrimId === trim.id;
-                        return (
-                          <button
-                            key={trim.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedTrimId(trim.id);
-                              setIsTrimDropdownOpen(false);
-                              setSelectedGalleryIndex(0);
-                              if (trim.images && trim.images.length > 0) {
-                                setActiveImg(trim.images[0]);
-                              }
-                              if (galleryEmblaApi) {
-                                galleryEmblaApi.reInit();
-                                galleryEmblaApi.scrollTo(0, true);
-                              }
-                              trackAddToCart({
-                                id: product?.id || 'mg-5',
-                                carTitle: product?.title,
-                                trimName: trim.name,
-                                price: trim.price
-                              });
-                            }}
-                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-right transition-all ${
-                              isSelected
-                                ? 'bg-red-600/20 border border-red-500/40 text-white'
-                                : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-red-400 ring-4 ring-red-400/20' : 'bg-white/20'}`} />
-                              <span className="text-xs sm:text-sm font-bold">{trim.name}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  {activeTrimsList.map((trim) => {
+                    const isSelected = selectedTrimId === trim.id;
+                    return (
+                      <button
+                        key={trim.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedTrimId(trim.id);
+                          setSelectedGalleryIndex(0);
+                          if (trim.images && trim.images.length > 0) {
+                            setActiveImg(trim.images[0]);
+                          }
+                          if (galleryEmblaApi) {
+                            galleryEmblaApi.reInit();
+                            galleryEmblaApi.scrollTo(0, true);
+                          }
+                          trackAddToCart({
+                            id: product?.id || 'car',
+                            carTitle: product?.title,
+                            trimName: trim.name,
+                            price: trim.price
+                          });
+                        }}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl text-right transition-all border ${
+                          isSelected
+                            ? 'bg-red-500/20 border-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.25)] ring-1 ring-red-500/40'
+                            : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:border-white/20 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isSelected ? 'bg-red-500 ring-4 ring-red-500/30' : 'bg-white/20'}`} />
+                          <div className="truncate text-right">
+                            <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                              <span>{trim.name}</span>
+                              {trim.badge && (
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${isSelected ? 'bg-red-500/30 text-red-200' : 'bg-white/10 text-white/50'}`}>
+                                  {trim.badge}
+                                </span>
+                              )}
                             </div>
-                            <div className="text-left shrink-0 mr-2 flex items-center gap-1.5">
-                              <span className={`text-xs font-bold ${isSelected ? 'text-red-300' : 'text-white/50'}`}>
-                                {trim.price}
-                              </span>
-                              {isSelected && <Check className="w-3.5 h-3.5 text-red-400 shrink-0" />}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
+                            {trim.tag && (
+                              <div className="text-[10px] text-white/40 mt-0.5 truncate">{trim.tag}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="text-left shrink-0 mr-2 flex flex-col items-end">
+                          <div className={`text-xs sm:text-sm font-black ${isSelected ? 'text-red-400' : 'text-white/80'}`}>
+                            {trim.price}
+                          </div>
+                          {isSelected && (
+                            <span className="text-[9px] text-red-300 font-bold flex items-center gap-0.5 mt-0.5">
+                              <Check className="w-3 h-3 text-red-400" /> محددة
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
 
             {/* 🎨 COMPACT COLOR PALETTE SELECTOR */}
@@ -1890,7 +1922,17 @@ export default function ProductTemplate() {
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
                   <h4 className="text-xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h4>
-                  <p className="text-white/60 text-sm">سنتصل بك قريباً على الرقم الذي قدمته.</p>
+                  <p className="text-white/60 text-sm mb-6">سنتصل بك قريباً على الرقم الذي قدمته لتأكيد الموعد وتوقيع العقد.</p>
+
+                  <a
+                    href={`https://wa.me/213541399342?text=${encodeURIComponent(`السلام عليكم، قمت بطلب حجز موعد شراء لسيارة ${product.title} (${activeTrim.name}).\nالاسم: ${bookingForm.name}\nالهاتف: ${bookingForm.phone}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-[0_4px_20px_rgba(37,211,102,0.3)] flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-5 h-5 fill-current" />
+                    <span>تأكيد فوري عبر واتساب (اختياري)</span>
+                  </a>
                 </motion.div>
               ) : (
                 <form onSubmit={handleBookingSubmit} className="space-y-4">
