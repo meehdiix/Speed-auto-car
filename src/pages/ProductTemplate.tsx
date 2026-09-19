@@ -235,10 +235,10 @@ export default function ProductTemplate() {
     {
       id: 'automatic',
       name: 'Automatic',
-      badge: 'أوتوماتيك',
+      badge: '',
       price: '275 مليون',
-      subtitle: 'قيادة سلسة ومريحة',
-      tag: 'عائلية',
+      subtitle: '',
+      tag: '',
       images: [
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613217/oy4rgutdpjynh4yjqqkj.png",
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613218/vftlrhgorttpmbgsehf7.png",
@@ -272,10 +272,10 @@ export default function ProductTemplate() {
     {
       id: 'manual',
       name: 'Manual',
-      badge: 'يدوي',
+      badge: '',
       price: '220 مليون',
-      subtitle: 'أداء فائق وتسارع قوي',
-      tag: 'يدوي',
+      subtitle: '',
+      tag: '',
       images: [
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png",
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png",
@@ -1283,81 +1283,98 @@ export default function ProductTemplate() {
               )}
             </div>
 
-            {/* 🌟 STANDOUT INTERACTIVE TRIMS SELECTOR */}
+            {/* 🌟 SLEEK STANDOUT TRIM DROPDOWN PILL BUTTON */}
             {activeTrimsList.length > 1 && (
-              <div className="space-y-2.5 bg-black/40 border border-red-500/20 rounded-2xl p-3.5 sm:p-4">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 font-bold text-white">
-                    <SlidersHorizontal className="w-4 h-4 text-red-400" />
-                    <span>فئات السيارة المتوفرة:</span>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsTrimDropdownOpen(!isTrimDropdownOpen)}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 bg-black/40 hover:bg-black/60 active:scale-[0.99] border border-red-500/30 hover:border-red-400/50 rounded-2xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.12)] group cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 border border-red-400/20">
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-[11px] text-red-400 font-bold bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">
-                    {activeTrimsList.length} فئات
-                  </span>
+                  <div className="text-right">
+                    <span className="text-[10px] text-white/50 block font-medium leading-tight">فئة السيارة</span>
+                    <span className="text-xs sm:text-sm font-bold text-white group-hover:text-red-300 transition-colors">
+                      {activeTrim.name} {activeTrim.badge ? `(${activeTrim.badge})` : ''}
+                    </span>
+                  </div>
                 </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-red-400">{activeTrim.price}</span>
+                  <ChevronDown className={`w-4 h-4 text-white/60 transition-transform duration-200 ${isTrimDropdownOpen ? 'rotate-180 text-red-400' : ''}`} />
+                </div>
+              </button>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  {activeTrimsList.map((trim) => {
-                    const isSelected = selectedTrimId === trim.id;
-                    return (
-                      <button
-                        key={trim.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedTrimId(trim.id);
-                          setSelectedGalleryIndex(0);
-                          if (trim.images && trim.images.length > 0) {
-                            setActiveImg(trim.images[0]);
-                          }
-                          if (galleryEmblaApi) {
-                            galleryEmblaApi.reInit();
-                            galleryEmblaApi.scrollTo(0, true);
-                          }
-                          trackAddToCart({
-                            id: product?.id || 'car',
-                            carTitle: product?.title,
-                            trimName: trim.name,
-                            price: trim.price
-                          });
-                        }}
-                        className={`w-full flex items-center justify-between p-3 rounded-xl text-right transition-all border ${
-                          isSelected
-                            ? 'bg-red-500/20 border-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.25)] ring-1 ring-red-500/40'
-                            : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:border-white/20 hover:text-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isSelected ? 'bg-red-500 ring-4 ring-red-500/30' : 'bg-white/20'}`} />
-                          <div className="truncate text-right">
-                            <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
-                              <span>{trim.name}</span>
-                              {trim.badge && (
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${isSelected ? 'bg-red-500/30 text-red-200' : 'bg-white/10 text-white/50'}`}>
-                                  {trim.badge}
-                                </span>
-                              )}
+              {/* Floating Dropdown Menu */}
+              <AnimatePresence>
+                {isTrimDropdownOpen && (
+                  <>
+                    {/* Backdrop to close */}
+                    <div 
+                      className="fixed inset-0 z-20" 
+                      onClick={() => setIsTrimDropdownOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full right-0 left-0 mt-2 z-30 bg-[#16181f]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden p-1.5 space-y-1"
+                    >
+                      {activeTrimsList.map((trim) => {
+                        const isSelected = selectedTrimId === trim.id;
+                        return (
+                          <button
+                            key={trim.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedTrimId(trim.id);
+                              setIsTrimDropdownOpen(false);
+                              setSelectedGalleryIndex(0);
+                              if (trim.images && trim.images.length > 0) {
+                                setActiveImg(trim.images[0]);
+                              }
+                              if (galleryEmblaApi) {
+                                galleryEmblaApi.reInit();
+                                galleryEmblaApi.scrollTo(0, true);
+                              }
+                              trackAddToCart({
+                                id: product?.id || 'car',
+                                carTitle: product?.title,
+                                trimName: trim.name,
+                                price: trim.price
+                              });
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-right transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-red-600/20 border border-red-500/40 text-white'
+                                : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-red-400 ring-4 ring-red-400/20' : 'bg-white/20'}`} />
+                              <span className="text-xs sm:text-sm font-bold">
+                                {trim.name} {trim.badge ? `(${trim.badge})` : ''}
+                              </span>
                             </div>
-                            {trim.tag && (
-                              <div className="text-[10px] text-white/40 mt-0.5 truncate">{trim.tag}</div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="text-left shrink-0 mr-2 flex flex-col items-end">
-                          <div className={`text-xs sm:text-sm font-black ${isSelected ? 'text-red-400' : 'text-white/80'}`}>
-                            {trim.price}
-                          </div>
-                          {isSelected && (
-                            <span className="text-[9px] text-red-300 font-bold flex items-center gap-0.5 mt-0.5">
-                              <Check className="w-3 h-3 text-red-400" /> محددة
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                            <div className="text-left shrink-0 mr-2 flex items-center gap-1.5">
+                              <span className={`text-xs font-bold ${isSelected ? 'text-red-300' : 'text-white/50'}`}>
+                                {trim.price}
+                              </span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-red-400 shrink-0" />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
             )}
 
             {/* 🎨 COMPACT COLOR PALETTE SELECTOR */}
@@ -1409,6 +1426,14 @@ export default function ProductTemplate() {
 
             {/* Key Facts (Perfect RTL Alignment) */}
             <div className="divide-y divide-white/5 text-xs sm:text-sm">
+              <div className="py-2.5 flex items-center justify-between gap-4">
+                <span className="text-white/60 flex items-center gap-2 shrink-0">
+                  <MapPin className="w-4 h-4 text-blue-400" />
+                  مكان المكتب:
+                </span>
+                <span className="font-bold text-blue-400 text-left">تڨرت (Touggourt)</span>
+              </div>
+
               <div className="py-2.5 flex items-center justify-between gap-4">
                 <span className="text-white/60 flex items-center gap-2 shrink-0">
                   <Clock className="w-4 h-4 text-red-400" />

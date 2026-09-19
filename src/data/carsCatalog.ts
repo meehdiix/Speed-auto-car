@@ -344,10 +344,10 @@ export const carsCatalog: Record<string, CarModel> = {
       {
         id: 'automatic',
         name: 'Automatic',
-        badge: 'أوتوماتيك',
+        badge: '',
         price: '275 مليون',
-        subtitle: 'قيادة سلسة ومريحة',
-        tag: 'عائلية',
+        subtitle: '',
+        tag: '',
         images: [
   "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613217/oy4rgutdpjynh4yjqqkj.png",
   "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789613218/vftlrhgorttpmbgsehf7.png",
@@ -384,10 +384,10 @@ export const carsCatalog: Record<string, CarModel> = {
       {
         id: 'manual',
         name: 'Manual',
-        badge: 'يدوي',
+        badge: '',
         price: '220 مليون',
-        subtitle: 'أداء فائق وتسارع قوي',
-        tag: 'يدوي',
+        subtitle: '',
+        tag: '',
         images: [
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183455/usvmxpqcl4v1as7ceuuh.png",
         "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183451/qvetbjmfrugty1dejcs7.png",
