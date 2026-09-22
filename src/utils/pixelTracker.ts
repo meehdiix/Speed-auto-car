@@ -15,6 +15,12 @@ let isMetaScriptLoaded = false;
 const loadedTikTokPixelIds = new Set<string>();
 const loadedMetaPixelIds = new Set<string>();
 
+// If base scripts were already executed in index.html, register default IDs to prevent duplicate init warnings
+if (typeof window !== 'undefined') {
+  if ((window as any).ttq) loadedTikTokPixelIds.add('DALDKHBC77U05QM9RMN0');
+  if ((window as any).fbq) loadedMetaPixelIds.add('962513616169647');
+}
+
 /**
  * Safely initializes the official TikTok Pixel runtime with full ad-blocker immunity.
  * If external network request fails due to ad-blockers, the stub buffers events safely
@@ -207,18 +213,24 @@ async function recordEventInFirestore(eventName: string, platform?: 'tiktok' | '
 }
 
 /**
- * 📄 PageView Tracker
+ * 📄 PageView Tracker with deduplication to prevent duplicate events on initial mount
  */
-export function trackPageView(pageUrl?: string) {
-  try {
-    if (window.ttq && typeof window.ttq.page === 'function') {
-      window.ttq.page();
-    }
-  } catch (e) {
-    // silent
-  }
+let lastTrackedPath = '';
+let lastTrackedPageViewTime = 0;
 
-  const eventId = `pv_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+export function trackPageView(pageUrl?: string) {
+  const currentPath = pageUrl || (typeof window !== 'undefined' ? window.location.pathname + window.location.search : '');
+  const now = Date.now();
+
+  // Deduplicate rapid repeat page views (within 800ms for identical URL)
+  if (currentPath && currentPath === lastTrackedPath && now - lastTrackedPageViewTime < 800) {
+    return;
+  }
+  lastTrackedPath = currentPath;
+  lastTrackedPageViewTime = now;
+
+  const eventId = `pv_${now}_${Math.random().toString(36).substring(2, 7)}`;
+
   try {
     if (window.ttq && typeof window.ttq.page === 'function') {
       window.ttq.page();
@@ -472,26 +484,32 @@ export async function sendMetaConversionsApi(
 
     const apiUrl = `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${encodeURIComponent(token)}`;
 
-    fetch(apiUrl, {
+    // 1. Send via Cloudflare Pages Function proxy (/api/meta-events)
+    // Server-to-server request from Cloudflare Edge Worker bypasses all browser CORS restrictions
+    fetch('/api/meta-events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        pixelId,
+        token,
+        payload
+      })
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data?.events_received) {
-          console.log(`📡 [Meta Conversions API] ${eventName} successfully tracked [event_id: ${eventId}]:`, data);
-        } else {
-          console.log(`ℹ️ [Meta Conversions API] response:`, data);
+      .then(async res => {
+        if (res.ok) {
+          const data = await res.json().catch(() => null);
+          if (data?.events_received) {
+            console.log(`📡 [Meta CAPI via Cloudflare] ${eventName} received [event_id: ${eventId}]:`, data);
+          }
         }
       })
-      .catch(err => {
-        console.log(`[Meta Conversions API] Network note: ${err?.message || err}`);
+      .catch(() => {
+        // Quiet fallback if serverless function not active
       });
   } catch (err) {
-    console.warn('[Meta Conversions API] Execution error:', err);
+    // safe
   }
 }
 
@@ -567,7 +585,7 @@ export function trackAddToCart(params?: {
   price?: string | number;
 }) {
   const validContentId = sanitizeContentId(params?.id);
-  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'Geely Coolray 2026';
   const eventId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
   const cartPayload = {
@@ -628,7 +646,7 @@ export function trackPurchase(params?: {
   price?: string | number;
 }) {
   const validContentId = sanitizeContentId(params?.id);
-  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'Geely Coolray 2026';
   const eventId = `pur_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
   const purchasePayload = {
@@ -701,7 +719,7 @@ export function trackPhoneCall(params?: {
 
   const label = params?.buttonLabel || 'إتصل بنا مباشرة';
   const validContentId = sanitizeContentId(params?.carId);
-  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'Geely Coolray 2026';
   const eventId = `call_${now}_${Math.random().toString(36).substring(2, 8)}`;
 
   // Full TikTok compliant product payload with valid content_id
@@ -815,7 +833,7 @@ export function trackWhatsApp(params?: {
 }) {
   const label = params?.buttonLabel || 'تواصل عبر واتساب';
   const validContentId = sanitizeContentId(params?.carId);
-  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'MG 5 2026';
+  const carName = params?.carTitle ? `${params.carTitle} ${params?.trimName || ''}`.trim() : 'Geely Coolray 2026';
   const eventId = `wa_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
   const productPayload = {

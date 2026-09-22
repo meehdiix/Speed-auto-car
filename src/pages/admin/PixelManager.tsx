@@ -26,6 +26,7 @@ export default function PixelManager() {
   const [pixelId, setPixelId] = useState('');
   const [name, setName] = useState('');
   const [metaCapiToken, setMetaCapiToken] = useState(getMetaConversionsApiToken());
+  const [metaTestCode, setMetaTestCode] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('meta_test_event_code') || '' : ''));
   const [submitting, setSubmitting] = useState(false);
   
   // UI states
@@ -367,6 +368,40 @@ export default function PixelManager() {
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0"
                 >
                   تحديث الرمز
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-white/5">
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                رمز اختبار الأحداث (Meta Test Event Code) - اختياري للمعاينة المباشرة:
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={metaTestCode}
+                  onChange={(e) => setMetaTestCode(e.target.value)}
+                  placeholder="مثال: TEST64210 (من تبويب اختبار الأحداث في فيسبوك)"
+                  className="flex-1 bg-black/60 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 focus:outline-none focus:border-blue-500 font-mono"
+                  dir="ltr"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const code = metaTestCode.trim();
+                    if (code) {
+                      localStorage.setItem('meta_test_event_code', code);
+                      sessionStorage.setItem('meta_test_event_code', code);
+                      showNotification(`تم تفعيل رمز اختبار ميتا ${code} بنجاح!`);
+                    } else {
+                      localStorage.removeItem('meta_test_event_code');
+                      sessionStorage.removeItem('meta_test_event_code');
+                      showNotification('تم إلغاء رمز الاختبار وسيعمل البيكسل بالوضع الفعلي المباشر');
+                    }
+                  }}
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                >
+                  حفظ الرمز
                 </button>
               </div>
             </div>

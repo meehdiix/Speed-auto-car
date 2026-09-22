@@ -58,7 +58,6 @@ export default function MetaPixelTracker() {
         }
         initTikTokPixelScript(cached.tiktokIds);
         initMetaPixelScript(cached.metaIds);
-        trackPageView();
         return;
       }
 
@@ -101,13 +100,11 @@ export default function MetaPixelTracker() {
 
         initTikTokPixelScript(tiktokIds);
         initMetaPixelScript(metaIds);
-        trackPageView();
       } catch (err: any) {
         // Fallback gracefully without throwing or blocking UI
         if (isCancelled) return;
         initTikTokPixelScript([TIKTOK_DEFAULT_PIXEL_ID]);
         initMetaPixelScript([META_DEFAULT_PIXEL_ID]);
-        trackPageView();
       }
 
       // 3. Supplement with general settings pixels if any

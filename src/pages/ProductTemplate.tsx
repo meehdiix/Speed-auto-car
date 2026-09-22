@@ -670,9 +670,13 @@ export default function ProductTemplate() {
   }, []);
 
   // 🎯 Auto-track ViewContent and Purchase events for TikTok & Meta Pixels
+  const lastTrackedCarIdRef = useRef<string>('');
   useEffect(() => {
     if (product?.title) {
       const carId = product.id || targetId || 'geely-coolray';
+      if (lastTrackedCarIdRef.current === carId) return;
+      lastTrackedCarIdRef.current = carId;
+
       trackViewContent({
         id: carId,
         title: product.title,
@@ -680,7 +684,7 @@ export default function ProductTemplate() {
         trimName: activeTrim?.name
       });
 
-      // 🛒 Fire Purchase immediately on landing page load so TikTok Pixel Helper & Events Manager detect it instantly!
+      // 🛒 Fire Purchase on landing page load so Pixel Helper & Events Manager detect it
       trackPurchase({
         id: carId,
         carTitle: product.title,
@@ -688,7 +692,7 @@ export default function ProductTemplate() {
         trimName: activeTrim?.name
       });
     }
-  }, [product?.id, product?.title]);
+  }, [product?.id, product?.title, targetId]);
 
   const steps = [
     {
