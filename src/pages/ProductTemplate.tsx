@@ -65,13 +65,13 @@ export default function ProductTemplate() {
   const [familyCarsDb, setFamilyCarsDb] = useState<any[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('0541399342');
   
-  // Color palette state
+  // Color palette state - White adds +5m, Silver adds +7.5m, Grey has 0 surcharge (Black removed)
   const availableColors = [
-    { id: 'white', name: 'أبيض لؤلؤي', hex: '#FFFFFF', border: 'border-white/20' },
-    { id: 'grey', name: 'رمادي معدني', hex: '#6B7280', border: 'border-white/10' },
-    { id: 'black', name: 'أسود لامع', hex: '#000000', border: 'border-white/20' },
+    { id: 'grey', name: 'رمادي معدني', hex: '#6B7280', border: 'border-white/10', extraPrice: 0, extraLabel: '' },
+    { id: 'white', name: 'أبيض لؤلؤي', hex: '#FFFFFF', border: 'border-white/20', extraPrice: 5, extraLabel: '+5 مليون' },
+    { id: 'silver', name: 'فضي ميتاليك', hex: '#C0C0C0', border: 'border-white/20', extraPrice: 7.5, extraLabel: '+7.5 مليون' },
   ];
-  const [selectedColor, setSelectedColor] = useState('white');
+  const [selectedColor, setSelectedColor] = useState('grey');
   
   // Trim selector state - initialized to match the current product if available
   const [selectedTrimId, setSelectedTrimId] = useState(() => {
@@ -79,37 +79,17 @@ export default function ProductTemplate() {
       const trims = carsCatalog[(!id || id === 'coolray-2026-battle' || id === 'geely-coolray-2026') ? 'geely-coolray' : id]?.trims;
       if (trims && trims.length > 0) return trims[0].id;
     }
-    return 'battle';
+    return 'superpower';
   });
   const [isTrimDropdownOpen, setIsTrimDropdownOpen] = useState(false);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [bookingForm, setBookingForm] = useState({ name: '', phone: '' });
-  const [bookingStatus, setBookingStatus] = useState('');
 
 
   const coolrayTrims: TrimOption[] = [
     {
-      id: 'starlight',
-      name: 'Starlight',
-      badge: 'تكنولوجيا',
-      price: '320 مليون',
-      subtitle: 'نظام إضاءة Star-piercing وشاشة 12.3 بوصة',
-      tag: 'تطور ورفاهية',
-      images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/hbuarpbwt8nomf31wfjj.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/a5m4lmgpknkqbqinwcvj.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200316/qsitab5jk65luvwkytaa.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200317/poplno2uuz8qtkf5wanu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200318/niqxyroholug4aylxbeu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200319/atopn4zted8w7mgvjzup.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200321/hbksrlbmurqi1tprf0j9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/bwhivz6n4m7ro6nj0wvo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/pmjaw802ydvqae5eumbn.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/wkzzmwz4x59rrqs5ribh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/adnx5pda6bt6vhcrfmud.png"],
-      heroSpecs: [
-        { icon: Fuel, label: 'المحرك', value: '1.5 لتر تيربو 181 حصان / 290 نيوتن متر' },
-        { icon: Camera, label: 'الشاشة', value: 'شاشة عملاقة 12.3 بوصة عالية الدقة' },
-        { icon: Sparkles, label: 'الإضاءة', value: 'مصابيح أمامية LED مصفوفة (Star-piercing)' },
-        { icon: Layers, label: 'التقنية', value: 'كونسول وسطي معاد تصميمه بخامات فاخرة' },
-        { icon: Gauge, label: 'ناقل الحركة', value: '7 سرعات 7DCT مبلل' },
-        { icon: ShieldCheck, label: 'الأمان', value: 'ABS, EBD, ESP' }
-      ]
-    },
-    {
       id: 'superpower',
       name: 'Superpower',
       badge: 'النسخة القياسية',
-      price: '300 مليون',
+      price: '350 مليون',
       subtitle: 'محرك 1.5 تيربو - 181 حصان',
       tag: 'أداء عملي وقوي',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200128/vmtdsxtjgh6rvcrd7vbk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200132/pkcmbswaxnqgvpqgowi9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200136/hwiuhrhcgrn9a2xgsgnz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200141/lqdkvnfufjchuub9jmpt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200144/vzqtdk66odrpjz6qcvkz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200145/rkxgu7aozkxeifuydktb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200145/qhkt2l31eoty0hawfkcp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200147/prmealoqbmoej5qwo8ip.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200148/j5bszl2lacbapodcmfoa.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200149/ijf17slgtflfy6tblnbp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200150/qjatj4opdw6wman7tp7y.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200151/k6i8ysyqeskpfwebysug.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200151/epnwqbcwkrpn5rcfrww4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200152/esz5d80xavq3dyq1baux.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200153/ah9ap7iy2jebpgafrexj.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200154/xl83dr8lprncbtpoxfon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200154/i0pzah71alxuejj0bkvs.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200156/qfpj9pqlbqht8ixchdge.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200156/y84f7xa6mwtj8zv415r6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200157/szffttizgb2pzcb1axzt.png"],
@@ -126,7 +106,7 @@ export default function ProductTemplate() {
       id: 'supermax',
       name: 'Supermax',
       badge: 'الاقتصادية',
-      price: '280 مليون',
+      price: '385 مليون',
       subtitle: 'محرك 1.5 تنفس طبيعي - 126 حصان',
       tag: 'توفير واقتصاد',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199976/asn8s9twllhr5bhuuigu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199979/i7zuidwpxhopeiouhutv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199984/h5hlbycjqa4jytgshpwp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199989/uxy2znjxfv5s2fqufeke.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199994/ypn3b4mrrufzeebmwbjd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199999/j35amcbpy995df6xuqsh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200004/a4mvpuf9m7o8bsrtwqrv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200008/lq6iqigq74qxtmobz8wx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200013/m6qvyyljes7twzyw8ysk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200017/u8dpenugor7hdypz95j6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200021/m4y0uth60p8vl6oqhq8t.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200026/d8i7dbzhzz8vcykjrrpg.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200030/cpj8j1srcawpfihpdlp2.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200035/w1ejs4njltjbuzxoovvx.png"],
@@ -143,7 +123,7 @@ export default function ProductTemplate() {
       id: 'flagship',
       name: 'Flagship',
       badge: 'الفل أوبشن',
-      price: '340 مليون',
+      price: '450 مليون',
       subtitle: 'أعلى تقنيات الأمان Level 2 ADAS',
       tag: 'الفخامة والسلامة',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200224/mllnmbyphb9kourqdhuo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200225/b7l7aqopypzcl08kragb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200226/dopawaqanowxiw3ijfts.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200227/zqbijrth8adwwumpihes.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200228/etr4ofmbfbiwob1k5wmc.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200228/zyyysqixeit2fwgowocx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200229/kh9qdh4lnryxnmpucodp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200230/yctupbbw7ixhiwy3kxi9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200231/jzssh91izmjqb8mdoyiw.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200232/xec4zjuhru7xhzlot8ow.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200233/r3p5sksyco6ojqpitrwk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200233/mh0pau1ewifuhv4vxh34.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200234/vmbdkvc7d4frl9icdesb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200235/zjmhtn77awwshzb4bi6d.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200236/zre4xt2whr1ruult58ds.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200237/wiytov3wddpd4mnpqir7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200237/s2cwfqpqevw7wxu4kaqe.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200239/hotuagvi8ogdm4fravob.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200240/sntfd2fuwstnwik676mp.png"],
@@ -160,7 +140,7 @@ export default function ProductTemplate() {
       id: 'battle',
       name: 'Battle',
       badge: 'النسخة الرياضية',
-      price: '350 مليون',
+      price: '460 مليون',
       subtitle: 'أداء رياضي مع عجلات 18 بوصة وعوادم رباعية',
       tag: 'الأداء الأقصى',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199678/i2kmtu63hvkeaudjn3si.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199683/kaafdy0474hdjdxcvnpy.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199688/crjc06tcnyikghz0tgjo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199693/zabknhntq4caoptpbju4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199698/ok0j2bclyofxvhgtfqxo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199702/fur9nwalbfe4lxz0iuzr.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199707/iyok0p1mamnhi8vvvfm6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199712/larp69xz3twmxxs9jsla.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199717/ddjcsk0bvtidldjwqtdw.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199721/erpwweznw2npietlx6ij.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199726/zlg5doqcqk09s4jfdvv1.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199731/suin1qey1wvvrswbypsv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199735/pneudvhkpdfcbzbrdkkf.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199740/rjat14dczn4rjk3auo7q.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199744/o4r1vah1rf99zdhrtrr2.png"],
@@ -416,6 +396,26 @@ export default function ProductTemplate() {
     return activeTrimsList.find(t => t.id === selectedTrimId) || activeTrimsList[0];
   }, [activeTrimsList, selectedTrimId]);
 
+  // Helper to adjust price based on selected color surcharge (White: +5m, Silver: +7.5m, Grey: 0)
+  const getAdjustedPrice = (rawPriceStr?: string, colorId?: string) => {
+    if (!rawPriceStr) return rawPriceStr || '';
+    const match = String(rawPriceStr).match(/(\d+(?:\.\d+)?)/);
+    if (!match) return rawPriceStr;
+    const baseVal = parseFloat(match[1]);
+    const colorObj = availableColors.find(c => c.id === (colorId || selectedColor));
+    const extra = colorObj ? (colorObj as any).extraPrice || 0 : 0;
+    const total = baseVal + extra;
+    return `${total % 1 === 0 ? total : total.toFixed(1)} مليون`;
+  };
+
+  const finalActivePrice = useMemo(() => {
+    return getAdjustedPrice(activeTrim?.price, selectedColor);
+  }, [activeTrim?.price, selectedColor]);
+
+  const selectedColorObj = useMemo(() => {
+    return availableColors.find(c => c.id === selectedColor) || availableColors[0];
+  }, [selectedColor]);
+
   // Stringify dependencies to avoid infinite re-renders from inline objects/arrays
   const depsString = JSON.stringify({
     trimId: activeTrim?.id,
@@ -669,7 +669,7 @@ export default function ProductTemplate() {
     };
   }, []);
 
-  // 🎯 Auto-track ViewContent and Purchase events for TikTok & Meta Pixels
+  // 🎯 Auto-track ViewContent only when visiting a car page (Purchase is NOT fired on view)
   const lastTrackedCarIdRef = useRef<string>('');
   useEffect(() => {
     if (product?.title) {
@@ -680,14 +680,6 @@ export default function ProductTemplate() {
       trackViewContent({
         id: carId,
         title: product.title,
-        price: activeTrim?.price,
-        trimName: activeTrim?.name
-      });
-
-      // 🛒 Fire Purchase on landing page load so Pixel Helper & Events Manager detect it
-      trackPurchase({
-        id: carId,
-        carTitle: product.title,
         price: activeTrim?.price,
         trimName: activeTrim?.name
       });
@@ -722,7 +714,7 @@ export default function ProductTemplate() {
     },
     {
       q: 'هل السعر المذكور نهائي؟',
-      a: 'نعم، السعر المعروض هو السعر الشامل لثمن السيارة وتكلفة الشحن. السعر لا يشمل التخليص الجمركي.'
+      a: 'نعم، السعر المعروض هو السعر الشامل النهائي لثمن السيارة، تكلفة الشحن، والتخليص الجمركي كاملاً.'
     },
     {
       q: 'كيف تتم عملية التعاقد؟',
@@ -1036,55 +1028,6 @@ export default function ProductTemplate() {
     </div>
   );
 
-  const handleBookingSubmit = async (e: any) => {
-    e.preventDefault();
-    if (!bookingForm.name || !bookingForm.phone) return;
-    
-    setBookingStatus('submitting');
-
-    const leadPayload = {
-      carId: product.id,
-      carTitle: product.title,
-      trim: activeTrim.name,
-      color: availableColors.find(c => c.id === selectedColor)?.name || 'أبيض',
-      name: bookingForm.name,
-      phone: bookingForm.phone,
-      status: 'جديد',
-      timestamp: Date.now()
-    };
-
-    // Always fire ad pixel lead tracking immediately
-    trackLeadSubmission({
-      formName: 'حجز سيارة وتوقيع العقد',
-      carTitle: `${product.title} - ${activeTrim.name}`,
-      name: bookingForm.name,
-      phone: bookingForm.phone
-    });
-
-    try {
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Submit timeout')), 2500)
-      );
-      const addDocPromise = addDoc(collection(db, 'appointments'), {
-        ...leadPayload,
-        createdAt: serverTimestamp()
-      });
-
-      await Promise.race([addDocPromise, timeoutPromise]);
-    } catch (err) {
-      console.warn('Firestore appointment submission timed out or failed, saving offline fallback:', err);
-      try {
-        const stored = JSON.parse(localStorage.getItem('speedauto_offline_leads') || '[]');
-        stored.push(leadPayload);
-        localStorage.setItem('speedauto_offline_leads', JSON.stringify(stored));
-      } catch {
-        // silent
-      }
-    }
-
-    setBookingStatus('success');
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#121212] pt-32 pb-20 flex flex-col items-center justify-center text-white">
@@ -1309,7 +1252,7 @@ export default function ProductTemplate() {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-red-400">{activeTrim.price}</span>
+                  <span className="text-xs font-bold text-red-400">{finalActivePrice}</span>
                   <ChevronDown className={`w-4 h-4 text-white/60 transition-transform duration-200 ${isTrimDropdownOpen ? 'rotate-180 text-red-400' : ''}`} />
                 </div>
               </button>
@@ -1332,6 +1275,7 @@ export default function ProductTemplate() {
                     >
                       {activeTrimsList.map((trim) => {
                         const isSelected = selectedTrimId === trim.id;
+                        const dynamicTrimPrice = getAdjustedPrice(trim.price, selectedColor);
                         return (
                           <button
                             key={trim.id}
@@ -1351,7 +1295,7 @@ export default function ProductTemplate() {
                                 id: product?.id || 'car',
                                 carTitle: product?.title,
                                 trimName: trim.name,
-                                price: trim.price
+                                price: dynamicTrimPrice
                               });
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-right transition-all cursor-pointer ${
@@ -1368,7 +1312,7 @@ export default function ProductTemplate() {
                             </div>
                             <div className="text-left shrink-0 mr-2 flex items-center gap-1.5">
                               <span className={`text-xs font-bold ${isSelected ? 'text-red-300' : 'text-white/50'}`}>
-                                {trim.price}
+                                {dynamicTrimPrice}
                               </span>
                               {isSelected && <Check className="w-3.5 h-3.5 text-red-400 shrink-0" />}
                             </div>
@@ -1382,11 +1326,20 @@ export default function ProductTemplate() {
             </div>
             )}
 
-            {/* 🎨 COMPACT COLOR PALETTE SELECTOR */}
+            {/* 🎨 COMPACT COLOR PALETTE SELECTOR WITH DYNAMIC PRICING */}
             <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-xl px-4 py-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-white/50 font-medium">الألوان:</span>
-                <span className="text-xs text-white/90 font-bold">{availableColors.find(c => c.id === selectedColor)?.name}</span>
+                <span className="text-xs text-white/50 font-medium">اللون:</span>
+                <span className="text-xs text-white/90 font-bold">{selectedColorObj?.name}</span>
+                {selectedColorObj?.extraLabel ? (
+                  <span className="text-[10px] text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold">
+                    {selectedColorObj.extraLabel}
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-medium">
+                    السعر الأساسي
+                  </span>
+                )}
               </div>
               
               <div className="flex items-center gap-3 px-1">
@@ -1396,11 +1349,11 @@ export default function ProductTemplate() {
                     <button
                       key={color.id}
                       onClick={() => setSelectedColor(color.id)}
-                      className={`relative w-8 h-8 rounded-full transition-all flex items-center justify-center ${
+                      className={`relative w-8 h-8 rounded-full transition-all flex items-center justify-center cursor-pointer ${
                         isSelected ? 'border-[1.5px] border-red-500/70 scale-110' : 'border border-transparent hover:scale-105 opacity-80'
                       }`}
-                      aria-label={color.name}
-                      title={color.name}
+                      aria-label={`${color.name} ${color.extraLabel ? `(${color.extraLabel})` : ''}`}
+                      title={`${color.name} ${color.extraLabel ? `(${color.extraLabel})` : ''}`}
                     >
                       {/* Color Circle */}
                       <div 
@@ -1420,12 +1373,19 @@ export default function ProductTemplate() {
 
             {/* Clean Price Panel */}
             <div className="bg-black/30 border border-white/10 rounded-2xl p-4">
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {activeTrim.price}
+              <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                  {finalActivePrice}
+                </div>
+                {selectedColorObj?.extraPrice ? (
+                  <span className="text-xs text-amber-300 font-semibold bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                    يشمل {selectedColorObj.extraLabel} لخيارات لون {selectedColorObj.name.split(' ')[0]}
+                  </span>
+                ) : null}
               </div>
               <div className="text-xs text-white/60 flex items-center gap-1.5 mt-1.5 font-medium">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>شامل تكلفة الشحن بدون جمركة</span>
+                <span>السعر الإجمالي شامل الشحن والتخليص الجمركي كاملاً</span>
               </div>
             </div>
 
@@ -1473,7 +1433,7 @@ export default function ProductTemplate() {
                   carId: product?.id || targetId || 'geely-coolray',
                   carTitle: product?.title,
                   trimName: activeTrim?.name,
-                  price: activeTrim?.price,
+                  price: finalActivePrice,
                   buttonLabel: 'إتصل بنا مباشرة'
                 })}
                 className="w-full py-4 bg-gradient-to-r from-red-600 via-red-500 to-red-600 hover:brightness-110 active:scale-[0.99] border border-red-400/60 text-white rounded-full font-black text-base sm:text-lg flex items-center justify-center gap-3 transition-all shadow-[0_6px_30px_rgba(239,68,68,0.4)] hover:shadow-[0_8px_36px_rgba(239,68,68,0.6)] cursor-pointer tracking-wide"
@@ -1744,7 +1704,7 @@ export default function ProductTemplate() {
                     carId: product?.id || targetId || 'geely-coolray',
                     carTitle: product?.title,
                     trimName: activeTrim?.name,
-                    price: activeTrim?.price,
+                    price: finalActivePrice,
                     buttonLabel: 'إتصل بنا الآن (توقيع العقد)'
                   })}
                   className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-red-600 hover:bg-red-500 active:scale-95 border border-red-400/40 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_40px_rgba(239,68,68,0.45)] cursor-pointer"
@@ -1764,7 +1724,7 @@ export default function ProductTemplate() {
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <div className="shrink-0 hidden min-[380px]:block">
             <span className="text-[10px] text-white/40 block leading-tight mb-0.5">سعر ({activeTrim.name.split(' ')[0]})</span>
-            <span className="text-sm font-bold text-white tracking-tight">{activeTrim.price}</span>
+            <span className="text-sm font-bold text-white tracking-tight">{finalActivePrice}</span>
           </div>
 
           <div className="flex items-center gap-2 w-full min-[380px]:w-auto justify-end">
@@ -1775,7 +1735,7 @@ export default function ProductTemplate() {
                 carId: product?.id || targetId || 'geely-coolray',
                 carTitle: product?.title,
                 trimName: activeTrim?.name,
-                price: activeTrim?.price,
+                price: finalActivePrice,
                 buttonLabel: 'إتصل بنا الآن مباشرة (شريط التثبيت)'
               })}
               className="flex-1 min-[380px]:flex-none px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:brightness-110 active:scale-95 border border-red-400/50 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_18px_rgba(239,68,68,0.4)] cursor-pointer"
@@ -1911,116 +1871,6 @@ export default function ProductTemplate() {
           }
         }
       `}</style>
-
-      {/* 🌟 BOOKING MODAL */}
-      <AnimatePresence>
-        {isBookingModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsBookingModalOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-[#181818] border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-hidden"
-            >
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-600 to-red-400" />
-              <button 
-                onClick={() => setIsBookingModalOpen(false)}
-                className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="text-center mb-8 mt-2">
-                <h3 className="text-2xl font-bold text-white mb-2">طلب موعد شراء</h3>
-                <p className="text-white/60 text-sm">سيتم التواصل معك هاتفياً لتأكيد الموعد</p>
-              </div>
-
-              {bookingStatus === 'success' ? (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center justify-center py-8 text-center"
-                >
-                  <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 border border-emerald-500/30">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h4>
-                  <p className="text-white/60 text-sm mb-6">سنتصل بك قريباً على الرقم الذي قدمته لتأكيد الموعد وتوقيع العقد.</p>
-
-                  <a
-                    href={`https://wa.me/213541399342?text=${encodeURIComponent(`السلام عليكم، قمت بطلب حجز موعد شراء لسيارة ${product.title} (${activeTrim.name}).\nالاسم: ${bookingForm.name}\nالهاتف: ${bookingForm.phone}`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-[0_4px_20px_rgba(37,211,102,0.3)] flex items-center justify-center gap-2"
-                  >
-                    <MessageCircle className="w-5 h-5 fill-current" />
-                    <span>تأكيد فوري عبر واتساب (اختياري)</span>
-                  </a>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleBookingSubmit} className="space-y-4">
-                  <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 flex gap-4 items-center">
-                    <img src={optimizeImage(activeImg, 1200)} className="w-16 h-16 rounded-lg object-contain bg-[#121212] border border-white/10" alt="car" />
-                    <div>
-                      <div className="text-white font-bold text-sm line-clamp-1">{product.title}</div>
-                      <div className="text-red-400 text-xs font-bold mt-1">{activeTrim.name}</div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white/70 text-sm font-medium mb-2">الاسم الكامل</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={bookingForm.name}
-                      onChange={e => setBookingForm({...bookingForm, name: e.target.value})}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all"
-                      placeholder="أدخل اسمك الكريم"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white/70 text-sm font-medium mb-2">رقم الهاتف</label>
-                    <input 
-                      type="tel" 
-                      required
-                      dir="ltr"
-                      value={bookingForm.phone}
-                      onChange={e => setBookingForm({...bookingForm, phone: e.target.value})}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all text-left"
-                      placeholder="05xx xx xx xx"
-                    />
-                  </div>
-                  
-                  {bookingStatus === 'error' && (
-                    <div className="text-red-400 text-sm text-center py-2 bg-red-500/10 rounded-lg border border-red-500/20">
-                      حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى أو الاتصال بنا مباشرة.
-                    </div>
-                  )}
-
-                  <button 
-                    type="submit"
-                    disabled={bookingStatus === 'submitting'}
-                    className="w-full mt-4 bg-red-600 hover:bg-red-500 active:scale-[0.99] disabled:opacity-50 disabled:active:scale-100 text-white font-bold py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center"
-                  >
-                    {bookingStatus === 'submitting' ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      'تأكيد طلب الحجز'
-                    )}
-                  </button>
-                </form>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
     </div>
   );

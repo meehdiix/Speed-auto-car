@@ -460,7 +460,7 @@ export default function InventoryManager() {
                   </td>
                   <td className="px-6 py-5 text-white/70">{car.year}</td>
                   <td className="px-6 py-5 text-white/70">{car.mileage || '---'}</td>
-                  <td className="px-6 py-5 text-white/70 font-bold">{car.price} دج</td>
+                  <td className="px-6 py-5 text-white/70 font-bold">{car.price?.includes('مليون') ? car.price : `${car.price} دج`}</td>
                   <td className="px-6 py-5 text-white/70">
                     <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1 rounded-full w-max">
                       <ImageIcon className="w-4 h-4 text-white/50" />

@@ -742,49 +742,29 @@ export function trackPhoneCall(params?: {
     ]
   };
 
-  // 1. TikTok Pixel Conversion Events (Deduplicated with matching event_id)
+  // 1. TikTok Pixel: Purchase & Contact on direct call click
   try {
     if (window.ttq && typeof window.ttq.track === 'function') {
-      // 🛒 1. Purchase (Official primary event recognized by TikTok Events Manager)
       window.ttq.track('Purchase', productPayload, { event_id: eventId });
-
-      // 🛒 2. AddToCart (Fired to activate & validate content_id for Add to Cart)
-      window.ttq.track('AddToCart', productPayload, { event_id: `${eventId}_cart` });
-
-      // 📞 3. Contact Event
       window.ttq.track('Contact', {
         ...productPayload,
         button_name: label
       }, { event_id: `${eventId}_cnt` });
 
-      // 📝 4. SubmitForm Event
-      window.ttq.track('SubmitForm', {
-        ...productPayload,
-        button_name: label
-      }, { event_id: `${eventId}_sub` });
-
-      // 👆 5. ClickButton Event
-      window.ttq.track('ClickButton', {
-        button_name: label,
-        content_name: carName,
-        content_id: validContentId
-      }, { event_id: `${eventId}_btn` });
-
-      console.log(`🔥 [TikTok Pixel] Standard Events sent: Purchase, AddToCart, Contact (${label}) [event_id: ${eventId}] [content_id: ${validContentId}]`);
+      console.log(`📞 [TikTok Pixel] Event: Purchase + Contact (${label}) [event_id: ${eventId}]`);
     }
   } catch (err) {
     console.warn('[TikTok Pixel] Track error:', err);
   }
 
-  // 2. TikTok Events API (Conversions API) - Server redundancy with matching event_id
+  // 2. TikTok Events API (Conversions API)
   sendTikTokEventsApi('Purchase', productPayload, eventId);
-  sendTikTokEventsApi('AddToCart', productPayload, `${eventId}_cart`);
   sendTikTokEventsApi('Contact', {
     ...productPayload,
     button_name: label
   }, `${eventId}_cnt`);
 
-  // 3. Meta Pixel & Conversions API Events (Purchase, Contact, Lead)
+  // 3. Meta Pixel & Conversions API: Purchase (and Contact)
   const metaPurPayload = {
     content_name: carName,
     content_ids: [validContentId],
@@ -794,19 +774,16 @@ export function trackPhoneCall(params?: {
   };
   const metaCntPayload = {
     content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
     button_name: label
-  };
-  const metaLeadPayload = {
-    content_name: carName,
-    value: 15000,
-    currency: 'USD'
   };
 
   try {
     if (window.fbq && typeof window.fbq === 'function') {
       window.fbq('track', 'Purchase', metaPurPayload, { eventID: eventId });
       window.fbq('track', 'Contact', metaCntPayload, { eventID: `${eventId}_cnt` });
-      window.fbq('track', 'Lead', metaLeadPayload, { eventID: `${eventId}_lead` });
+      console.log(`🔥 [Meta Pixel] Fired Purchase & Contact for ${label} [eventID: ${eventId}]`);
     }
   } catch {
     // safe
@@ -814,7 +791,6 @@ export function trackPhoneCall(params?: {
 
   sendMetaConversionsApi('Purchase', metaPurPayload, eventId);
   sendMetaConversionsApi('Contact', metaCntPayload, `${eventId}_cnt`);
-  sendMetaConversionsApi('Lead', metaLeadPayload, `${eventId}_lead`);
 
   // 4. Record in Admin statistics
   recordEventInFirestore('PhoneCall');
@@ -855,54 +831,43 @@ export function trackWhatsApp(params?: {
     ]
   };
 
-  // 1. TikTok Pixel Events with deduplication event_id in 3rd parameter
+  // 1. TikTok Pixel Event (Contact)
   try {
     if (window.ttq && typeof window.ttq.track === 'function') {
-      window.ttq.track('Purchase', productPayload, { event_id: eventId });
-      window.ttq.track('AddToCart', productPayload, { event_id: `${eventId}_cart` });
       window.ttq.track('Contact', {
         ...productPayload,
         button_name: label
-      }, { event_id: `${eventId}_cnt` });
+      }, { event_id: eventId });
 
-      console.log(`💬 [TikTok Pixel] Event: Purchase + AddToCart + Contact (${label})`, { content_id: validContentId, event_id: eventId });
+      console.log(`💬 [TikTok Pixel] Event: Contact (${label})`, { content_id: validContentId, event_id: eventId });
     }
   } catch (err) {
     console.warn('[TikTok Pixel] Track error:', err);
   }
 
   // 2. TikTok Events API
-  sendTikTokEventsApi('Purchase', productPayload, eventId);
-  sendTikTokEventsApi('AddToCart', productPayload, `${eventId}_cart`);
   sendTikTokEventsApi('Contact', {
     ...productPayload,
     button_name: label
-  }, `${eventId}_cnt`);
+  }, eventId);
 
-  // 3. Meta Pixel & Conversions API Events
-  const metaPurPayload = {
+  // 3. Meta Pixel & Conversions API Event (Contact only)
+  const metaCntPayload = {
     content_name: carName,
     content_ids: [validContentId],
     content_type: 'product',
-    value: 15000,
-    currency: 'USD'
-  };
-  const metaCntPayload = {
-    content_name: carName,
     button_name: label
   };
 
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', metaPurPayload, { eventID: eventId });
-      window.fbq('track', 'Contact', metaCntPayload, { eventID: `${eventId}_cnt` });
+      window.fbq('track', 'Contact', metaCntPayload, { eventID: eventId });
     }
   } catch {
     // safe
   }
 
-  sendMetaConversionsApi('Purchase', metaPurPayload, eventId);
-  sendMetaConversionsApi('Contact', metaCntPayload, `${eventId}_cnt`);
+  sendMetaConversionsApi('Contact', metaCntPayload, eventId);
 
   // 4. Record in Admin statistics
   recordEventInFirestore('WhatsApp');

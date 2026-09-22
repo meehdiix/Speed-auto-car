@@ -39,18 +39,16 @@ export const carsCatalog: Record<string, CarModel> = {
     status: 'متاح',
     description: 'سيارة دفع رباعي رياضية متطورة بتصميم جريء وتكنولوجيا ذكية',
     availableColors: [
+      { id: 'grey', name: 'رمادي معدني', hex: '#6B7280', border: 'border-gray-500' },
       { id: 'white', name: 'أبيض لؤلؤي', hex: '#FFFFFF', border: 'border-gray-200' },
-      { id: 'gray', name: 'رمادي تيتانيوم', hex: '#4B4C50', border: 'border-gray-500' },
-      { id: 'red', name: 'أحمر سبورت', hex: '#BA1717', border: 'border-red-800' },
-      { id: 'blue', name: 'أزرق محيطي', hex: '#1C355E', border: 'border-blue-900' },
-      { id: 'black', name: 'أسود كوزموس', hex: '#111111', border: 'border-gray-800' },
+      { id: 'silver', name: 'فضي ميتاليك', hex: '#C0C0C0', border: 'border-gray-300' },
     ],
     trims: [
       {
         id: 'superpower',
         name: 'Superpower',
         badge: 'النسخة القياسية',
-        price: '300 مليون', 
+        price: '350 مليون', 
         subtitle: 'محرك 1.5 تيربو - 181 حصان',
         tag: 'أداء عملي وقوي',
         images: [
@@ -86,7 +84,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'supermax',
         name: 'Supermax',
         badge: 'الاقتصادية',
-        price: '280 مليون', 
+        price: '385 مليون', 
         subtitle: 'محرك 1.5 تنفس طبيعي - 126 حصان',
         tag: 'توفير واقتصاد',
         images: [
@@ -113,37 +111,10 @@ export const carsCatalog: Record<string, CarModel> = {
         ]
       },
       {
-        id: 'starlight',
-        name: 'Starlight',
-        badge: 'تكنولوجيا',
-        price: '320 مليون', 
-        subtitle: 'نظام إضاءة Star-piercing وشاشة 12.3 بوصة',
-        tag: 'تطور ورفاهية',
-        images: [
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/adnx5pda6bt6vhcrfmud.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/wkzzmwz4x59rrqs5ribh.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/pmjaw802ydvqae5eumbn.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/a5m4lmgpknkqbqinwcvj.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/hbuarpbwt8nomf31wfjj.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200316/qsitab5jk65luvwkytaa.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200317/poplno2uuz8qtkf5wanu.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200321/hbksrlbmurqi1tprf0j9.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200318/niqxyroholug4aylxbeu.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/bwhivz6n4m7ro6nj0wvo.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200319/atopn4zted8w7mgvjzup.png"
-      ],
-        heroSpecs: [
-          { icon: Gauge, label: 'المحرك', value: '1.5 لتر تيربو 181 حصان / 290 نيوتن متر' },
-          { icon: Camera, label: 'الشاشة والتقنية', value: 'شاشة عملاقة 12.3 بوصة عالية الدقة مع ذكاء اصطناعي صوتي' },
-          { icon: Sparkles, label: 'الإضاءة', value: 'مصابيح أمامية LED مصفوفة (Star-piercing)' },
-          { icon: Layers, label: 'المقاعد', value: 'كونسول وسطي معاد تصميمه بخامات فاخرة' }
-        ]
-      },
-      {
         id: 'flagship',
         name: 'Flagship',
         badge: 'الفل أوبشن',
-        price: '340 مليون', 
+        price: '450 مليون', 
         subtitle: 'أعلى تقنيات الأمان Level 2 ADAS',
         tag: 'الفخامة والسلامة',
         images: [
@@ -178,7 +149,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'battle',
         name: 'Battle',
         badge: 'النسخة الرياضية',
-        price: '350 مليون', 
+        price: '460 مليون', 
         subtitle: 'أداء رياضي مع عجلات 18 بوصة وعوادم رباعية',
         tag: 'الأداء الأقصى',
         images: [
