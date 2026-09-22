@@ -11,7 +11,11 @@ import {
   triggerAllOptimizationEvents,
   sendTikTokEventsApi,
   TIKTOK_EVENTS_API_TOKEN,
-  TIKTOK_DEFAULT_PIXEL_ID
+  TIKTOK_DEFAULT_PIXEL_ID,
+  META_DEFAULT_PIXEL_ID,
+  META_CONVERSIONS_API_TOKEN,
+  getMetaConversionsApiToken,
+  setMetaConversionsApiToken
 } from '../../utils/pixelTracker';
 
 export default function PixelManager() {
@@ -21,6 +25,7 @@ export default function PixelManager() {
   // Clean inputs
   const [pixelId, setPixelId] = useState('');
   const [name, setName] = useState('');
+  const [metaCapiToken, setMetaCapiToken] = useState(getMetaConversionsApiToken());
   const [submitting, setSubmitting] = useState(false);
   
   // UI states
@@ -102,12 +107,17 @@ export default function PixelManager() {
   };
 
   const handleTestEvent = () => {
+    const isMeta = activePlatform === 'meta';
+    const testCarId = 'geely-coolray';
+    const testCarTitle = 'Geely Coolray 2026';
+    const testPrice = '300 مليون دج';
+
     triggerAllOptimizationEvents({
-      carId: 'mg-5',
-      carTitle: 'MG 5 2026',
-      price: '3,000,000 دج'
+      carId: testCarId,
+      carTitle: testCarTitle,
+      price: testPrice
     });
-    showNotification(`تم إرسال أحداث التحويل (Purchase, AddToCart, Contact, ViewContent) مع Content ID: mg-5 ورمز عدم التكرار (event_id) بنجاح!`);
+    showNotification(`تم إرسال أحداث التحويل (Purchase, AddToCart, Contact, ViewContent) لسيارة ${testCarTitle} (${testCarId}) بنجاح!`);
   };
 
   // Filter pixels strictly by platform
@@ -247,11 +257,19 @@ export default function PixelManager() {
             <button
               type="button"
               onClick={handleTestEvent}
-              className="px-4 py-2.5 rounded-xl text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.15)]"
-              title="إرسال وتفعيل أحداث التحويل (CompletePayment, Contact, Lead) فوراً لإزالة حالة الانتظار في تيك توك"
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                activePlatform === 'tiktok'
+                  ? 'text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+                  : 'text-blue-300 hover:text-white bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+              }`}
+              title="إرسال وتفعيل أحداث التحويل (Purchase, Contact, Lead) فوراً للبيكسل وواجهة التحويلات"
             >
-              <Zap className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>⚡ تفعيل كافة الأحداث في تيك توك الآن (CompletePayment & Contact)</span>
+              <Zap className={`w-4 h-4 animate-pulse ${activePlatform === 'tiktok' ? 'text-amber-400' : 'text-blue-400'}`} />
+              <span>
+                {activePlatform === 'tiktok'
+                  ? '⚡ تفعيل كافة أحداث تيك توك الآن (CompletePayment & Contact)'
+                  : '⚡ إرسال واختبار كافة أحداث فيسبوك وميتا CAPI الآن (Purchase & Contact)'}
+              </span>
             </button>
           </div>
         </form>
@@ -282,6 +300,74 @@ export default function PixelManager() {
               <div className="p-2 bg-black/50 border border-white/5 rounded-lg flex items-center justify-between">
                 <span className="text-white/40">Token:</span>
                 <span className="text-emerald-400 truncate max-w-[150px]">{TIKTOK_EVENTS_API_TOKEN.substring(0, 10)}...{TIKTOK_EVENTS_API_TOKEN.substring(34)}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Meta Conversions API (CAPI) Status & Setup Card */}
+        {activePlatform === 'meta' && (
+          <div className="p-4 bg-gradient-to-r from-blue-950/30 to-black border border-blue-500/20 rounded-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4 text-blue-400" />
+                <span className="text-white font-bold text-sm">واجهة تحويلات ميتا / فيسبوك (Meta Conversions API - CAPI)</span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 w-fit">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                مربوط ونشط بالتزامن مع البيكسل
+              </span>
+            </div>
+
+            <p className="text-white/60 text-xs leading-relaxed">
+              تعمل واجهة تحويلات ميتا (Conversions API) جنباً إلى جنب مع بيكسل فيسبوك المخصص لسيارة <strong className="text-white">جيلي كولراي (Geely Coolray 2026)</strong> لإرسال أحداث الشراء والاتصال والـ Leads من السيرفر مباشرة لتفادي مشاكل iOS ومانعات الإعلانات، مع مطابقة الأحداث وتفادي تكرارها عبر <code className="text-blue-300 font-mono text-[11px]">eventID</code>.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono pt-1" dir="ltr">
+              <div className="p-2 bg-black/50 border border-white/5 rounded-lg flex items-center justify-between">
+                <span className="text-white/40">Pixel ID:</span>
+                <span className="text-white font-bold">{META_DEFAULT_PIXEL_ID}</span>
+              </div>
+              <div className="p-2 bg-black/50 border border-white/5 rounded-lg flex items-center justify-between">
+                <span className="text-white/40">Target Model:</span>
+                <span className="text-blue-400 font-bold">geely-coolray</span>
+              </div>
+              <div className="p-2 bg-black/50 border border-white/5 rounded-lg flex items-center justify-between">
+                <span className="text-white/40">CAPI Token:</span>
+                <span className="text-emerald-400 font-bold truncate max-w-[130px]">
+                  {metaCapiToken ? `${metaCapiToken.substring(0, 10)}...${metaCapiToken.substring(metaCapiToken.length - 8)}` : `${META_CONVERSIONS_API_TOKEN.substring(0, 10)}...${META_CONVERSIONS_API_TOKEN.substring(META_CONVERSIONS_API_TOKEN.length - 8)}`}
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-white/5">
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                تحديث رمز الوصول لواجهة تحويلات ميتا (Meta Conversions API Access Token):
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={metaCapiToken}
+                  onChange={(e) => setMetaCapiToken(e.target.value)}
+                  placeholder="EAAG... الرمز مفعل ومثبت تلقائياً"
+                  className="flex-1 bg-black/60 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 focus:outline-none focus:border-blue-500 font-mono"
+                  dir="ltr"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const token = metaCapiToken.trim();
+                    if (!token) {
+                      alert('الرجاء إدخال رمز الوصول أولاً');
+                      return;
+                    }
+                    setMetaConversionsApiToken(token);
+                    showNotification('تم تحديث رمز واجهة تحويلات ميتا (Meta CAPI Token) وتفعيل الربط بنجاح!');
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                >
+                  تحديث الرمز
+                </button>
               </div>
             </div>
           </div>

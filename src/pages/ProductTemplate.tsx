@@ -56,6 +56,7 @@ function getInitialCar(id: string | undefined) {
 export default function ProductTemplate() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const targetId = (!id || id === 'coolray-2026-battle' || id === 'geely-coolray-2026') ? 'geely-coolray' : id;
   const initialCar = getInitialCar(id);
   const [product, setProduct] = useState<any>(initialCar);
   const [loading, setLoading] = useState(!initialCar);
@@ -671,7 +672,7 @@ export default function ProductTemplate() {
   // 🎯 Auto-track ViewContent and Purchase events for TikTok & Meta Pixels
   useEffect(() => {
     if (product?.title) {
-      const carId = product.id || 'mg-5';
+      const carId = product.id || targetId || 'geely-coolray';
       trackViewContent({
         id: carId,
         title: product.title,
@@ -1465,7 +1466,7 @@ export default function ProductTemplate() {
                 id="btn-call-direct"
                 href={`tel:${phoneNumber}`}
                 onClick={() => trackPhoneCall({
-                  carId: product?.id || 'mg-5',
+                  carId: product?.id || targetId || 'geely-coolray',
                   carTitle: product?.title,
                   trimName: activeTrim?.name,
                   price: activeTrim?.price,
@@ -1736,7 +1737,7 @@ export default function ProductTemplate() {
                   id="btn-call-contract"
                   href={`tel:${phoneNumber}`}
                   onClick={() => trackPhoneCall({
-                    carId: product?.id || 'mg-5',
+                    carId: product?.id || targetId || 'geely-coolray',
                     carTitle: product?.title,
                     trimName: activeTrim?.name,
                     price: activeTrim?.price,
@@ -1767,7 +1768,7 @@ export default function ProductTemplate() {
               id="btn-sticky-call"
               href={`tel:${phoneNumber}`}
               onClick={() => trackPhoneCall({
-                carId: product?.id || 'mg-5',
+                carId: product?.id || targetId || 'geely-coolray',
                 carTitle: product?.title,
                 trimName: activeTrim?.name,
                 price: activeTrim?.price,

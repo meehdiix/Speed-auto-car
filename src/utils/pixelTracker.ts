@@ -218,18 +218,49 @@ export function trackPageView(pageUrl?: string) {
     // silent
   }
 
+  const eventId = `pv_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   try {
-    if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'PageView');
+    if (window.ttq && typeof window.ttq.page === 'function') {
+      window.ttq.page();
     }
   } catch (e) {
     // silent
   }
+
+  try {
+    if (window.fbq && typeof window.fbq === 'function') {
+      window.fbq('track', 'PageView', {}, { eventID: eventId });
+    }
+  } catch (e) {
+    // silent
+  }
+
+  sendMetaConversionsApi('PageView', {}, eventId);
 }
 
 export const TIKTOK_DEFAULT_PIXEL_ID = 'DALDKHBC77U05QM9RMN0';
+export const META_DEFAULT_PIXEL_ID = '962513616169647';
 export const TIKTOK_EVENTS_API_TOKEN = 'a4776bca7a43fa12a286aef531c73c6f74e8f870';
-export const DEFAULT_CAR_CONTENT_ID = 'mg-5';
+export const META_CONVERSIONS_API_TOKEN = 'EAAGFpRVZC8eMBStIBLLNarsoIeUw0khZCbYp5ZBgKwLDkIFFuRZAhXi1MTrm0GkwIM0STTn3BSGJfGXEXLJIkZCWi6ItNL0EZB3EFMoQbjdiS317JzsuK6klhAs8AVRVic9vHU3bZAUb7y9WG7ZCFbVBBLH7qGDYTAvHXaTaxQs4V5ZA6Sb8pQT9a7lGCYKMjpz7mNAZDZD';
+export const DEFAULT_CAR_CONTENT_ID = 'geely-coolray';
+
+let dynamicMetaCapiToken = '';
+
+export function setMetaConversionsApiToken(token: string) {
+  dynamicMetaCapiToken = token.trim();
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('speedauto_meta_capi_token', token.trim());
+  }
+}
+
+export function getMetaConversionsApiToken(): string {
+  if (dynamicMetaCapiToken) return dynamicMetaCapiToken;
+  if (typeof localStorage !== 'undefined') {
+    const saved = localStorage.getItem('speedauto_meta_capi_token');
+    if (saved) return saved;
+  }
+  return META_CONVERSIONS_API_TOKEN;
+}
 
 /**
  * Ensures content_id is ALWAYS valid, non-empty and has no trailing whitespace.
@@ -332,6 +363,139 @@ export async function sendTikTokEventsApi(
 }
 
 /**
+ * Fast SHA-256 hashing for Meta Event Match Quality (EMQ)
+ */
+async function sha256Hash(value: string): Promise<string> {
+  if (!value || typeof window === 'undefined' || !window.crypto?.subtle) return '';
+  try {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(value.trim().toLowerCase());
+    const hash = await window.crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Extracts Facebook click ID (_fbc) and browser cookie (_fbp) for optimal match rate
+ */
+export async function getMetaUserInfo(extra?: { phone?: string; email?: string }) {
+  if (typeof window === 'undefined') return {};
+
+  let fbp = '';
+  let fbc = '';
+  try {
+    const fbpMatch = document.cookie.match(/(?:^|;\s*)_fbp=([^;]*)/);
+    if (fbpMatch) fbp = fbpMatch[1];
+
+    const fbcMatch = document.cookie.match(/(?:^|;\s*)_fbc=([^;]*)/);
+    if (fbcMatch) {
+      fbc = fbcMatch[1];
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fbclid = urlParams.get('fbclid');
+      if (fbclid) {
+        fbc = `fb.1.${Date.now()}.${fbclid}`;
+      }
+    }
+  } catch {}
+
+  const userData: Record<string, any> = {
+    client_user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined
+  };
+  if (fbp) userData.fbp = fbp;
+  if (fbc) userData.fbc = fbc;
+
+  if (extra?.phone) {
+    const cleanPhone = extra.phone.replace(/[^0-9]/g, '');
+    if (cleanPhone) {
+      const hashedPhone = await sha256Hash(cleanPhone);
+      if (hashedPhone) userData.ph = [hashedPhone];
+    }
+  }
+
+  if (extra?.email) {
+    const hashedEmail = await sha256Hash(extra.email);
+    if (hashedEmail) userData.em = [hashedEmail];
+  }
+
+  return userData;
+}
+
+/**
+ * 📡 Sends events directly to Meta Graph Conversions API (CAPI)
+ * Ensures 100% server-to-server redundancy, bypasses iOS ad-blockers,
+ * and deduplicates with browser Pixel via event_id matching { eventID: eventId }.
+ */
+export async function sendMetaConversionsApi(
+  eventName: string,
+  customData: Record<string, any>,
+  eventId: string,
+  extraUserInfo?: { phone?: string; email?: string },
+  pixelId: string = META_DEFAULT_PIXEL_ID
+) {
+  if (typeof window === 'undefined') return;
+
+  const token = getMetaConversionsApiToken();
+  if (!token) return;
+
+  try {
+    const userData = await getMetaUserInfo(extraUserInfo);
+    
+    // Check if test event code is configured in session or local storage
+    const testEventCode = 
+      sessionStorage.getItem('meta_test_event_code') || 
+      localStorage.getItem('meta_test_event_code') || 
+      undefined;
+
+    const eventPayload: Record<string, any> = {
+      event_name: eventName,
+      event_time: Math.floor(Date.now() / 1000),
+      event_id: eventId,
+      event_source_url: window.location.href,
+      action_source: 'website',
+      user_data: userData,
+      custom_data: customData || {}
+    };
+
+    const payload: Record<string, any> = {
+      data: [eventPayload],
+      access_token: token
+    };
+
+    if (testEventCode) {
+      payload.test_event_code = testEventCode;
+    }
+
+    const apiUrl = `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${encodeURIComponent(token)}`;
+
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data?.events_received) {
+          console.log(`📡 [Meta Conversions API] ${eventName} successfully tracked [event_id: ${eventId}]:`, data);
+        } else {
+          console.log(`ℹ️ [Meta Conversions API] response:`, data);
+        }
+      })
+      .catch(err => {
+        console.log(`[Meta Conversions API] Network note: ${err?.message || err}`);
+      });
+  } catch (err) {
+    console.warn('[Meta Conversions API] Execution error:', err);
+  }
+}
+
+/**
  * 🚗 ViewContent Tracker - When a customer browses a specific car
  */
 export function trackViewContent(params: {
@@ -375,19 +539,21 @@ export function trackViewContent(params: {
   sendTikTokEventsApi('ViewContent', viewPayload, eventId);
 
   // Meta Pixel ViewContent
+  const metaViewData = {
+    content_ids: [validContentId],
+    content_name: carName,
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'ViewContent', {
-        content_ids: [validContentId],
-        content_name: carName,
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: eventId });
+      window.fbq('track', 'ViewContent', metaViewData, { eventID: eventId });
     }
   } catch {
     // safe
   }
+  sendMetaConversionsApi('ViewContent', metaViewData, eventId);
 }
 
 /**
@@ -434,19 +600,21 @@ export function trackAddToCart(params?: {
 
   sendTikTokEventsApi('AddToCart', cartPayload, eventId);
 
+  const metaCartData = {
+    content_ids: [validContentId],
+    content_name: carName,
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'AddToCart', {
-        content_ids: [validContentId],
-        content_name: carName,
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: eventId });
+      window.fbq('track', 'AddToCart', metaCartData, { eventID: eventId });
     }
   } catch {
     // safe
   }
+  sendMetaConversionsApi('AddToCart', metaCartData, eventId);
 }
 
 /**
@@ -493,17 +661,19 @@ export function trackPurchase(params?: {
 
   sendTikTokEventsApi('Purchase', purchasePayload, eventId);
 
+  const metaPurData = {
+    content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        content_ids: [validContentId],
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: eventId });
+      window.fbq('track', 'Purchase', metaPurData, { eventID: eventId });
     }
   } catch {}
+  sendMetaConversionsApi('Purchase', metaPurData, eventId);
 }
 
 /**
@@ -596,31 +766,37 @@ export function trackPhoneCall(params?: {
     button_name: label
   }, `${eventId}_cnt`);
 
-  // 3. Meta Pixel Events (Purchase, Contact, Lead)
+  // 3. Meta Pixel & Conversions API Events (Purchase, Contact, Lead)
+  const metaPurPayload = {
+    content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
+  const metaCntPayload = {
+    content_name: carName,
+    button_name: label
+  };
+  const metaLeadPayload = {
+    content_name: carName,
+    value: 15000,
+    currency: 'USD'
+  };
+
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        content_ids: [validContentId],
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: eventId });
-
-      window.fbq('track', 'Contact', {
-        content_name: carName,
-        button_name: label
-      }, { eventID: `${eventId}_cnt` });
-
-      window.fbq('track', 'Lead', {
-        content_name: carName,
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: `${eventId}_lead` });
+      window.fbq('track', 'Purchase', metaPurPayload, { eventID: eventId });
+      window.fbq('track', 'Contact', metaCntPayload, { eventID: `${eventId}_cnt` });
+      window.fbq('track', 'Lead', metaLeadPayload, { eventID: `${eventId}_lead` });
     }
   } catch {
     // safe
   }
+
+  sendMetaConversionsApi('Purchase', metaPurPayload, eventId);
+  sendMetaConversionsApi('Contact', metaCntPayload, `${eventId}_cnt`);
+  sendMetaConversionsApi('Lead', metaLeadPayload, `${eventId}_lead`);
 
   // 4. Record in Admin statistics
   recordEventInFirestore('PhoneCall');
@@ -685,25 +861,30 @@ export function trackWhatsApp(params?: {
     button_name: label
   }, `${eventId}_cnt`);
 
-  // 3. Meta Pixel Events
+  // 3. Meta Pixel & Conversions API Events
+  const metaPurPayload = {
+    content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
+  const metaCntPayload = {
+    content_name: carName,
+    button_name: label
+  };
+
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        content_ids: [validContentId],
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: eventId });
-
-      window.fbq('track', 'Contact', {
-        content_name: carName,
-        button_name: label
-      }, { eventID: `${eventId}_cnt` });
+      window.fbq('track', 'Purchase', metaPurPayload, { eventID: eventId });
+      window.fbq('track', 'Contact', metaCntPayload, { eventID: `${eventId}_cnt` });
     }
   } catch {
     // safe
   }
+
+  sendMetaConversionsApi('Purchase', metaPurPayload, eventId);
+  sendMetaConversionsApi('Contact', metaCntPayload, `${eventId}_cnt`);
 
   // 4. Record in Admin statistics
   recordEventInFirestore('WhatsApp');
@@ -724,7 +905,7 @@ export function triggerAllOptimizationEvents(params?: {
   price?: string | number;
 }) {
   const validContentId = sanitizeContentId(params?.carId);
-  const carName = params?.carTitle || 'MG 5 2026';
+  const carName = params?.carTitle || 'Geely Coolray 2026';
   const eventId = `opt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
   const fullPayload = {
@@ -780,35 +961,41 @@ export function triggerAllOptimizationEvents(params?: {
   sendTikTokEventsApi('AddToCart', fullPayload, `${eventId}_cart`);
   sendTikTokEventsApi('ViewContent', fullPayload, `${eventId}_view`);
 
+  const metaPurData = {
+    content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
+  const metaCartData = {
+    content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
+  const metaViewData = {
+    content_name: carName,
+    content_ids: [validContentId],
+    content_type: 'product',
+    value: 15000,
+    currency: 'USD'
+  };
+
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Purchase', {
-        content_name: carName,
-        content_ids: [validContentId],
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: eventId });
-
-      window.fbq('track', 'AddToCart', {
-        content_name: carName,
-        content_ids: [validContentId],
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: `${eventId}_cart` });
-
-      window.fbq('track', 'ViewContent', {
-        content_name: carName,
-        content_ids: [validContentId],
-        content_type: 'product',
-        value: 15000,
-        currency: 'USD'
-      }, { eventID: `${eventId}_view` });
+      window.fbq('track', 'Purchase', metaPurData, { eventID: eventId });
+      window.fbq('track', 'AddToCart', metaCartData, { eventID: `${eventId}_cart` });
+      window.fbq('track', 'ViewContent', metaViewData, { eventID: `${eventId}_view` });
     }
   } catch {
     // safe
   }
+
+  sendMetaConversionsApi('Purchase', metaPurData, eventId);
+  sendMetaConversionsApi('AddToCart', metaCartData, `${eventId}_cart`);
+  sendMetaConversionsApi('ViewContent', metaViewData, `${eventId}_view`);
 }
 
 /**
@@ -844,17 +1031,21 @@ export function trackLeadSubmission(params: {
     // safe
   }
 
+  const metaLeadData = {
+    content_name: params.formName,
+    car_title: params.carTitle || '',
+    content_ids: [validContentId]
+  };
+
   try {
     if (window.fbq && typeof window.fbq === 'function') {
-      window.fbq('track', 'Lead', {
-        content_name: params.formName,
-        car_title: params.carTitle || '',
-        content_ids: [validContentId]
-      }, { eventID: eventId });
+      window.fbq('track', 'Lead', metaLeadData, { eventID: eventId });
     }
   } catch {
     // safe
   }
+
+  sendMetaConversionsApi('Lead', metaLeadData, eventId, { phone: params.phone });
 
   recordEventInFirestore('Lead');
 }

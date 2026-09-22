@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import { initTikTokPixelScript, initMetaPixelScript, trackPageView } from '../utils/pixelTracker';
+import { initTikTokPixelScript, initMetaPixelScript, trackPageView, TIKTOK_DEFAULT_PIXEL_ID, META_DEFAULT_PIXEL_ID } from '../utils/pixelTracker';
 import { getGeneralSettings } from '../utils/settings';
 
 const PIXEL_CACHE_KEY = 'speedauto_pixel_ids_cache_v2';
@@ -50,13 +50,14 @@ export default function MetaPixelTracker() {
       // 1. Check local storage cache first for instant 0ms execution
       const cached = getStoredPixels();
       if (cached) {
-        if (!cached.tiktokIds.includes('DALDKHBC77U05QM9RMN0')) {
-          cached.tiktokIds.push('DALDKHBC77U05QM9RMN0');
+        if (!cached.tiktokIds.includes(TIKTOK_DEFAULT_PIXEL_ID)) {
+          cached.tiktokIds.push(TIKTOK_DEFAULT_PIXEL_ID);
+        }
+        if (!cached.metaIds.includes(META_DEFAULT_PIXEL_ID)) {
+          cached.metaIds.push(META_DEFAULT_PIXEL_ID);
         }
         initTikTokPixelScript(cached.tiktokIds);
-        if (cached.metaIds.length > 0) {
-          initMetaPixelScript(cached.metaIds);
-        }
+        initMetaPixelScript(cached.metaIds);
         trackPageView();
         return;
       }
@@ -88,22 +89,24 @@ export default function MetaPixelTracker() {
           }
         });
 
-        if (!tiktokIds.includes('DALDKHBC77U05QM9RMN0')) {
-          tiktokIds.push('DALDKHBC77U05QM9RMN0');
+        if (!tiktokIds.includes(TIKTOK_DEFAULT_PIXEL_ID)) {
+          tiktokIds.push(TIKTOK_DEFAULT_PIXEL_ID);
+        }
+        if (!metaIds.includes(META_DEFAULT_PIXEL_ID)) {
+          metaIds.push(META_DEFAULT_PIXEL_ID);
         }
 
         // Cache for future page views
         storePixels(tiktokIds, metaIds);
 
         initTikTokPixelScript(tiktokIds);
-        if (metaIds.length > 0) {
-          initMetaPixelScript(metaIds);
-        }
+        initMetaPixelScript(metaIds);
         trackPageView();
       } catch (err: any) {
         // Fallback gracefully without throwing or blocking UI
         if (isCancelled) return;
-        initTikTokPixelScript(['DALDKHBC77U05QM9RMN0']);
+        initTikTokPixelScript([TIKTOK_DEFAULT_PIXEL_ID]);
+        initMetaPixelScript([META_DEFAULT_PIXEL_ID]);
         trackPageView();
       }
 
