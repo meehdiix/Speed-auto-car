@@ -111,21 +111,37 @@ function saveCarsToStorage(cars: DisplayCarItem[]) {
 }
 
 /**
+ * Invalidates cars cache in memory and sessionStorage
+ */
+export function invalidateCarsCache() {
+  memoryCarsCache = null;
+  cachedRawDbCars = null;
+  lastCarsFetchTime = 0;
+  pendingPromise = null;
+  isFetchingCars = false;
+  try {
+    sessionStorage.removeItem(CARS_CACHE_KEY);
+  } catch {
+    // silent
+  }
+}
+
+/**
  * Returns all raw Firestore car documents cached in memory
  */
-export async function getRawDbCars(): Promise<any[]> {
-  if (cachedRawDbCars && cachedRawDbCars.length > 0) {
+export async function getRawDbCars(forceRefresh = false): Promise<any[]> {
+  if (!forceRefresh && cachedRawDbCars && cachedRawDbCars.length > 0) {
     return cachedRawDbCars;
   }
-  await getCarsList();
+  await getCarsList(forceRefresh);
   return cachedRawDbCars || [];
 }
 
 /**
  * Returns all Firestore cars belonging to a given car model
  */
-export async function getDbCarsForModel(modelId: string): Promise<any[]> {
-  const raw = await getRawDbCars();
+export async function getDbCarsForModel(modelId: string, forceRefresh = false): Promise<any[]> {
+  const raw = await getRawDbCars(forceRefresh);
   return raw.filter(car => {
     const matched = matchCarModelId(car.title);
     return matched === modelId;
@@ -202,7 +218,17 @@ export async function getCarsList(forceRefresh = false): Promise<DisplayCarItem[
       Object.entries(carsCatalog).forEach(([catalogId, catalogData]) => {
         const groupCars = groupedCatalogCars[catalogId]?.cars || [];
 
-        // Determine best images
+        // Sort groupCars so the car with images that was most recently updated/created is chosen first
+        groupCars.sort((a, b) => {
+          const aHasImg = (a.images && a.images.length > 0) ? 1 : 0;
+          const bHasImg = (b.images && b.images.length > 0) ? 1 : 0;
+          if (aHasImg !== bHasImg) return bHasImg - aHasImg;
+          const timeA = a.updatedAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0;
+          const timeB = b.updatedAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0;
+          return timeB - timeA;
+        });
+
+        // Determine best images: Use the car with organized images from DB first!
         let imagesToUse: string[] = [];
         const carWithImages = groupCars.find(c => c.images && c.images.length > 0);
         if (carWithImages) {

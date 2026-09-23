@@ -39,15 +39,15 @@ export default function Catalog() {
     getCarsList().then(fetched => {
       if (isMounted && fetched && fetched.length > 0) {
         setCars(fetched.map(c => ({
+          ...c,
           id: c.id,
           title: c.title,
-          price: c.price || '0',
+          price: c.price || 'تواصل معنا',
           year: c.year || '2026',
           mileage: c.mileage || '0 كم',
           status: c.status || 'متاح',
           images: c.images || [],
-          baseCarId: c.baseCarId || c.id,
-          ...c
+          baseCarId: c.baseCarId || c.id
         })));
       }
     }).catch(() => {
@@ -67,58 +67,7 @@ export default function Catalog() {
     { id: 'livan', name: 'Livan' }
   ];
 
-  const groupedCars = Object.values(cars.reduce((acc, car) => {
-    const key = (car.baseCarId && carsCatalog[car.baseCarId]) ? car.baseCarId : (matchCarModelId(car.title) || car.baseCarId || car.id);
-    if (!acc[key]) {
-      acc[key] = {
-        baseCarId: key,
-        titles: new Set([car.title]),
-        prices: [],
-        year: car.year,
-        images: car.images,
-        count: 0
-      };
-    }
-    
-    // Extract numerical value from price (e.g., "300 مليون" -> 300)
-    const numMatch = String(car.price).match(/\d+(\.\d+)?/);
-    if (numMatch) {
-      acc[key].prices.push(parseFloat(numMatch[0]));
-    }
-    
-    acc[key].titles.add(car.title);
-    acc[key].count += 1;
-    
-    return acc;
-  }, {} as Record<string, any>)).map((group: any) => {
-    const catalogItem = carsCatalog[group.baseCarId];
-    
-    // If no prices found in group, check catalogItem trims
-    if (group.prices.length === 0 && catalogItem?.trims) {
-      catalogItem.trims.forEach(t => {
-        const numMatch = String(t.price).match(/\d+(\.\d+)?/);
-        if (numMatch) {
-          group.prices.push(parseFloat(numMatch[0]));
-        }
-      });
-    }
-
-    const minPrice = group.prices.length > 0 ? Math.min(...group.prices) : 0;
-    
-    return {
-      id: group.baseCarId,
-      baseCarId: group.baseCarId,
-      title: catalogItem ? catalogItem.title : Array.from(group.titles)[0],
-      price: minPrice > 0 ? `${minPrice} مليون` : 'تواصل معنا',
-      minPriceNum: minPrice,
-      year: group.year,
-      images: group.images,
-      hasMultipleTrims: group.count > 1 || (catalogItem?.trims?.length > 1),
-      mainImg: catalogItem ? ((catalogItem as any).mainImg || catalogItem.trims?.[0]?.images?.[0] || '') : ''
-    };
-  });
-
-  const filteredCars = groupedCars.filter(car => {
+  const filteredCars = cars.filter(car => {
     const matchesSearch = String(car.title).toLowerCase().includes(searchTerm.toLowerCase());
     
     let matchesBrand = true;
@@ -132,7 +81,9 @@ export default function Catalog() {
 
   const sortedCars = [...filteredCars].sort((a, b) => {
     if (priceSort === 'none') return 0;
-    return priceSort === 'asc' ? a.minPriceNum - b.minPriceNum : b.minPriceNum - a.minPriceNum;
+    const aPrice = typeof a.minPriceNum === 'number' ? a.minPriceNum : (parseFloat(String(a.price).match(/\d+(\.\d+)?/)?.[0] || '0'));
+    const bPrice = typeof b.minPriceNum === 'number' ? b.minPriceNum : (parseFloat(String(b.price).match(/\d+(\.\d+)?/)?.[0] || '0'));
+    return priceSort === 'asc' ? aPrice - bPrice : bPrice - aPrice;
   });
 
   return (
@@ -267,7 +218,7 @@ export default function Catalog() {
                   >
                     <div className="relative aspect-[4/5] bg-gradient-to-br from-white/5 to-transparent flex items-center justify-center overflow-hidden">
                       <img 
-                        src={optimizeImage(car.images?.[0] || car.mainImg, 600)} 
+                        src={optimizeImage(car.mainImg || car.images?.[0], 600)} 
                         alt={car.title} 
                         className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-2xl"
                       />
@@ -302,7 +253,9 @@ export default function Catalog() {
                           ) : (
                             <div className="text-xs text-white/40 mb-1">السعر النهائي (شامل كل شيء)</div>
                           )}
-                          <div className="text-xl font-bold text-red-400">{car.price} دج</div>
+                          <div className="text-xl font-bold text-red-400">
+                            {car.price ? (String(car.price).includes('مليون') || String(car.price).includes('دج') ? car.price : `${car.price} دج`) : 'تواصل معنا'}
+                          </div>
                         </div>
                         <div className="w-12 h-12 bg-white/5 hover:bg-red-600 rounded-2xl flex items-center justify-center transition-colors group/btn">
                           <ArrowLeft className="w-5 h-5 text-white group-hover/btn:-translate-x-1 transition-transform" />

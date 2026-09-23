@@ -65,11 +65,11 @@ export default function ProductTemplate() {
   const [familyCarsDb, setFamilyCarsDb] = useState<any[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('0541399342');
   
-  // Color palette state - White adds +5m, Silver adds +7.5m, Grey has 0 surcharge (Black removed)
+  // Color palette state
   const availableColors = [
-    { id: 'grey', name: 'رمادي معدني', hex: '#6B7280', border: 'border-white/10', extraPrice: 0, extraLabel: '' },
-    { id: 'white', name: 'أبيض لؤلؤي', hex: '#FFFFFF', border: 'border-white/20', extraPrice: 5, extraLabel: '+5 مليون' },
-    { id: 'silver', name: 'فضي ميتاليك', hex: '#C0C0C0', border: 'border-white/20', extraPrice: 7.5, extraLabel: '+7.5 مليون' },
+    { id: 'grey', name: 'رمادي معدني', hex: '#6B7280', border: 'border-white/10' },
+    { id: 'white', name: 'أبيض لؤلؤي', hex: '#FFFFFF', border: 'border-white/20' },
+    { id: 'silver', name: 'فضي ميتاليك', hex: '#C0C0C0', border: 'border-white/20' },
   ];
   const [selectedColor, setSelectedColor] = useState('grey');
   
@@ -89,7 +89,7 @@ export default function ProductTemplate() {
       id: 'superpower',
       name: 'Superpower',
       badge: 'النسخة القياسية',
-      price: '350 مليون',
+      price: '300 مليون',
       subtitle: 'محرك 1.5 تيربو - 181 حصان',
       tag: 'أداء عملي وقوي',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200128/vmtdsxtjgh6rvcrd7vbk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200132/pkcmbswaxnqgvpqgowi9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200136/hwiuhrhcgrn9a2xgsgnz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200141/lqdkvnfufjchuub9jmpt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200144/vzqtdk66odrpjz6qcvkz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200145/rkxgu7aozkxeifuydktb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200145/qhkt2l31eoty0hawfkcp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200147/prmealoqbmoej5qwo8ip.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200148/j5bszl2lacbapodcmfoa.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200149/ijf17slgtflfy6tblnbp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200150/qjatj4opdw6wman7tp7y.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200151/k6i8ysyqeskpfwebysug.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200151/epnwqbcwkrpn5rcfrww4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200152/esz5d80xavq3dyq1baux.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200153/ah9ap7iy2jebpgafrexj.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200154/xl83dr8lprncbtpoxfon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200154/i0pzah71alxuejj0bkvs.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200156/qfpj9pqlbqht8ixchdge.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200156/y84f7xa6mwtj8zv415r6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200157/szffttizgb2pzcb1axzt.png"],
@@ -106,7 +106,7 @@ export default function ProductTemplate() {
       id: 'supermax',
       name: 'Supermax',
       badge: 'الاقتصادية',
-      price: '385 مليون',
+      price: '280 مليون',
       subtitle: 'محرك 1.5 تنفس طبيعي - 126 حصان',
       tag: 'توفير واقتصاد',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199976/asn8s9twllhr5bhuuigu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199979/i7zuidwpxhopeiouhutv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199984/h5hlbycjqa4jytgshpwp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199989/uxy2znjxfv5s2fqufeke.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199994/ypn3b4mrrufzeebmwbjd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199999/j35amcbpy995df6xuqsh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200004/a4mvpuf9m7o8bsrtwqrv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200008/lq6iqigq74qxtmobz8wx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200013/m6qvyyljes7twzyw8ysk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200017/u8dpenugor7hdypz95j6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200021/m4y0uth60p8vl6oqhq8t.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200026/d8i7dbzhzz8vcykjrrpg.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200030/cpj8j1srcawpfihpdlp2.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200035/w1ejs4njltjbuzxoovvx.png"],
@@ -120,10 +120,37 @@ export default function ProductTemplate() {
       ]
     },
     {
+      id: 'starlight',
+      name: 'Starlight',
+      badge: 'ستارلايت',
+      price: '320 مليون',
+      subtitle: 'محرك 1.5 تيربو - تجهيزات متوازنة',
+      tag: 'توازن وأناقة',
+      images: [
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/adnx5pda6bt6vhcrfmud.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/pmjaw802ydvqae5eumbn.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/wkzzmwz4x59rrqs5ribh.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200316/qsitab5jk65luvwkytaa.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/hbuarpbwt8nomf31wfjj.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/a5m4lmgpknkqbqinwcvj.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200317/poplno2uuz8qtkf5wanu.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200318/niqxyroholug4aylxbeu.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200321/hbksrlbmurqi1tprf0j9.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/bwhivz6n4m7ro6nj0wvo.png",
+        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200319/atopn4zted8w7mgvjzup.png"
+      ],
+      heroSpecs: [
+        { icon: Gauge, label: 'المحرك', value: '1.5 لتر تيربو 181 حصان و 290 نيوتن متر' },
+        { icon: Layers, label: 'ناقل الحركة', value: '7 سرعات 7DCT' },
+        { icon: Sparkles, label: 'التقنية', value: 'شاشة مركزية 10.25 بوصة وكاميرا 360' },
+        { icon: Flame, label: 'الراحة', value: 'فتحة سقف وتجهيزات راحة متميزة' }
+      ]
+    },
+    {
       id: 'flagship',
       name: 'Flagship',
       badge: 'الفل أوبشن',
-      price: '450 مليون',
+      price: '340 مليون',
       subtitle: 'أعلى تقنيات الأمان Level 2 ADAS',
       tag: 'الفخامة والسلامة',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200224/mllnmbyphb9kourqdhuo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200225/b7l7aqopypzcl08kragb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200226/dopawaqanowxiw3ijfts.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200227/zqbijrth8adwwumpihes.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200228/etr4ofmbfbiwob1k5wmc.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200228/zyyysqixeit2fwgowocx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200229/kh9qdh4lnryxnmpucodp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200230/yctupbbw7ixhiwy3kxi9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200231/jzssh91izmjqb8mdoyiw.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200232/xec4zjuhru7xhzlot8ow.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200233/r3p5sksyco6ojqpitrwk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200233/mh0pau1ewifuhv4vxh34.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200234/vmbdkvc7d4frl9icdesb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200235/zjmhtn77awwshzb4bi6d.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200236/zre4xt2whr1ruult58ds.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200237/wiytov3wddpd4mnpqir7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200237/s2cwfqpqevw7wxu4kaqe.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200239/hotuagvi8ogdm4fravob.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200240/sntfd2fuwstnwik676mp.png"],
@@ -140,7 +167,7 @@ export default function ProductTemplate() {
       id: 'battle',
       name: 'Battle',
       badge: 'النسخة الرياضية',
-      price: '460 مليون',
+      price: '350 مليون',
       subtitle: 'أداء رياضي مع عجلات 18 بوصة وعوادم رباعية',
       tag: 'الأداء الأقصى',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199678/i2kmtu63hvkeaudjn3si.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199683/kaafdy0474hdjdxcvnpy.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199688/crjc06tcnyikghz0tgjo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199693/zabknhntq4caoptpbju4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199698/ok0j2bclyofxvhgtfqxo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199702/fur9nwalbfe4lxz0iuzr.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199707/iyok0p1mamnhi8vvvfm6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199712/larp69xz3twmxxs9jsla.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199717/ddjcsk0bvtidldjwqtdw.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199721/erpwweznw2npietlx6ij.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199726/zlg5doqcqk09s4jfdvv1.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199731/suin1qey1wvvrswbypsv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199735/pneudvhkpdfcbzbrdkkf.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199740/rjat14dczn4rjk3auo7q.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199744/o4r1vah1rf99zdhrtrr2.png"],
@@ -177,7 +204,7 @@ export default function ProductTemplate() {
       id: 'auto',
       name: 'Auto / CVT',
       badge: 'صندوق أوتوماتيك',
-      price: '250 مليون',
+      price: '245 مليون',
       subtitle: 'راحة داخل المدينة',
       tag: 'CVT أوتوماتيك',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183651/fmapu0rjals1j2lroqnh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183655/vt1sj1acmssr2qei5jjr.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183659/ateamavfw3q3ituplq98.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183662/vnqsgwhxagrqsutyamrr.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183663/feeyobkcfqsk4gglycsu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183664/dpswlwwluicxbuvby954.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183665/wp0d6tkjrr79eu1jgfyy.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183666/ibzlsa02b2epazc97bgs.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183667/qjtnft0tte3hyoxa9wpc.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183668/bfqmwfdfksrvbi7rc3el.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183668/fisuype5dxybmkipgy39.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183669/hl2bdy7rozhyerz4rjm8.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183670/pfwuaijmby88zsihxvzg.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183671/wpnwbjzigwm0tpqfopjf.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183672/xnfnkylind9ml5rcsp2o.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183673/sfsdiolbdyuhaoiarl33.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789183673/wqwjsyrblnrsfe0vvfp0.png"],
@@ -197,7 +224,7 @@ export default function ProductTemplate() {
       id: 'standard',
       name: 'Standard',
       badge: 'سيدان',
-      price: '270 مليون',
+      price: '210 مليون',
       subtitle: 'محرك ألمنيوم 1.5 لتر',
       tag: 'سيدان عائلية',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200388/aglwg8esunanffnookez.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200389/pngmrcp5xal9krrwuxnz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200390/g2lsq1eop0z8kl6ozsup.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200391/tclipihigvms9bbvual4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200392/aqtl7kgzeqkrrjcw7mw4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200392/arqd8nrfl7ofpkn3fuvp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200393/ioum1j58ygi7vnnaoe03.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200394/hloek1ah7omkhfn5w19p.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200395/s9pgqputwhvefkr1kjim.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200395/pzfpisnqmjuxcqm6bmnb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200396/wuc2vaq5guzjwypbgi0v.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200397/oakdnwvv61du41tnaykl.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200398/qwtfcvgrz1nd0d0yohof.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200399/zlftnjvbxvdzu6gqqssu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200400/snzbpsaitwqmmlqgpxcx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200401/o0s6waqjp1nf9tosduo3.png"],
@@ -396,21 +423,14 @@ export default function ProductTemplate() {
     return activeTrimsList.find(t => t.id === selectedTrimId) || activeTrimsList[0];
   }, [activeTrimsList, selectedTrimId]);
 
-  // Helper to adjust price based on selected color surcharge (White: +5m, Silver: +7.5m, Grey: 0)
-  const getAdjustedPrice = (rawPriceStr?: string, colorId?: string) => {
-    if (!rawPriceStr) return rawPriceStr || '';
-    const match = String(rawPriceStr).match(/(\d+(?:\.\d+)?)/);
-    if (!match) return rawPriceStr;
-    const baseVal = parseFloat(match[1]);
-    const colorObj = availableColors.find(c => c.id === (colorId || selectedColor));
-    const extra = colorObj ? (colorObj as any).extraPrice || 0 : 0;
-    const total = baseVal + extra;
-    return `${total % 1 === 0 ? total : total.toFixed(1)} مليون`;
+  // Active price helper
+  const getAdjustedPrice = (rawPriceStr?: string) => {
+    return rawPriceStr || '';
   };
 
   const finalActivePrice = useMemo(() => {
-    return getAdjustedPrice(activeTrim?.price, selectedColor);
-  }, [activeTrim?.price, selectedColor]);
+    return activeTrim?.price || '';
+  }, [activeTrim?.price]);
 
   const selectedColorObj = useMemo(() => {
     return availableColors.find(c => c.id === selectedColor) || availableColors[0];
@@ -425,87 +445,42 @@ export default function ProductTemplate() {
   });
 
   const displayImages = useMemo(() => {
-    // If activeTrim specifically defines images (such as distinct MG 5 trims or Coolray trims), prioritize them directly
-    if (activeTrim?.images && activeTrim.images.length > 0) {
-      // Check if this specific trim has custom images in Firestore
-      if (familyCarsDb && familyCarsDb.length > 0) {
+    // 1. Check if Firestore has custom images for this model or trim
+    if (familyCarsDb && familyCarsDb.length > 0) {
+      // 1a. Check for trim-specific document in DB
+      if (activeTrim) {
         const matchedDbTrim = familyCarsDb.find(c => 
-          c.titleLower.includes(activeTrim.id) || 
-          c.titleLower.includes(activeTrim.name.toLowerCase()) || 
-          (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
+          c.titleLower && (
+            c.titleLower.includes(activeTrim.id.toLowerCase()) || 
+            c.titleLower.includes(activeTrim.name.toLowerCase()) || 
+            (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
+          )
         );
-        if (matchedDbTrim && matchedDbTrim.images?.length > 0) {
+        if (matchedDbTrim && matchedDbTrim.images && matchedDbTrim.images.length > 0) {
           return matchedDbTrim.images;
         }
       }
+
+      // 1b. Check if any DB car document for this model has custom images organized by admin
+      const carWithImages = familyCarsDb.find(c => c.images && c.images.length > 0);
+      if (carWithImages && carWithImages.images && carWithImages.images.length > 0) {
+        return carWithImages.images;
+      }
+    }
+
+    // 2. Check if product itself has custom images from DB
+    if (product?.images && product.images.length > 0 && product.hasCustomImages) {
+      return product.images;
+    }
+
+    // 3. Fallback to static catalog trim images if defined
+    if (activeTrim?.images && activeTrim.images.length > 0) {
       return activeTrim.images;
     }
 
-    let images = (product?.images || defaultCoolray.thumbs);
-    
-    const applyPermutation = (customImages: string[]) => {
-      const defaultTrimImages = activeTrimsList[0]?.images || [];
-      const activeTrimCatalogImages = activeTrim?.images?.length > 0 ? activeTrim.images : defaultCoolray.thumbs;
-      
-      const orderedActiveTrimImages: string[] = [];
-      const usedIndices = new Set();
-      
-      customImages.forEach((customImg: string) => {
-        const indexInDefault = defaultTrimImages.indexOf(customImg);
-        if (indexInDefault !== -1 && indexInDefault < activeTrimCatalogImages.length) {
-          orderedActiveTrimImages.push(activeTrimCatalogImages[indexInDefault]);
-          usedIndices.add(indexInDefault);
-        } else {
-          orderedActiveTrimImages.push(customImg);
-        }
-      });
-      
-      activeTrimCatalogImages.forEach((img: string, idx: number) => {
-        if (!usedIndices.has(idx)) {
-          orderedActiveTrimImages.push(img);
-        }
-      });
-      
-      return orderedActiveTrimImages;
-    };
-    
-    if (familyCarsDb && familyCarsDb.length > 0 && activeTrim) {
-      let matchedDbTrim = familyCarsDb.find(c => 
-        c.titleLower.includes(activeTrim.id) || 
-        c.titleLower.includes(activeTrim.name.toLowerCase()) || 
-        (activeTrim.badge && c.titleLower.includes(activeTrim.badge.toLowerCase()))
-      );
-      
-      if (!matchedDbTrim) {
-        matchedDbTrim = familyCarsDb.find(c => {
-          const matchesOther = activeTrimsList.some(otherTrim => 
-            otherTrim.id !== activeTrim.id && (
-              c.titleLower.includes(otherTrim.id) || 
-              c.titleLower.includes(otherTrim.name.toLowerCase()) || 
-              (otherTrim.badge && c.titleLower.includes(otherTrim.badge.toLowerCase()))
-            )
-          );
-          return !matchesOther;
-        });
-      }
-      
-      if (matchedDbTrim && matchedDbTrim.images?.length > 0) {
-        images = matchedDbTrim.images;
-      } else if (product?.hasCustomImages) {
-        images = applyPermutation(product.images);
-      }
-    } else if (product?.hasCustomImages) {
-      images = applyPermutation(product.images);
-    }
-    return images;
+    // 4. Fallback to product images or default thumbs
+    return (product?.images && product.images.length > 0) ? product.images : defaultCoolray.thumbs;
   }, [depsString]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (displayImages && displayImages.length > 0) {
-      if (!displayImages.includes(activeImg)) {
-        setActiveImg(displayImages[0]);
-      }
-    }
-  }, [displayImages, activeImg]);
 
   // Preload top 2 images only to preserve mobile bandwidth
   useEffect(() => {
@@ -554,11 +529,20 @@ export default function ProductTemplate() {
         if (carsCatalog[id]) {
           const catalogData = carsCatalog[id];
           
-          // Query cached Firestore trim documents for this car model
+          // Query Firestore trim documents for this car model
           let customImages: string[] = [];
           let familyDbMatches: any[] = [];
           try {
-            familyDbMatches = await getDbCarsForModel(id);
+            familyDbMatches = await getDbCarsForModel(id, true);
+            // Prioritize car documents with images and most recently updated/created
+            familyDbMatches.sort((a, b) => {
+              const aHasImg = (a.images && a.images.length > 0) ? 1 : 0;
+              const bHasImg = (b.images && b.images.length > 0) ? 1 : 0;
+              if (aHasImg !== bHasImg) return bHasImg - aHasImg;
+              const timeA = a.updatedAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0;
+              const timeB = b.updatedAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0;
+              return timeB - timeA;
+            });
             const carWithImages = familyDbMatches.find(c => c.images && c.images.length > 0);
             if (carWithImages) {
               customImages = carWithImages.images;
@@ -714,7 +698,7 @@ export default function ProductTemplate() {
     },
     {
       q: 'هل السعر المذكور نهائي؟',
-      a: 'نعم، السعر المعروض هو السعر الشامل النهائي لثمن السيارة، تكلفة الشحن، والتخليص الجمركي كاملاً.'
+      a: 'نعم، السعر المعروض هو السعر الشامل لثمن السيارة وتكلفة الشحن. السعر لا يشمل التخليص الجمركي.'
     },
     {
       q: 'كيف تتم عملية التعاقد؟',
@@ -811,15 +795,15 @@ export default function ProductTemplate() {
 
   // When trim/displayImages change, reset to first image
   useEffect(() => {
+    if (displayImages && displayImages.length > 0) {
+      setActiveImg(displayImages[0]);
+    }
+    setSelectedGalleryIndex(0);
     if (galleryEmblaApi) {
       galleryEmblaApi.reInit();
       galleryEmblaApi.scrollTo(0, true);
     }
-    setSelectedGalleryIndex(0);
-    if (displayImages && displayImages.length > 0) {
-      setActiveImg(displayImages[0]);
-    }
-  }, [displayImages, galleryEmblaApi]);
+  }, [displayImages, selectedTrimId, galleryEmblaApi]);
 
   // Auto-scroll active thumbnail into view
   useEffect(() => {
@@ -1275,7 +1259,7 @@ export default function ProductTemplate() {
                     >
                       {activeTrimsList.map((trim) => {
                         const isSelected = selectedTrimId === trim.id;
-                        const dynamicTrimPrice = getAdjustedPrice(trim.price, selectedColor);
+                        const dynamicTrimPrice = trim.price;
                         return (
                           <button
                             key={trim.id}
@@ -1284,9 +1268,6 @@ export default function ProductTemplate() {
                               setSelectedTrimId(trim.id);
                               setIsTrimDropdownOpen(false);
                               setSelectedGalleryIndex(0);
-                              if (trim.images && trim.images.length > 0) {
-                                setActiveImg(trim.images[0]);
-                              }
                               if (galleryEmblaApi) {
                                 galleryEmblaApi.reInit();
                                 galleryEmblaApi.scrollTo(0, true);
@@ -1326,20 +1307,11 @@ export default function ProductTemplate() {
             </div>
             )}
 
-            {/* 🎨 COMPACT COLOR PALETTE SELECTOR WITH DYNAMIC PRICING */}
+            {/* 🎨 COMPACT COLOR PALETTE SELECTOR */}
             <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-xl px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-white/50 font-medium">اللون:</span>
                 <span className="text-xs text-white/90 font-bold">{selectedColorObj?.name}</span>
-                {selectedColorObj?.extraLabel ? (
-                  <span className="text-[10px] text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold">
-                    {selectedColorObj.extraLabel}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-medium">
-                    السعر الأساسي
-                  </span>
-                )}
               </div>
               
               <div className="flex items-center gap-3 px-1">
@@ -1352,8 +1324,8 @@ export default function ProductTemplate() {
                       className={`relative w-8 h-8 rounded-full transition-all flex items-center justify-center cursor-pointer ${
                         isSelected ? 'border-[1.5px] border-red-500/70 scale-110' : 'border border-transparent hover:scale-105 opacity-80'
                       }`}
-                      aria-label={`${color.name} ${color.extraLabel ? `(${color.extraLabel})` : ''}`}
-                      title={`${color.name} ${color.extraLabel ? `(${color.extraLabel})` : ''}`}
+                      aria-label={color.name}
+                      title={color.name}
                     >
                       {/* Color Circle */}
                       <div 
@@ -1377,15 +1349,10 @@ export default function ProductTemplate() {
                 <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                   {finalActivePrice}
                 </div>
-                {selectedColorObj?.extraPrice ? (
-                  <span className="text-xs text-amber-300 font-semibold bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-md">
-                    يشمل {selectedColorObj.extraLabel} لخيارات لون {selectedColorObj.name.split(' ')[0]}
-                  </span>
-                ) : null}
               </div>
               <div className="text-xs text-white/60 flex items-center gap-1.5 mt-1.5 font-medium">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>السعر الإجمالي شامل الشحن والتخليص الجمركي كاملاً</span>
+                <span>شامل تكلفة الشحن بدون جمركة</span>
               </div>
             </div>
 

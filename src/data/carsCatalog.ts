@@ -48,7 +48,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'superpower',
         name: 'Superpower',
         badge: 'النسخة القياسية',
-        price: '350 مليون', 
+        price: '255 مليون', 
         subtitle: 'محرك 1.5 تيربو - 181 حصان',
         tag: 'أداء عملي وقوي',
         images: [
@@ -84,7 +84,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'supermax',
         name: 'Supermax',
         badge: 'الاقتصادية',
-        price: '385 مليون', 
+        price: '280 مليون', 
         subtitle: 'محرك 1.5 تنفس طبيعي - 126 حصان',
         tag: 'توفير واقتصاد',
         images: [
@@ -111,10 +111,37 @@ export const carsCatalog: Record<string, CarModel> = {
         ]
       },
       {
+        id: 'starlight',
+        name: 'Starlight',
+        badge: 'نسخة ستارلايت',
+        price: '320 مليون',
+        subtitle: 'محرك 1.5 تيربو - تجهيزات متوازنة',
+        tag: 'توازن وأناقة',
+        images: [
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/adnx5pda6bt6vhcrfmud.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/pmjaw802ydvqae5eumbn.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/wkzzmwz4x59rrqs5ribh.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200316/qsitab5jk65luvwkytaa.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/hbuarpbwt8nomf31wfjj.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/a5m4lmgpknkqbqinwcvj.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200317/poplno2uuz8qtkf5wanu.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200318/niqxyroholug4aylxbeu.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200321/hbksrlbmurqi1tprf0j9.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/bwhivz6n4m7ro6nj0wvo.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200319/atopn4zted8w7mgvjzup.png"
+        ],
+        heroSpecs: [
+          { icon: Gauge, label: 'المحرك والأداء', value: 'محرك 1.5 لتر تيربو 4 أسطوانات بقوة 181 حصان و 290 نيوتن متر' },
+          { icon: Layers, label: 'ناقل الحركة', value: '7 سرعات مزدوج القابض (7DCT)' },
+          { icon: Sparkles, label: 'التقنية', value: 'شاشة مركزية 10.25 بوصة وكاميرا 360 درجة' },
+          { icon: Flame, label: 'الراحة', value: 'فتحة سقف كهربائية وتجهيزات داخلية مميزة' }
+        ]
+      },
+      {
         id: 'flagship',
         name: 'Flagship',
         badge: 'الفل أوبشن',
-        price: '450 مليون', 
+        price: '340 مليون', 
         subtitle: 'أعلى تقنيات الأمان Level 2 ADAS',
         tag: 'الفخامة والسلامة',
         images: [
@@ -149,7 +176,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'battle',
         name: 'Battle',
         badge: 'النسخة الرياضية',
-        price: '460 مليون', 
+        price: '350 مليون', 
         subtitle: 'أداء رياضي مع عجلات 18 بوصة وعوادم رباعية',
         tag: 'الأداء الأقصى',
         images: [
@@ -235,7 +262,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'auto',
         name: 'Auto / CVT',
         badge: 'علبة أوتوماتيكية',
-        price: '250 مليون',
+        price: '245 مليون',
         subtitle: 'راحة داخل المدينة',
         tag: 'CVT أوتوماتيك',
         images: [
@@ -282,11 +309,27 @@ export const carsCatalog: Record<string, CarModel> = {
       {
         id: 'standard',
         name: 'Standard',
-        badge: 'أساسية',
-        price: '270 مليون', // placeholder
+        badge: 'سيدان عائلية',
+        price: '210 مليون',
         subtitle: 'محرك ألمنيوم 1.5 لتر',
         tag: 'سيدان عائلية',
-        images: [],
+        images: [
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200398/qwtfcvgrz1nd0d0yohof.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200388/aglwg8esunanffnookez.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200389/pngmrcp5xal9krrwuxnz.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200399/zlftnjvbxvdzu6gqqssu.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200400/snzbpsaitwqmmlqgpxcx.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200396/wuc2vaq5guzjwypbgi0v.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200397/oakdnwvv61du41tnaykl.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200393/ioum1j58ygi7vnnaoe03.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200392/aqtl7kgzeqkrrjcw7mw4.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200390/g2lsq1eop0z8kl6ozsup.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200394/hloek1ah7omkhfn5w19p.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200392/arqd8nrfl7ofpkn3fuvp.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200395/pzfpisnqmjuxcqm6bmnb.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200391/tclipihigvms9bbvual4.png",
+          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200395/s9pgqputwhvefkr1kjim.png"
+        ],
         heroSpecs: [
           { icon: Gauge, label: 'المحرك', value: '1.5 لتر تنفس طبيعي 15FCD، ألمنيوم بالكامل (129 حصان)' },
           { icon: Layers, label: 'التقنية', value: 'حقن مباشر وضغط عالي 12:1 بدون مشاكل احتراق' },

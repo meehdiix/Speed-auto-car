@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Image as ImageIcon, MapPin, Hash, CheckCircle2, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { invalidateCarsCache } from '../../utils/carsCache';
 
 export default function InventoryManager() {
   const [isAdding, setIsAdding] = useState(false);
@@ -133,6 +134,7 @@ export default function InventoryManager() {
         description,
         images: finalImageUrls,
         status: 'متاح',
+        updatedAt: serverTimestamp(),
       };
 
       if (editingId) {
@@ -145,6 +147,7 @@ export default function InventoryManager() {
         });
       }
 
+      invalidateCarsCache();
       resetForm();
     } catch (err) {
       console.error(err);
@@ -164,6 +167,7 @@ export default function InventoryManager() {
   const confirmDelete = async () => {
     if (deleteConfirmId) {
       await deleteDoc(doc(db, 'cars', deleteConfirmId));
+      invalidateCarsCache();
       setDeleteConfirmId(null);
     }
   };
@@ -316,8 +320,8 @@ export default function InventoryManager() {
                           )}
                         </div>
                       </div>
-                      <div className="absolute bottom-1 right-1 bg-red-600/90 px-2 rounded text-[10px] font-bold text-white z-10 shadow">
-                        {idx + 1}
+                      <div className={`absolute bottom-1 right-1 px-2 rounded text-[10px] font-bold text-white z-10 shadow ${idx === 0 ? 'bg-emerald-600/90 border border-emerald-400/40' : 'bg-red-600/90'}`}>
+                        {idx === 0 ? '⭐️ الصورة الأولى (الرئيسية)' : `#${idx + 1}`}
                       </div>
                       <button 
                         type="button"
