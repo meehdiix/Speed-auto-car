@@ -89,7 +89,7 @@ export default function ProductTemplate() {
       id: 'superpower',
       name: 'Superpower',
       badge: 'النسخة القياسية',
-      price: '300 مليون',
+      price: '245 مليون',
       subtitle: 'محرك 1.5 تيربو - 181 حصان',
       tag: 'أداء عملي وقوي',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200128/vmtdsxtjgh6rvcrd7vbk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200132/pkcmbswaxnqgvpqgowi9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200136/hwiuhrhcgrn9a2xgsgnz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200141/lqdkvnfufjchuub9jmpt.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200144/vzqtdk66odrpjz6qcvkz.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200145/rkxgu7aozkxeifuydktb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200145/qhkt2l31eoty0hawfkcp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200147/prmealoqbmoej5qwo8ip.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200148/j5bszl2lacbapodcmfoa.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200149/ijf17slgtflfy6tblnbp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200150/qjatj4opdw6wman7tp7y.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200151/k6i8ysyqeskpfwebysug.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200151/epnwqbcwkrpn5rcfrww4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200152/esz5d80xavq3dyq1baux.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200153/ah9ap7iy2jebpgafrexj.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200154/xl83dr8lprncbtpoxfon.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200154/i0pzah71alxuejj0bkvs.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200156/qfpj9pqlbqht8ixchdge.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200156/y84f7xa6mwtj8zv415r6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200157/szffttizgb2pzcb1axzt.png"],
@@ -106,7 +106,7 @@ export default function ProductTemplate() {
       id: 'supermax',
       name: 'Supermax',
       badge: 'الاقتصادية',
-      price: '280 مليون',
+      price: '288 مليون',
       subtitle: 'محرك 1.5 تنفس طبيعي - 126 حصان',
       tag: 'توفير واقتصاد',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199976/asn8s9twllhr5bhuuigu.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199979/i7zuidwpxhopeiouhutv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199984/h5hlbycjqa4jytgshpwp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199989/uxy2znjxfv5s2fqufeke.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199994/ypn3b4mrrufzeebmwbjd.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199999/j35amcbpy995df6xuqsh.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200004/a4mvpuf9m7o8bsrtwqrv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200008/lq6iqigq74qxtmobz8wx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200013/m6qvyyljes7twzyw8ysk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200017/u8dpenugor7hdypz95j6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200021/m4y0uth60p8vl6oqhq8t.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200026/d8i7dbzhzz8vcykjrrpg.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200030/cpj8j1srcawpfihpdlp2.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200035/w1ejs4njltjbuzxoovvx.png"],
@@ -120,37 +120,10 @@ export default function ProductTemplate() {
       ]
     },
     {
-      id: 'starlight',
-      name: 'Starlight',
-      badge: 'ستارلايت',
-      price: '320 مليون',
-      subtitle: 'محرك 1.5 تيربو - تجهيزات متوازنة',
-      tag: 'توازن وأناقة',
-      images: [
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/adnx5pda6bt6vhcrfmud.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/pmjaw802ydvqae5eumbn.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/wkzzmwz4x59rrqs5ribh.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200316/qsitab5jk65luvwkytaa.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/hbuarpbwt8nomf31wfjj.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/a5m4lmgpknkqbqinwcvj.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200317/poplno2uuz8qtkf5wanu.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200318/niqxyroholug4aylxbeu.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200321/hbksrlbmurqi1tprf0j9.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/bwhivz6n4m7ro6nj0wvo.png",
-        "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200319/atopn4zted8w7mgvjzup.png"
-      ],
-      heroSpecs: [
-        { icon: Gauge, label: 'المحرك', value: '1.5 لتر تيربو 181 حصان و 290 نيوتن متر' },
-        { icon: Layers, label: 'ناقل الحركة', value: '7 سرعات 7DCT' },
-        { icon: Sparkles, label: 'التقنية', value: 'شاشة مركزية 10.25 بوصة وكاميرا 360' },
-        { icon: Flame, label: 'الراحة', value: 'فتحة سقف وتجهيزات راحة متميزة' }
-      ]
-    },
-    {
       id: 'flagship',
       name: 'Flagship',
       badge: 'الفل أوبشن',
-      price: '340 مليون',
+      price: '320 مليون',
       subtitle: 'أعلى تقنيات الأمان Level 2 ADAS',
       tag: 'الفخامة والسلامة',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200224/mllnmbyphb9kourqdhuo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200225/b7l7aqopypzcl08kragb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200226/dopawaqanowxiw3ijfts.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200227/zqbijrth8adwwumpihes.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200228/etr4ofmbfbiwob1k5wmc.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200228/zyyysqixeit2fwgowocx.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200229/kh9qdh4lnryxnmpucodp.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200230/yctupbbw7ixhiwy3kxi9.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200231/jzssh91izmjqb8mdoyiw.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200232/xec4zjuhru7xhzlot8ow.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200233/r3p5sksyco6ojqpitrwk.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200233/mh0pau1ewifuhv4vxh34.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200234/vmbdkvc7d4frl9icdesb.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200235/zjmhtn77awwshzb4bi6d.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200236/zre4xt2whr1ruult58ds.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200237/wiytov3wddpd4mnpqir7.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200237/s2cwfqpqevw7wxu4kaqe.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200239/hotuagvi8ogdm4fravob.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200240/sntfd2fuwstnwik676mp.png"],
@@ -167,7 +140,7 @@ export default function ProductTemplate() {
       id: 'battle',
       name: 'Battle',
       badge: 'النسخة الرياضية',
-      price: '350 مليون',
+      price: '325 مليون',
       subtitle: 'أداء رياضي مع عجلات 18 بوصة وعوادم رباعية',
       tag: 'الأداء الأقصى',
       images: ["https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199678/i2kmtu63hvkeaudjn3si.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199683/kaafdy0474hdjdxcvnpy.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199688/crjc06tcnyikghz0tgjo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199693/zabknhntq4caoptpbju4.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199698/ok0j2bclyofxvhgtfqxo.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199702/fur9nwalbfe4lxz0iuzr.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199707/iyok0p1mamnhi8vvvfm6.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199712/larp69xz3twmxxs9jsla.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199717/ddjcsk0bvtidldjwqtdw.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199721/erpwweznw2npietlx6ij.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199726/zlg5doqcqk09s4jfdvv1.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199731/suin1qey1wvvrswbypsv.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199735/pneudvhkpdfcbzbrdkkf.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199740/rjat14dczn4rjk3auo7q.png","https://res.cloudinary.com/ypfk2p2e/image/upload/v1789199744/o4r1vah1rf99zdhrtrr2.png"],
@@ -319,6 +292,7 @@ export default function ProductTemplate() {
     id: 'coolray-2026-battle',
     title: 'Geely Coolray 2026',
     year: '2026',
+    price: '245 مليون',
     mileage: '0 كم جديدة من المصنع',
     mainImg: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=2000&auto=format&fit=crop',
     thumbs: [
@@ -356,7 +330,7 @@ export default function ProductTemplate() {
     const trimBadgeLower = (trim.badge || '').toLowerCase();
     const trimTagLower = (trim.tag || '').toLowerCase();
 
-    // 1. Direct trim ID match (e.g. 'flagship', 'battle', 'starlight', 'superpower', 'supermax', 'auto', 'manual')
+    // 1. Direct trim ID match (e.g. 'flagship', 'battle', 'superpower', 'supermax', 'auto', 'manual')
     let matched = dbCars.find(c => c.titleLower && c.titleLower.includes(trimIdLower));
     if (matched) return matched;
 

@@ -111,7 +111,7 @@ export default function PixelManager() {
     const isMeta = activePlatform === 'meta';
     const testCarId = 'geely-coolray';
     const testCarTitle = 'Geely Coolray 2026';
-    const testPrice = '300 مليون دج';
+    const testPrice = '245 مليون دج';
 
     triggerAllOptimizationEvents({
       carId: testCarId,

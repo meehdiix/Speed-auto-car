@@ -16,8 +16,8 @@ export interface DisplayCarItem {
   [key: string]: any;
 }
 
-const CARS_CACHE_KEY = 'speedauto_cars_cache_v5';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes TTL
+const CARS_CACHE_KEY = 'speedauto_cars_cache_v12';
+const CACHE_TTL_MS = 10 * 1000; // 10 seconds TTL
 
 let memoryCarsCache: DisplayCarItem[] | null = null;
 let cachedRawDbCars: any[] | null = null;
@@ -80,13 +80,16 @@ export function getDefaultCatalogCars(): DisplayCarItem[] {
 
 function loadCarsFromStorage(): DisplayCarItem[] | null {
   try {
-    // Clean up any stale legacy cache versions to avoid showing separated trim cards
+    // Clean up any stale legacy cache versions to avoid showing outdated prices or cards
+    const keysToRemove: string[] = [];
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
-      if (key && key.startsWith('speedauto_cars_') && key !== CARS_CACHE_KEY) {
-        sessionStorage.removeItem(key);
+      if (key && (key.startsWith('speedauto_cars_') || key.includes('cars_cache')) && key !== CARS_CACHE_KEY) {
+        keysToRemove.push(key);
       }
     }
+    keysToRemove.forEach(k => sessionStorage.removeItem(k));
+
     const raw = sessionStorage.getItem(CARS_CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
@@ -120,7 +123,12 @@ export function invalidateCarsCache() {
   pendingPromise = null;
   isFetchingCars = false;
   try {
-    sessionStorage.removeItem(CARS_CACHE_KEY);
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+      const key = sessionStorage.key(i);
+      if (key && (key.startsWith('speedauto_cars_') || key.includes('cars_cache'))) {
+        sessionStorage.removeItem(key);
+      }
+    }
   } catch {
     // silent
   }

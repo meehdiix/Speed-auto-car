@@ -48,7 +48,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'superpower',
         name: 'Superpower',
         badge: 'النسخة القياسية',
-        price: '255 مليون', 
+        price: '245 مليون', 
         subtitle: 'محرك 1.5 تيربو - 181 حصان',
         tag: 'أداء عملي وقوي',
         images: [
@@ -84,7 +84,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'supermax',
         name: 'Supermax',
         badge: 'الاقتصادية',
-        price: '280 مليون', 
+        price: '288 مليون', 
         subtitle: 'محرك 1.5 تنفس طبيعي - 126 حصان',
         tag: 'توفير واقتصاد',
         images: [
@@ -111,37 +111,10 @@ export const carsCatalog: Record<string, CarModel> = {
         ]
       },
       {
-        id: 'starlight',
-        name: 'Starlight',
-        badge: 'نسخة ستارلايت',
-        price: '320 مليون',
-        subtitle: 'محرك 1.5 تيربو - تجهيزات متوازنة',
-        tag: 'توازن وأناقة',
-        images: [
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/adnx5pda6bt6vhcrfmud.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/pmjaw802ydvqae5eumbn.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200324/wkzzmwz4x59rrqs5ribh.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200316/qsitab5jk65luvwkytaa.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/hbuarpbwt8nomf31wfjj.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200315/a5m4lmgpknkqbqinwcvj.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200317/poplno2uuz8qtkf5wanu.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200318/niqxyroholug4aylxbeu.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200321/hbksrlbmurqi1tprf0j9.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200322/bwhivz6n4m7ro6nj0wvo.png",
-          "https://res.cloudinary.com/ypfk2p2e/image/upload/v1789200319/atopn4zted8w7mgvjzup.png"
-        ],
-        heroSpecs: [
-          { icon: Gauge, label: 'المحرك والأداء', value: 'محرك 1.5 لتر تيربو 4 أسطوانات بقوة 181 حصان و 290 نيوتن متر' },
-          { icon: Layers, label: 'ناقل الحركة', value: '7 سرعات مزدوج القابض (7DCT)' },
-          { icon: Sparkles, label: 'التقنية', value: 'شاشة مركزية 10.25 بوصة وكاميرا 360 درجة' },
-          { icon: Flame, label: 'الراحة', value: 'فتحة سقف كهربائية وتجهيزات داخلية مميزة' }
-        ]
-      },
-      {
         id: 'flagship',
         name: 'Flagship',
         badge: 'الفل أوبشن',
-        price: '340 مليون', 
+        price: '320 مليون', 
         subtitle: 'أعلى تقنيات الأمان Level 2 ADAS',
         tag: 'الفخامة والسلامة',
         images: [
@@ -176,7 +149,7 @@ export const carsCatalog: Record<string, CarModel> = {
         id: 'battle',
         name: 'Battle',
         badge: 'النسخة الرياضية',
-        price: '350 مليون', 
+        price: '325 مليون', 
         subtitle: 'أداء رياضي مع عجلات 18 بوصة وعوادم رباعية',
         tag: 'الأداء الأقصى',
         images: [
